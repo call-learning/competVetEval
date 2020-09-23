@@ -1,0 +1,7 @@
+{
+  "name": "competVetEval",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
