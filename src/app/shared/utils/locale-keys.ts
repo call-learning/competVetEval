@@ -1,3 +1,3 @@
 export class LocaleKeys {
-  static exampleKey = "APP_example-key";
+  static schoolChoiceId = "CVE_AUTH-school-choice";
 }

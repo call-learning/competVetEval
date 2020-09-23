@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>school-choice</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div
+    *ngFor="let school of schoolsList"
+    (click)="chooseSchool(school)"
+    class="nnki-mt nnki-pointer"
+  >
+    {{ school.name }}
+  </div>
+</ion-content>
