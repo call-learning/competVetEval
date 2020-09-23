@@ -1,11 +1,11 @@
-import { Injectable } from "@angular/core";
-import { CanLoad, UrlTree } from "@angular/router";
+import { Injectable } from '@angular/core'
+import { CanLoad, UrlTree } from '@angular/router'
 
-import { of, Observable } from "rxjs";
-import { AuthService, LOGIN_STATE } from "../services/auth.service";
+import { of, Observable } from 'rxjs'
+import { AuthService, LOGIN_STATE } from '../services/auth.service'
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class ApplicationIsLoadedGuard implements CanLoad {
   constructor(private authService: AuthService) {}
@@ -18,9 +18,9 @@ export class ApplicationIsLoadedGuard implements CanLoad {
     if (
       this.authService.loginState.getValue() !== LOGIN_STATE.ATTEMPT_TO_RECOVER
     ) {
-      return of(true);
+      return of(true)
     } else {
-      return this.authService.recoverSession();
+      return this.authService.recoverSession()
     }
   }
 }

@@ -1,24 +1,24 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core'
 
-import { Platform } from "@ionic/angular";
+import { Platform } from '@ionic/angular'
 
-import { Capacitor, Plugins } from "@capacitor/core";
+import { Capacitor, Plugins } from '@capacitor/core'
 
 @Component({
-  selector: "app-root",
-  templateUrl: "app.component.html",
-  styleUrls: ["app.component.scss"],
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
   constructor(private platform: Platform) {
-    this.initializeApp();
+    this.initializeApp()
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
-      if (Capacitor.isPluginAvailable("SplashScreen")) {
-        Plugins.SplashScreen.hide();
+      if (Capacitor.isPluginAvailable('SplashScreen')) {
+        Plugins.SplashScreen.hide()
       }
-    });
+    })
   }
 }

@@ -1,10 +1,10 @@
 export class School {
-  id: string;
-  name: string;
-  logo: string;
-  moodleUrl: string;
+  id: string
+  name: string
+  logo: string
+  moodleUrl: string
 
   constructor(input: any) {
-    Object.assign(this, input);
+    Object.assign(this, input)
   }
 }

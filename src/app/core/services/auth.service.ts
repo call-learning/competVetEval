@@ -1,30 +1,30 @@
-import { Injectable } from "@angular/core";
-import { Router } from "@angular/router";
+import { Injectable } from '@angular/core'
+import { Router } from '@angular/router'
 
-import { of, throwError, BehaviorSubject } from "rxjs";
-import { catchError, tap } from "rxjs/operators";
-import { CevUser } from "src/app/shared/models/cev-user.model";
-import { School } from "src/app/shared/models/school.model";
-import { LocaleKeys } from "src/app/shared/utils/locale-keys";
-import { SchoolsProviderService } from "../providers/schools-provider.service";
+import { of, throwError, BehaviorSubject } from 'rxjs'
+import { catchError, tap } from 'rxjs/operators'
+import { CevUser } from 'src/app/shared/models/cev-user.model'
+import { School } from 'src/app/shared/models/school.model'
+import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
+import { SchoolsProviderService } from '../providers/schools-provider.service'
 
 export let LOGIN_STATE = {
-  ATTEMPT_TO_RECOVER: "ATTEMPT_TO_RECOVER",
-  IDLE: "IDLE",
-  LOGGED: "LOGGED",
-};
+  ATTEMPT_TO_RECOVER: 'ATTEMPT_TO_RECOVER',
+  IDLE: 'IDLE',
+  LOGGED: 'LOGGED',
+}
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthService {
-  chosenSchool: School;
+  chosenSchool: School
 
-  loggedUser = new BehaviorSubject<CevUser>(null);
-  loginState = new BehaviorSubject<string>(LOGIN_STATE.ATTEMPT_TO_RECOVER);
+  loggedUser = new BehaviorSubject<CevUser>(null)
+  loginState = new BehaviorSubject<string>(LOGIN_STATE.ATTEMPT_TO_RECOVER)
 
-  accessToken: string;
-  refreshToken: string;
+  accessToken: string
+  refreshToken: string
 
   constructor(
     private router: Router,
@@ -52,15 +52,15 @@ export class AuthService {
   }
 
   logout() {
-    this.router.navigate(["login"]);
+    this.router.navigate(['login'])
 
-    this.cleanAuthLocalStorage();
+    this.cleanAuthLocalStorage()
 
-    this.loginState.next(LOGIN_STATE.IDLE);
-    this.loggedUser.next(null);
+    this.loginState.next(LOGIN_STATE.IDLE)
+    this.loggedUser.next(null)
 
-    this.accessToken = null;
-    this.refreshToken = null;
+    this.accessToken = null
+    this.refreshToken = null
   }
 
   register() {
@@ -79,22 +79,22 @@ export class AuthService {
     if (localStorage.getItem(LocaleKeys.schoolChoiceId)) {
       this.chosenSchool = this.schoolsProviderService.getSchoolFromId(
         localStorage.getItem(LocaleKeys.schoolChoiceId)
-      );
+      )
     }
 
     if (this.variablesInSessionExists()) {
       return this.recoverStorageVariables().pipe(
         tap((res) => {
-          this.loginState.next(LOGIN_STATE.LOGGED);
+          this.loginState.next(LOGIN_STATE.LOGGED)
         }),
         catchError((err) => {
-          this.logout();
-          return throwError(err);
+          this.logout()
+          return throwError(err)
         })
-      );
+      )
     } else {
-      this.loginState.next(LOGIN_STATE.IDLE);
-      return of(true);
+      this.loginState.next(LOGIN_STATE.IDLE)
+      return of(true)
     }
   }
 
@@ -110,7 +110,7 @@ export class AuthService {
   // }
 
   variablesInSessionExists() {
-    return false;
+    return false
     // return (
     //   localStorage.getItem(LocaleKeys.tokenExpiresAt) &&
     //   localStorage.getItem(LocaleKeys.tokenId) &&
@@ -119,7 +119,7 @@ export class AuthService {
   }
 
   isStillLoggedIn() {
-    return false;
+    return false
     // const expiresAt = parseInt(localStorage.getItem(LocaleKeys.tokenExpiresAt), 10);
 
     // if (!expiresAt) {
@@ -141,7 +141,7 @@ export class AuthService {
     //     }
     //   })
     // );
-    return of(false);
+    return of(false)
   }
 
   refreshAuthToken() {
@@ -157,7 +157,7 @@ export class AuthService {
   }
 
   updateUser() {
-    this.loadUserProfile().subscribe();
+    this.loadUserProfile().subscribe()
   }
 
   private loadUserProfile() {
@@ -171,7 +171,7 @@ export class AuthService {
     //     }
     //   })
     // );
-    return of(true);
+    return of(true)
   }
 
   // private setUserProfile(userProfile: CevUser) {
@@ -180,8 +180,8 @@ export class AuthService {
   // }
 
   private cleanAuthLocalStorage() {
-    this.accessToken = null;
-    this.refreshToken = null;
+    this.accessToken = null
+    this.refreshToken = null
     // localStorage.removeItem(LocaleKeys.tokenId);
     // localStorage.removeItem(LocaleKeys.refreshTokenId);
     // localStorage.removeItem(LocaleKeys.tokenExpiresAt);
@@ -189,6 +189,6 @@ export class AuthService {
   }
 
   get loggedUserValue() {
-    return this.loggedUser.getValue();
+    return this.loggedUser.getValue()
   }
 }

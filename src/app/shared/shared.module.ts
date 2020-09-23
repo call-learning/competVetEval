@@ -1,8 +1,8 @@
-import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
-import { ReactiveFormsModule } from "@angular/forms";
+import { CommonModule } from '@angular/common'
+import { NgModule } from '@angular/core'
+import { ReactiveFormsModule } from '@angular/forms'
 
-import { AngularSvgIconModule } from "angular-svg-icon";
+import { AngularSvgIconModule } from 'angular-svg-icon'
 
 @NgModule({
   declarations: [],
