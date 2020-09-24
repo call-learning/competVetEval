@@ -7,7 +7,6 @@ export class HttpExampleService {
   // constructor(private http: HttpClient) {}
   // query() {
   //   return this.http.get("url").pipe(
-  //     retry(2),
   //     map((res: any) => {
   //       res = res.map((raw) => {
   //         return new Example(raw);
@@ -22,7 +21,6 @@ export class HttpExampleService {
   // }
   // get(id: string) {
   //   return this.http.get("url").pipe(
-  //     retry(2),
   //     map((res) => {
   //       return new Example(res);
   //     }),

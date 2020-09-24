@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { of, throwError, BehaviorSubject } from 'rxjs'
-import { catchError, tap } from 'rxjs/operators'
+import { catchError, concatMap, map, tap } from 'rxjs/operators'
+import { LoginResult } from 'src/app/shared/models/auth.model'
 import { CevUser } from 'src/app/shared/models/cev-user.model'
 import { School } from 'src/app/shared/models/school.model'
 import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
+import { HttpAuthService } from '../http-services/http-auth.service'
 import { SchoolsProviderService } from '../providers/schools-provider.service'
 
 export let LOGIN_STATE = {
@@ -24,31 +26,36 @@ export class AuthService {
   loginState = new BehaviorSubject<string>(LOGIN_STATE.ATTEMPT_TO_RECOVER)
 
   accessToken: string
-  refreshToken: string
 
   constructor(
     private router: Router,
-    private schoolsProviderService: SchoolsProviderService
+    private schoolsProviderService: SchoolsProviderService,
+    private httpAuthService: HttpAuthService
   ) {}
 
   login(username: string, password: string) {
-    // this.cleanAuthLocalStorage();
-    // return this.httpUserService.login(username, password).pipe(
-    //   tap((res) => {
-    //     this.setSession(res);
-    //   }),
-    //   concatMap((res) => {
-    //     return this.loadUserProfile();
-    //   }),
-    //   map((resUserProfile) => {
-    //     if (resUserProfile) {
-    //       this.loginState.next(LOGIN_STATE.LOGGED);
-    //       return resUserProfile;
-    //     } else {
-    //       throw new Error('Api data is not valid');
-    //     }
-    //   })
-    // );
+    this.cleanAuthLocalStorage()
+    return this.httpAuthService.login(username, password).pipe(
+      tap((res) => {
+        if (res.errorcode) {
+          throw new Error(res.errorcode)
+        }
+      }),
+      tap((res) => {
+        this.setSession(res)
+      }),
+      concatMap((res) => {
+        return this.loadUserProfile()
+      }),
+      map((resUserProfile) => {
+        if (resUserProfile) {
+          this.loginState.next(LOGIN_STATE.LOGGED)
+          return resUserProfile
+        } else {
+          throw new Error('Api data is not valid')
+        }
+      })
+    )
   }
 
   logout() {
@@ -60,19 +67,6 @@ export class AuthService {
     this.loggedUser.next(null)
 
     this.accessToken = null
-    this.refreshToken = null
-  }
-
-  register() {
-    // return this.httpUserService.register(registerCredentials).pipe(
-    //   map((res) => {
-    //     if (!res || !res.message) {
-    //       throw new Error('Api data is not valid');
-    //     } else {
-    //       return res;
-    //     }
-    //   })
-    // );
   }
 
   recoverSession() {
@@ -98,62 +92,30 @@ export class AuthService {
     }
   }
 
-  // private setSession() {
-  // this.accessToken = loginResult.access_token;
-  // localStorage.setItem(LocaleKeys.tokenId, this.accessToken);
-
-  // this.refreshToken = loginResult.refresh_token;
-  // localStorage.setItem(LocaleKeys.refreshTokenId, this.refreshToken);
-
-  // const expiresAt = (loginResult.expires_in * 1000 + new Date().getTime()).toString();
-  // localStorage.setItem(LocaleKeys.tokenExpiresAt, expiresAt);
-  // }
+  private setSession(loginResult: LoginResult) {
+    this.accessToken = loginResult.token
+    localStorage.setItem(LocaleKeys.tokenId, this.accessToken)
+  }
 
   variablesInSessionExists() {
-    return false
-    // return (
-    //   localStorage.getItem(LocaleKeys.tokenExpiresAt) &&
-    //   localStorage.getItem(LocaleKeys.tokenId) &&
-    //   localStorage.getItem(LocaleKeys.refreshTokenId)
-    // );
+    return localStorage.getItem(LocaleKeys.tokenId)
   }
 
   isStillLoggedIn() {
-    return false
-    // const expiresAt = parseInt(localStorage.getItem(LocaleKeys.tokenExpiresAt), 10);
-
-    // if (!expiresAt) {
-    //   return false;
-    // } else {
-    //   return Date.now() < expiresAt && this.variablesInSessionExists();
-    // }
+    this.variablesInSessionExists()
   }
 
   private recoverStorageVariables() {
-    // this.accessToken = localStorage.getItem(LocaleKeys.tokenId);
-    // this.refreshToken = localStorage.getItem(LocaleKeys.refreshTokenId);
-    // return this.loadUserProfile().pipe(
-    //   map((res) => {
-    //     if (res) {
-    //       return true;
-    //     } else {
-    //       return false;
-    //     }
-    //   })
-    // );
-    return of(false)
-  }
-
-  refreshAuthToken() {
-    // return this.httpUserService.refreshAuthToken(this.refreshToken).pipe(
-    //   tap((authResult) => {
-    //     this.setSession(authResult);
-    //   }),
-    //   catchError((error) => {
-    //     this.logout();
-    //     return throwError(error);
-    //   })
-    // );
+    this.accessToken = localStorage.getItem(LocaleKeys.tokenId)
+    return this.loadUserProfile().pipe(
+      map((res) => {
+        if (res) {
+          return true
+        } else {
+          return false
+        }
+      })
+    )
   }
 
   updateUser() {
@@ -161,31 +123,28 @@ export class AuthService {
   }
 
   private loadUserProfile() {
-    // return this.httpUserService.getUserProfile().pipe(
-    //   map((res) => {
-    //     if (res && res.user) {
-    //       this.setUserProfile(res.user);
-    //       return res.user;
-    //     } else {
-    //       throw new Error('Api data is not valid');
-    //     }
-    //   })
-    // );
-    return of(true)
+    return this.httpAuthService.getUserProfile().pipe(
+      map((res) => {
+        if (res) {
+          this.setUserProfile(res)
+          return res
+        } else {
+          throw new Error('Api data is not valid')
+        }
+      })
+    )
   }
 
-  // private setUserProfile(userProfile: CevUser) {
-  // this.loggedUser.next(userProfile);
-  // localStorage.setItem(LocaleKeys.authProfile, JSON.stringify(userProfile));
-  // }
+  private setUserProfile(userProfile: CevUser) {
+    this.loggedUser.next(userProfile)
+    localStorage.setItem(LocaleKeys.authProfile, JSON.stringify(userProfile))
+  }
 
   private cleanAuthLocalStorage() {
     this.accessToken = null
-    this.refreshToken = null
-    // localStorage.removeItem(LocaleKeys.tokenId);
-    // localStorage.removeItem(LocaleKeys.refreshTokenId);
-    // localStorage.removeItem(LocaleKeys.tokenExpiresAt);
-    // localStorage.removeItem(LocaleKeys.authProfile);
+
+    localStorage.removeItem(LocaleKeys.tokenId)
+    localStorage.removeItem(LocaleKeys.authProfile)
   }
 
   get loggedUserValue() {

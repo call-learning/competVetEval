@@ -14,13 +14,13 @@ export class SchoolsProviderService {
         id: 'enva',
         name: 'EnvA',
         logo: 'xxx',
-        moodleUrl: 'xxx',
+        moodleUrl: 'https://cveteval.call-learning.fr',
       },
       {
         id: 'oniris',
         name: 'Oniris',
         logo: 'xxx',
-        moodleUrl: 'xxx',
+        moodleUrl: 'https://cveteval.call-learning.fr',
       },
     ]
   }
