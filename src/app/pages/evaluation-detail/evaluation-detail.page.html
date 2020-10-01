@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button [routerLink]="['/rotation-detail', 1]">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Rotation #4 (Henri Chateau)</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item *ngFor="let critery of [0, 0, 0, 0]">
+      <ion-label>
+        <p>Savoir être, qualités personnelles et professionnelles</p>
+        <p>
+          <small>4/9 sous critères</small>
+        </p>
+      </ion-label>
+      <ion-icon name="happy" slot="end"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <p>
+    <strong>Commentaires</strong>
+  </p>
+
+  <p>
+    Courageux, autonome, Laurent a fait preuve de tenacité pendant cette
+    rotation.
+  </p>
+
+  <p>
+    <strong>Commentaire étudiant</strong>
+  </p>
+
+  <form
+    [formGroup]="answerEvaluationForm"
+    (ngSubmit)="answerEvaluation()"
+    (keyup.enter)="answerEvaluation()"
+  >
+    <ion-item>
+      <ion-label position="floating">Droit de réponse</ion-label>
+      <ion-textarea formControlName="answer"></ion-textarea>
+    </ion-item>
+
+    <ion-button color="primary" expand="block" (click)="answerEvaluation()">
+      Répondre
+    </ion-button>
+
+    <div *ngIf="errorMsg">{{ errorMsg }}</div>
+  </form>
+</ion-content>

@@ -5,17 +5,17 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 
 import { SharedModule } from 'src/app/shared/shared.module'
-import { RotationsListPageRoutingModule } from './rotations-list-routing.module'
-import { RotationsListPage } from './rotations-list.page'
+import { AskEvaluationPageRoutingModule } from './ask-evaluation-routing.module'
+import { AskEvaluationPage } from './ask-evaluation.page'
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    RotationsListPageRoutingModule,
+    AskEvaluationPageRoutingModule,
     SharedModule,
   ],
-  declarations: [RotationsListPage],
+  declarations: [AskEvaluationPage],
 })
-export class RotationsListPageModule {}
+export class AskEvaluationPageModule {}

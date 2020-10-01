@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
+import { SharedModule } from 'src/app/shared/shared.module'
 import { SchoolChoicePageRoutingModule } from './school-choice-routing.module'
 import { SchoolChoicePage } from './school-choice.page'
 
@@ -13,6 +14,7 @@ import { SchoolChoicePage } from './school-choice.page'
     FormsModule,
     IonicModule,
     SchoolChoicePageRoutingModule,
+    SharedModule,
   ],
   declarations: [SchoolChoicePage],
 })
