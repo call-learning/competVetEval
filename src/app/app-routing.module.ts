@@ -3,12 +3,13 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
 import { ApplicationIsLoadedGuard } from './core/guards/application-is-loaded.guard'
 import { AuthenticatedGuard } from './core/guards/authenticated.guard'
+import { GuestGuard } from './core/guards/guest.guard'
 import { SchoolGuard } from './core/guards/school.guard'
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'rotations-list',
     pathMatch: 'full',
   },
   {
@@ -18,13 +19,14 @@ const routes: Routes = [
         (m) => m.SchoolChoicePageModule
       ),
     canLoad: [ApplicationIsLoadedGuard],
+    canActivate: [GuestGuard],
   },
   {
     path: 'login',
     loadChildren: () =>
       import('./pages/login/login.module').then((m) => m.LoginPageModule),
     canLoad: [ApplicationIsLoadedGuard],
-    canActivate: [SchoolGuard],
+    canActivate: [SchoolGuard, GuestGuard],
   },
   {
     path: 'rotations-list',

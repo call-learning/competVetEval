@@ -1,10 +1,11 @@
 import {
+  HttpEvent,
+  HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpHandler,
-  HttpEvent,
 } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+
 import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
 
@@ -19,6 +20,13 @@ export class FormatRequestInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(timeout(TIME_OUT_DELAY))
+    const clonedRequest = request.clone({
+      headers: request.headers.set(
+        'Accept',
+        'application/json, text/plain, */*'
+      ),
+    })
+
+    return next.handle(clonedRequest).pipe(timeout(TIME_OUT_DELAY))
   }
 }

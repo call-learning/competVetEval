@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
+
 import { LoadingController } from '@ionic/angular'
-import { debounceTime } from 'rxjs/operators'
+
 import { AuthService } from 'src/app/core/services/auth.service'
 
 @Component({
@@ -48,6 +49,8 @@ export class LoginPage implements OnInit {
           .subscribe(
             (res) => {
               this.router.navigate(['/rotations-list'])
+              this.loader.dismiss()
+              this.isLoading = false
             },
             (err: Error) => {
               if (err.message === 'invalidlogin') {
