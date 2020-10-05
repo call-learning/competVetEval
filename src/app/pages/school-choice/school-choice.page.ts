@@ -1,3 +1,4 @@
+import { AuthService } from './../../core/services/auth.service'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 
@@ -15,7 +16,8 @@ export class SchoolChoicePage implements OnInit {
 
   constructor(
     private schoolsProviderService: SchoolsProviderService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -23,7 +25,7 @@ export class SchoolChoicePage implements OnInit {
   }
 
   chooseSchool(school: School) {
-    localStorage.setItem(LocaleKeys.schoolChoiceId, school.id)
+    this.authService.setChosenSchool(school)
     this.router.navigate(['/login'])
   }
 }
