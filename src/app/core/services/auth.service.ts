@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 
-import { of, throwError, BehaviorSubject } from 'rxjs'
+import { of, throwError, BehaviorSubject, Subject } from 'rxjs'
 import { catchError, concatMap, map, tap } from 'rxjs/operators'
 import { LoginResult } from 'src/app/shared/models/auth.model'
 import { CevUser } from 'src/app/shared/models/cev-user.model'
@@ -69,6 +69,11 @@ export class AuthService {
     this.loggedUser.next(null)
 
     this.accessToken = null
+  }
+
+  setChosenSchool(school: School) {
+    localStorage.setItem(LocaleKeys.schoolChoiceId, school.id)
+    this.chosenSchool = school
   }
 
   recoverSession() {
