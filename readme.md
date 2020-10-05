@@ -19,22 +19,9 @@ npx cap add android|ios
 
 # Configuration android
 
-android/app/src/main/AndroidManifest.xml -> package name + activity name
+android/app/src/main/AndroidManifest.xml -> package name
 android/app/src/main/res/values/strings.xml -> all
-
-# Configuration ios
-
-TODO
-
-# Build
-
-ionic build --prod
-
-npx cap copy (android|ios) OR npm cap sync (android|ios)
-
-(copy -> web assets only / sync -> also updates native dependencies)
-
-npx cap open android|ios
+android/app/build.gradle -> Modify package name
 
 # Update platforms (after plugin installation)
 
@@ -43,3 +30,30 @@ npx cap update
 # Icons and splashscreens
 
 cordova-res (android|ios) --skip-config --copy
+
+resources/icon.png (1024x1024)
+resources/splash.png (2732x2732 + elements in 1200x1200 square)
+resources/android/icon-background.png
+resources/android/icon-foreground.png
+
+# Configuration ios
+
+TODO
+
+# Build android
+
+android/app/build.gradle -> Modify version number + name
+
+ionic build --prod
+
+npx cap copy android OR npm cap sync android
+
+(copy -> web assets only / sync -> also updates native dependencies)
+
+npx cap open android
+
+From Android studio Build > Build bundle or APK
+
+# Build ios
+
+TODO
