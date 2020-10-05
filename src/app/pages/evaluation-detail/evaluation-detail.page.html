@@ -5,13 +5,16 @@
         <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Rotation #4 (Henri Chateau)</ion-title>
+    <ion-title> Rotation #4 (Henri Chateau) </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <ion-list>
-    <ion-item *ngFor="let critery of [0, 0, 0, 0]">
+    <ion-item
+      *ngFor="let criterion of [0, 0, 0, 0]"
+      [routerLink]="['/criterion-detail', 1, 1, 1]"
+    >
       <ion-label>
         <p>Savoir être, qualités personnelles et professionnelles</p>
         <p>
@@ -31,24 +34,26 @@
     rotation.
   </p>
 
-  <p>
-    <strong>Commentaire étudiant</strong>
-  </p>
+  <ng-container *ngIf="authService.isStudentMode">
+    <p>
+      <strong>Commentaire étudiant</strong>
+    </p>
 
-  <form
-    [formGroup]="answerEvaluationForm"
-    (ngSubmit)="answerEvaluation()"
-    (keyup.enter)="answerEvaluation()"
-  >
-    <ion-item>
-      <ion-label position="floating">Droit de réponse</ion-label>
-      <ion-textarea formControlName="answer"></ion-textarea>
-    </ion-item>
+    <form
+      [formGroup]="answerEvaluationForm"
+      (ngSubmit)="answerEvaluation()"
+      (keyup.enter)="answerEvaluation()"
+    >
+      <ion-item>
+        <ion-label position="floating">Droit de réponse</ion-label>
+        <ion-textarea formControlName="answer"></ion-textarea>
+      </ion-item>
 
-    <ion-button color="primary" expand="block" (click)="answerEvaluation()">
-      Répondre
-    </ion-button>
+      <ion-button color="primary" expand="block" (click)="answerEvaluation()">
+        Répondre
+      </ion-button>
 
-    <div *ngIf="errorMsg">{{ errorMsg }}</div>
-  </form>
+      <div *ngIf="errorMsg">{{ errorMsg }}</div>
+    </form>
+  </ng-container>
 </ion-content>

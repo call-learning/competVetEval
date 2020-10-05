@@ -17,6 +17,18 @@ export class SchoolsProviderService {
         moodleUrl: 'https://cveteval.call-learning.fr',
       },
       {
+        id: 'vet-agro-sup',
+        name: 'VetAgro Sup',
+        logo: 'xxx',
+        moodleUrl: 'https://cveteval.call-learning.fr',
+      },
+      {
+        id: 'envt',
+        name: 'envt',
+        logo: 'xxx',
+        moodleUrl: 'https://cveteval.call-learning.fr',
+      },
+      {
         id: 'oniris',
         name: 'Oniris',
         logo: 'xxx',

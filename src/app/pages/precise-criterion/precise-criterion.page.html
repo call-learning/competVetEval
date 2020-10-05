@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button [routerLink]="['/start-evaluation', 1]">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="help()">
+        <ion-icon slot="icon-only" name="help"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Savoir être</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form
+    [formGroup]="criterionForm"
+    (ngSubmit)="saveCriterion()"
+    (keyup.enter)="saveCriterion()"
+  >
+    <ion-list>
+      <ion-item *ngFor="let subcriterion of [0, 0, 0, 0]">
+        <ion-label>
+          <p>Ponctualité</p>
+          <div>
+            <ion-icon
+              name="happy"
+              slot="end"
+              *ngFor="let smiley of [0, 0, 0, 0, 0]"
+            ></ion-icon>
+          </div>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <p>
+      <strong>Commentaires</strong>
+    </p>
+
+    <ion-item>
+      <ion-label position="floating"
+        >Points fort, points faibles, pistes de progression...</ion-label
+      >
+      <ion-textarea formControlName="comments"></ion-textarea>
+    </ion-item>
+
+    <ion-button color="primary" expand="block" (click)="saveCriterion()">
+      Enregistrer
+    </ion-button>
+
+    <div *ngIf="errorMsg">{{ errorMsg }}</div>
+  </form>
+</ion-content>

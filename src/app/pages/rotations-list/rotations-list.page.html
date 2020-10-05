@@ -1,16 +1,23 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button>
+      <ion-button (click)="openMenu()">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button>
+      <ion-button (click)="filterRotations()">
         <ion-icon slot="icon-only" name="filter"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Mes évaluations</ion-title>
+    <ion-title>
+      <ng-container *ngIf="authService.isStudentMode">
+        Mes évaluations
+      </ng-container>
+      <ng-container *ngIf="authService.isEvaluatorMode">
+        Évaluations
+      </ng-container>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -34,7 +41,36 @@
         </div>
       </div>
     </ion-card-header>
+    <ion-card-content>
+      <ng-container *ngIf="authService.isStudentMode">
+        3 critères sur 4 ont été évalués
+      </ng-container>
 
-    <ion-card-content> 3 critères sur 4 ont été évalués </ion-card-content>
+      <ng-container *ngIf="authService.isEvaluatorMode">
+        <div class="evaluator-content">
+          <div>
+            <ion-icon
+              name="person"
+              slot="start"
+              class="ion-margin-end"
+            ></ion-icon>
+            <em>Laurent DAVID</em>
+          </div>
+          <div>4/4</div>
+        </div>
+      </ng-container>
+    </ion-card-content>
   </ion-card>
+
+  <ion-fab
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed"
+    *ngIf="authService.isEvaluatorMode"
+    [routerLink]="['/create-evaluation']"
+  >
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

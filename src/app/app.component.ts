@@ -3,6 +3,7 @@ import { Component } from '@angular/core'
 import { Platform } from '@ionic/angular'
 
 import { Capacitor, Plugins } from '@capacitor/core'
+import { AuthService } from './core/services/auth.service'
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,7 @@ import { Capacitor, Plugins } from '@capacitor/core'
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private platform: Platform) {
+  constructor(private platform: Platform, public authService: AuthService) {
     this.initializeApp()
   }
 
@@ -20,5 +21,13 @@ export class AppComponent {
         Plugins.SplashScreen.hide()
       }
     })
+  }
+
+  toggleUserRole() {
+    if (this.authService.isStudentMode) {
+      this.authService.currentUserRole = 'evaluator'
+    } else if (this.authService.isEvaluatorMode) {
+      this.authService.currentUserRole = 'student'
+    }
   }
 }

@@ -27,6 +27,8 @@ export class AuthService {
 
   accessToken: string
 
+  currentUserRole: 'student' | 'evaluator' = 'evaluator'
+
   constructor(
     private router: Router,
     private schoolsProviderService: SchoolsProviderService,
@@ -149,5 +151,13 @@ export class AuthService {
 
   get loggedUserValue() {
     return this.loggedUser.getValue()
+  }
+
+  get isStudentMode() {
+    return this.currentUserRole === 'student'
+  }
+
+  get isEvaluatorMode() {
+    return this.currentUserRole === 'evaluator'
   }
 }

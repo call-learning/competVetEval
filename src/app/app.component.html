@@ -1,3 +1,31 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-menu
+    side="start"
+    menuId="main"
+    contentId="main"
+    type="overlay"
+    [disabled]="!authService.loggedUserValue"
+  >
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Menu</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item button (click)="toggleUserRole()">
+          Passer en mode
+          <ng-container *ngIf="authService.currentUserRole == 'student'">
+            évaluateur
+          </ng-container>
+          <ng-container *ngIf="authService.currentUserRole == 'evaluator'">
+            étudiant
+          </ng-container>
+        </ion-item>
+        <ion-item button (click)="authService.logout()">Déconnexion</ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+  <ion-router-outlet id="main"></ion-router-outlet>
 </ion-app>

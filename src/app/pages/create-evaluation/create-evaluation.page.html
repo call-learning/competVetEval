@@ -1,21 +1,21 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/rotation-detail', 1]">
+      <ion-button [routerLink]="['/rotations-list']">
         <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button (click)="more()">
-        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+      <ion-button (click)="help()">
+        <ion-icon slot="icon-only" name="help"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Evaluation Rotation #2</ion-title>
+    <ion-title>Nouvelle évaluation</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <p>Présentez ce QR Code à votre évaluateur</p>
+  <p>Scannez le QR code présenté par l'étudiant</p>
 
   <img src="https://via.placeholder.com/500x500" />
 </ion-content>

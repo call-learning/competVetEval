@@ -40,3 +40,12 @@
     }
   }
 }
+
+.evaluator-content {
+  display: flex;
+  justify-content: space-between;
+
+  ion-icon {
+    margin-right: 5px;
+  }
+}

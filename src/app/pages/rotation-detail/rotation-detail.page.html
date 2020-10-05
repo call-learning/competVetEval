@@ -18,7 +18,27 @@
   <img src="https://via.placeholder.com/500x300" />
   <p>4-10 juillet 2020</p>
 
-  <p><strong>Evaluations</strong></p>
+  <ng-container *ngIf="authService.isEvaluatorMode">
+    <p><strong>Étudiant</strong></p>
+
+    <ion-list>
+      <ion-item>
+        <ion-icon name="person" slot="start"></ion-icon>
+        <ion-label> Laurent DAVID </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <p>
+    <strong>
+      <ng-container *ngIf="authService.isStudentMode">
+        Évaluations
+      </ng-container>
+      <ng-container *ngIf="authService.isEvaluatorMode">
+        Autres évaluations
+      </ng-container>
+    </strong>
+  </p>
 
   <ion-list>
     <ion-item
@@ -30,11 +50,33 @@
     </ion-item>
   </ion-list>
 
-  <ion-button
-    color="primary"
-    expand="block"
-    [routerLink]="['/ask-evaluation', 1]"
-  >
-    Demander une évaluation
-  </ion-button>
+  <div class="ion-margin-top">
+    <ion-button
+      color="primary"
+      expand="block"
+      [routerLink]="['/ask-evaluation', 1]"
+      *ngIf="authService.isStudentMode"
+    >
+      Demander une évaluation
+    </ion-button>
+
+    <ng-container *ngIf="authService.isEvaluatorMode">
+      <ion-button
+        color="primary"
+        expand="block"
+        [routerLink]="['/start-evaluation', 1]"
+      >
+        Démarrer l'évaluation
+      </ion-button>
+
+      <ion-button
+        color="primary"
+        fill="outline"
+        expand="block"
+        (click)="saveForLater()"
+      >
+        Enregistrer pour plus tard
+      </ion-button>
+    </ng-container>
+  </div>
 </ion-content>
