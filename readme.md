@@ -23,6 +23,11 @@ android/app/src/main/AndroidManifest.xml -> package name
 android/app/src/main/res/values/strings.xml -> all
 android/app/build.gradle -> Modify package name
 
+# Configuration ios
+
+Générer sur portail apple appid, certificats, profils
+Configurer Signing et capabilities dans Xcode
+
 # Update platforms (after plugin installation)
 
 npx cap update
@@ -35,10 +40,6 @@ resources/icon.png (1024x1024)
 resources/splash.png (2732x2732 + elements in 1200x1200 square)
 resources/android/icon-background.png
 resources/android/icon-foreground.png
-
-# Configuration ios
-
-TODO
 
 # Build android
 
@@ -56,4 +57,13 @@ From Android studio Build > Build bundle or APK
 
 # Build ios
 
-TODO
+ionic build --prod
+
+npx cap copy ios OR npm cap sync ios
+
+(copy -> web assets only / sync -> also updates native dependencies)
+
+From Xcode >
+
+Modify version number + name
+Product > Archive
