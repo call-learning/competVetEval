@@ -2,13 +2,14 @@ import { CommonModule } from '@angular/common'
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 
+import { AngularSvgIconModule } from 'angular-svg-icon'
 import { AddTokenInterceptor } from './interceptors/add-token.interceptor'
 import { FormatRequestInterceptor } from './interceptors/format-request.interceptor'
 import { UseSchoolUrlInterceptor } from './interceptors/use-school-url.interceptor'
 
 @NgModule({
   declarations: [],
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, AngularSvgIconModule.forRoot()],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

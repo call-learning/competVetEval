@@ -1,10 +1,9 @@
-import { AuthService } from './../../core/services/auth.service'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { SchoolsProviderService } from 'src/app/core/providers/schools-provider.service'
 import { School } from 'src/app/shared/models/school.model'
-import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
+import { AuthService } from './../../core/services/auth.service'
 
 @Component({
   selector: 'app-school-choice',
