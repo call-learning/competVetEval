@@ -63,6 +63,8 @@ npx cap copy ios OR npm cap sync ios
 
 (copy -> web assets only / sync -> also updates native dependencies)
 
+npx cap open ios
+
 From Xcode >
 
 Modify version number + name
