@@ -18,8 +18,10 @@ export class AddTokenInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    if (this.authService.accessToken) {
-      request.body.append('wstoken', this.authService.accessToken)
+    if (request.url.indexOf('svg-icons/') === -1) {
+      if (this.authService.accessToken) {
+        request.body.append('wstoken', this.authService.accessToken)
+      }
     }
 
     return next.handle(request).pipe(

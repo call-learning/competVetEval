@@ -17,13 +17,15 @@ export class UseSchoolUrlInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    if (this.authService.chosenSchool) {
-      const newUrl = {
-        url: this.authService.chosenSchool.moodleUrl + request.url,
-        urlWithParams:
-          this.authService.chosenSchool.moodleUrl + request.urlWithParams,
+    if (request.url.indexOf('svg-icons/') === -1) {
+      if (this.authService.chosenSchool) {
+        const newUrl = {
+          url: this.authService.chosenSchool.moodleUrl + request.url,
+          urlWithParams:
+            this.authService.chosenSchool.moodleUrl + request.urlWithParams,
+        }
+        request = Object.assign(request, newUrl)
       }
-      request = Object.assign(request, newUrl)
     }
 
     return next.handle(request)

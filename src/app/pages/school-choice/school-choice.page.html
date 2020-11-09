@@ -1,17 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Choix école</ion-title>
+    <ion-title>Sélection de l'école</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list>
-    <ion-item
-      button
-      *ngFor="let school of schoolsList"
-      (click)="chooseSchool(school)"
-    >
-      {{ school.name }}
-    </ion-item>
-  </ion-list>
+  <a
+    class="card card--school"
+    *ngFor="let school of schoolsList"
+    (click)="chooseSchool(school)"
+  >
+    <img [src]="school.logo" />
+  </a>
 </ion-content>

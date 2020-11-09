@@ -18,9 +18,11 @@ export class LoginPage implements OnInit {
   loader: HTMLIonLoadingElement
   isLoading = false
 
+  formSubmitted = false
+
   constructor(
     private formBuilder: FormBuilder,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router,
     private loadingController: LoadingController
   ) {
@@ -39,6 +41,7 @@ export class LoginPage implements OnInit {
   login() {
     if (!this.isLoading) {
       this.errorMsg = ''
+      this.formSubmitted = true
 
       if (this.loginForm.valid) {
         this.loader.present()

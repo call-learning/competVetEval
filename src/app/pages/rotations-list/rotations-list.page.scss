@@ -1,51 +1,43 @@
-.badges {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+.rotations-list__toolbar {
+  padding: 0 20px 10px 20px;
+  width: 100%;
+}
 
+.rotations-list__top-toolbar {
   display: flex;
   align-items: center;
 
-  > div {
-    margin: 0 5px;
-    position: relative;
+  .rotations-list__avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: 10px;
+    overflow: hidden;
 
-    ion-icon {
-      font-size: 20px;
-      color: var(--ion-color-dark);
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      object-fit: cover;
     }
+  }
 
-    &.-noValue {
-      ion-icon {
-        color: var(--ion-color-medium);
-      }
-    }
-
-    .badge-value {
-      position: absolute;
-      top: -3px;
-      right: -3px;
-
-      background: var(--ion-color-danger);
-      border-radius: 50%;
-      width: 10px;
-      height: 10px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      color: var(--ion-color-danger-contrast);
-      font-size: 10px;
-    }
+  .rotations-list__title {
+    font-size: 34px;
+    font-weight: 700;
   }
 }
 
-.evaluator-content {
+.rotations-list__bottom-toolbar {
+  margin-top: 20px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
 
-  ion-icon {
-    margin-right: 5px;
+  ion-segment {
+    margin: 0;
   }
 }

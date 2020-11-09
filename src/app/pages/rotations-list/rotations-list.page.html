@@ -1,66 +1,118 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="openMenu()">
-        <ion-icon slot="icon-only" name="menu"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button (click)="filterRotations()">
-        <ion-icon slot="icon-only" name="filter"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title>
-      <ng-container *ngIf="authService.isStudentMode">
-        Mes évaluations
-      </ng-container>
-      <ng-container *ngIf="authService.isEvaluatorMode">
-        Évaluations
-      </ng-container>
-    </ion-title>
+  <ion-toolbar color="primary">
+    <div class="rotations-list__toolbar">
+      <div class="rotations-list__top-toolbar">
+        <div class="rotations-list__avatar" (click)="openMenu()">
+          <img src="https://via.placeholder.com/50x50" />
+        </div>
+        <div class="rotations-list__title">
+          <ng-container *ngIf="authService.isStudentMode">
+            Rotations
+          </ng-container>
+          <ng-container *ngIf="authService.isEvaluatorMode">
+            Évaluations
+          </ng-container>
+        </div>
+      </div>
+      <div class="rotations-list__bottom-toolbar">
+        <ion-segment
+          (ionChange)="segmentChanged($event)"
+          value="to_evaluate"
+          mode="ios"
+        >
+          <ion-segment-button value="to_evaluate">
+            À évaluer
+          </ion-segment-button>
+          <ion-segment-button value="all"> Toutes </ion-segment-button>
+        </ion-segment>
+
+        <button
+          class="btn btn-primary btn-icon-left btn-light"
+          (click)="filterRotations()"
+        >
+          <ion-icon name="filter"></ion-icon>
+          Filtrer
+        </button>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-card
-    [routerLink]="['/rotation-detail', rotation]"
-    *ngFor="let rotation of [1, 2, 3, 4]"
-  >
-    <ion-card-header>
-      <ion-card-title>Rotation</ion-card-title>
-      <ion-card-subtitle>10-14 Août 2020</ion-card-subtitle>
-
-      <div class="badges">
-        <div class="users-badge">
-          <ion-icon slot="icon-only" name="happy"></ion-icon>
-          <div class="badge-value">4</div>
-        </div>
-
-        <div class="discussion-badge -noValue">
-          <ion-icon slot="icon-only" name="chatbubbles"></ion-icon>
+  <div class="rotations-list__list">
+    <div
+      class="rotation__item"
+      [routerLink]="['/rotation-detail', rotation.id]"
+      *ngFor="let rotation of rotations"
+    >
+      <div class="rotation__item-image" *ngIf="rotation.type == 'evaluator'">
+        <img [src]="rotation.image" />
+      </div>
+      <div class="rotation__item-content">
+        <div class="rotation__item-title">{{ rotation.title }}</div>
+        <div class="rotation__item-subtitle">{{ rotation.subtitle }}</div>
+        <div class="rotation__item-infos">
+          <ng-container *ngIf="rotation.type == 'student'">
+            <div class="rotation__item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-smile.svg"
+                [svgStyle]="{ 'width.px':21 }"
+              ></svg-icon>
+              <span>{{ rotation.evaluated}}</span>
+            </div>
+            <div class="rotation__item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-comment.svg"
+                [svgStyle]="{ 'width.px':23 }"
+              ></svg-icon>
+              <span>{{ rotation.comments }}</span>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="rotation.type == 'evaluator'">
+            <div class="rotations__item-info">
+              <ng-container *ngIf="rotation.status == 'in_progress'">
+                <svg-icon
+                  src="assets/images/svg-icons/icon-times-light.svg"
+                  [svgStyle]="{ 'width.px':21 }"
+                ></svg-icon>
+                <span>Rotation non validée</span>
+              </ng-container>
+              <ng-container *ngIf="rotation.status == 'done'">
+                <svg-icon
+                  src="assets/images/svg-icons/icon-check-light.svg"
+                  [svgStyle]="{ 'width.px':21 }"
+                ></svg-icon>
+                Rotation validée
+              </ng-container>
+            </div>
+          </ng-container>
         </div>
       </div>
-    </ion-card-header>
-    <ion-card-content>
-      <ng-container *ngIf="authService.isStudentMode">
-        3 critères sur 4 ont été évalués
-      </ng-container>
+      <div
+        class="rotation__item-icon"
+        [class.-done]="rotation.status == 'done'"
+        [class.-todo]="rotation.status == 'todo'"
+      >
+        <svg-icon
+          src="assets/images/svg-icons/icon-check.svg"
+          [svgStyle]="{ 'width.px':26 }"
+          *ngIf="rotation.status == 'done'"
+        ></svg-icon>
 
-      <ng-container *ngIf="authService.isEvaluatorMode">
-        <div class="evaluator-content">
-          <div>
-            <ion-icon
-              name="person"
-              slot="start"
-              class="ion-margin-end"
-            ></ion-icon>
-            <em>Laurent DAVID</em>
-          </div>
-          <div>4/4</div>
-        </div>
-      </ng-container>
-    </ion-card-content>
-  </ion-card>
+        <svg-icon
+          src="assets/images/svg-icons/icon-donut.svg"
+          [svgStyle]="{ 'width.px':24 }"
+          *ngIf="rotation.status == 'in_progress'"
+        ></svg-icon>
+
+        <svg-icon
+          src="assets/images/svg-icons/icon-warning.svg"
+          [svgStyle]="{ 'width.px':26 }"
+          *ngIf="rotation.status == 'todo'"
+        ></svg-icon>
+      </div>
+    </div>
+  </div>
 
   <ion-fab
     vertical="bottom"

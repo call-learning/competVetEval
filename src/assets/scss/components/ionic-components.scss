@@ -1,0 +1,30 @@
+// toolbar
+
+ion-title {
+  padding-left: unset;
+  padding-right: unset;
+  padding-inline-start: 20px;
+  padding-inline-end: 20px;
+}
+
+.sc-ion-buttons-ios-s ion-button,
+.sc-ion-buttons-md-s ion-button {
+  font-size: 14px;
+}
+
+.sc-ion-buttons-ios-s ion-icon[slot='start'],
+.sc-ion-buttons-md-s ion-icon[slot='start'] {
+  margin-inline-end: 3px;
+}
+
+ion-button {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+// buttons
+
+ion-fab-button {
+  width: 48px;
+  height: 48px;
+}

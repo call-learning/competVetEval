@@ -20,12 +20,15 @@ export class FormatRequestInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const clonedRequest = request.clone({
-      headers: request.headers.set(
-        'Accept',
-        'application/json, text/plain, */*'
-      ),
-    })
+    let clonedRequest = request
+    if (request.url.indexOf('svg-icons/') === -1) {
+      clonedRequest = request.clone({
+        headers: request.headers.set(
+          'Accept',
+          'application/json, text/plain, */*'
+        ),
+      })
+    }
 
     return next.handle(clonedRequest).pipe(timeout(TIME_OUT_DELAY))
   }

@@ -13,25 +13,25 @@ export class SchoolsProviderService {
       {
         id: 'enva',
         name: 'EnvA',
-        logo: 'xxx',
-        moodleUrl: 'https://cveteval.call-learning.fr',
-      },
-      {
-        id: 'vet-agro-sup',
-        name: 'VetAgro Sup',
-        logo: 'xxx',
-        moodleUrl: 'https://cveteval.call-learning.fr',
-      },
-      {
-        id: 'envt',
-        name: 'envt',
-        logo: 'xxx',
+        logo: 'assets/images/schools/logo-enva.png',
         moodleUrl: 'https://cveteval.call-learning.fr',
       },
       {
         id: 'oniris',
         name: 'Oniris',
-        logo: 'xxx',
+        logo: 'assets/images/schools/logo-oniris.png',
+        moodleUrl: 'https://cveteval.call-learning.fr',
+      },
+      {
+        id: 'envt',
+        name: 'envt',
+        logo: 'assets/images/schools/logo-envt.png',
+        moodleUrl: 'https://cveteval.call-learning.fr',
+      },
+      {
+        id: 'vet-agro-sup',
+        name: 'VetAgro Sup',
+        logo: 'assets/images/schools/logo-vetagro.png',
         moodleUrl: 'https://cveteval.call-learning.fr',
       },
     ]

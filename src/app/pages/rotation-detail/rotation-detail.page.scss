@@ -1,0 +1,61 @@
+.rotation-detail__illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 20px;
+
+  img {
+    object-fit: cover;
+    box-shadow: 0 26px 15px -14px rgba(59, 87, 85, 0.23);
+  }
+}
+
+.rotation-detail__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 35px;
+
+  .rotation-detail__header-content {
+    flex-grow: 1;
+  }
+
+  .rotation-detail__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .rotation-detail__subtitle {
+    font-size: 17px;
+  }
+}
+
+.rotation-detail__evaluations-title {
+  font-size: 17px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.rotation-detail__student {
+  margin-bottom: 20px;
+}
+
+.rotation-detail__no-evaluations {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.5;
+  padding: 0 20px;
+}
+
+.rotation__item-subtitle {
+  span {
+    opacity: 0.5;
+  }
+}
+
+.rotation-detail__ask-evaluation {
+  margin-top: 25px;
+}

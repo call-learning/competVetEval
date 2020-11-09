@@ -2,29 +2,58 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button [routerLink]="['/school-choice']">
-        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        Écoles
       </ion-button>
     </ion-buttons>
-    <ion-title>Login</ion-title>
+    <ion-title>Identification</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <form [formGroup]="loginForm" (ngSubmit)="login()" (keyup.enter)="login()">
-    <ion-item>
-      <ion-label position="floating">Nom d'utilisateur</ion-label>
+<ion-content class="ion-padding ion-text-center">
+  <img [src]="authService.chosenSchool.logo" class="login__school-logo" />
+
+  <button class="btn btn-primary btn-full btn-icon-right">
+    Se connecter avec <img src="assets/images/logos/logo-cas.png" />
+  </button>
+
+  <p class="login__form-separator">
+    <span> ou </span>
+  </p>
+
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="login()"
+    (keyup.enter)="login()"
+    class="form"
+    [class.-submitted]="formSubmitted"
+  >
+    <label class="form-label">Nom d'utilisateur</label>
+    <ion-item class="form-input -backgroundIcon" lines="none">
       <ion-input formControlName="username"></ion-input>
+      <svg-icon
+        src="assets/images/svg-icons/icon-email.svg"
+        [svgStyle]="{ 'width.px':17 }"
+      ></svg-icon>
     </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Mot de passe</ion-label>
+    <label class="form-label">Mot de passe</label>
+    <ion-item class="form-input -backgroundIcon" lines="none">
       <ion-input formControlName="password" type="password"></ion-input>
+      <svg-icon
+        src="assets/images/svg-icons/icon-password.svg"
+        [svgStyle]="{ 'width.px':17 }"
+      ></svg-icon>
     </ion-item>
 
-    <ion-button color="primary" expand="block" (click)="login()"
-      >Login</ion-button
-    >
+    <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
 
-    <div *ngIf="errorMsg">{{ errorMsg }}</div>
+    <button class="btn btn-primary btn-full" (click)="login()">
+      Se connecter
+    </button>
+
+    <div class="login__reset-password ion-text-center">
+      <a>Mot de passe oublié ?</a>
+    </div>
   </form>
 </ion-content>

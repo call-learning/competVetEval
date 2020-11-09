@@ -26,10 +26,15 @@
 @import '~@ionic/angular/css/flex-utils.css';
 
 @import 'assets/scss/abstracts/variables';
+
 @import 'assets/scss/abstracts/fonts';
+@import 'assets/scss/abstracts/mixins';
 @import 'assets/scss/abstracts/theme';
 @import 'assets/scss/abstracts/typos';
 
+@import 'assets/scss/components/app-components';
 @import 'assets/scss/components/buttons';
+@import 'assets/scss/components/cards';
 @import 'assets/scss/components/forms';
+@import 'assets/scss/components/ionic-components';
 @import 'assets/scss/components/utils';
