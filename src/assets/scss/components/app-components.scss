@@ -84,6 +84,7 @@
 .list-item-icon {
   flex-shrink: 0;
   margin-left: 20px;
+  position: relative;
 
   &.-done {
     color: var(--ion-color-success);
@@ -91,5 +92,43 @@
 
   &.-todo {
     color: var(--ion-color-warning);
+  }
+}
+
+.evaluate-criterion {
+  .mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+  }
+}
+
+.emojis-list {
+  border-radius: 29.5px;
+  box-shadow: 0 5px 10px -4px rgba(0, 0, 0, 0.35);
+  background-color: var(--white);
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px;
+
+  position: absolute;
+  top: 30px;
+  left: -10px;
+
+  z-index: 11;
+
+  svg-icon {
+    margin: 7px 0;
+    filter: grayscale(100%);
+
+    &.-selected,
+    &:hover {
+      filter: none;
+    }
   }
 }

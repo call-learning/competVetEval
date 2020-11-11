@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/rotation-detail', 1]">
+      <ion-button [routerLink]="['/rotations-list']">
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -12,7 +12,11 @@
 <ion-content class="ion-padding">
   <div class="page-title">Contexte</div>
 
-  <p class="page-text">{{ evaluation.context }}</p>
+  <form [formGroup]="contextForm" class="form">
+    <ion-item class="form-input" lines="none">
+      <ion-textarea formControlName="context"></ion-textarea>
+    </ion-item>
+  </form>
 
   <div class="page-title">Évaluations</div>
 
@@ -20,7 +24,7 @@
     <div
       class="list-item"
       *ngFor="let criterion of evaluation.criteria"
-      (click)="openModalCriterionDetail(criterion)"
+      (click)="openModalEvaluateCriterion(criterion)"
     >
       <div class="list-item-content">
         <div class="list-item-title -regular">{{ criterion.title }}</div>
@@ -43,39 +47,37 @@
       </div>
       <div class="list-item-icon">
         <svg-icon
-          src="assets/images/svg-icons/emojis/ranking-active-{{ criterion.grade ? criterion.grade : 'null' }}.svg"
+          class="nnki-pointer"
+          src="assets/images/svg-icons/emojis/ranking-active-{{ criterion.grade ? criterion.grade : 'add' }}.svg"
           [svgStyle]="{ 'width.px':36 }"
+          (click)="evaluateCriterion(criterion, $event)"
         ></svg-icon>
+
+        <div class="evaluate-criterion" *ngIf="criterion.evaluating">
+          <div
+            class="mask"
+            (click)="dismissEvaluateCriterion(criterion, $event)"
+          ></div>
+          <div class="emojis-list">
+            <svg-icon
+              *ngFor="let grade of [5, 4, 3, 2, 1, -1]"
+              src="assets/images/svg-icons/emojis/ranking-active-{{ grade }}.svg"
+              [svgStyle]="{ 'width.px':36 }"
+              (click)="selectGrade(criterion, grade, $event)"
+              class="nnki-pointer"
+              [class.-selected]="criterion.grade == grade"
+            ></svg-icon>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="page-title">Commentaire</div>
 
-  <p class="page-text quote">
-    <svg-icon
-      src="assets/images/svg-icons/icon-quote.svg"
-      [svgStyle]="{ 'width.px':16 }"
-    ></svg-icon>
-    {{ evaluation.comment }}
-  </p>
-
-  <div class="page-subtitle">Répondre</div>
-
-  <form
-    [formGroup]="answerEvaluationForm"
-    (ngSubmit)="answerEvaluation()"
-    [class.-submitted]="formSubmitted"
-    class="form"
-  >
+  <form [formGroup]="commentForm" class="form">
     <ion-item class="form-input" lines="none">
-      <ion-textarea formControlName="answer"></ion-textarea>
+      <ion-textarea formControlName="comment"></ion-textarea>
     </ion-item>
-
-    <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
-
-    <button class="btn btn-primary" (click)="answerEvaluation()">
-      Envoyer
-    </button>
   </form>
 </ion-content>

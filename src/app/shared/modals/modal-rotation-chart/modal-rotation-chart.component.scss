@@ -1,0 +1,21 @@
+.table-container {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.td-content {
+  width: 60px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 1px;
+}
+
+td:nth-child(2n + 2) {
+  .td-content {
+    background: var(--primary-background);
+  }
+}

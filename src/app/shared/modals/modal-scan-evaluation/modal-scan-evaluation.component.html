@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismissModal()"> Annuler </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="modal-ask-evaluation__qr-code ion-text-center">
+    <img src="https://via.placeholder.com/800x800" />
+  </div>
+
+  <div class="ion-padding">
+    <p class="ion-text-center page-text">
+      Scannez le QR code présenté par l’étudiant
+    </p>
+
+    <div class="button-link">
+      <a (click)="notImplemented()">Rechercher manuellement</a>
+    </div>
+  </div>
+</ion-content>

@@ -21,9 +21,14 @@
           mode="ios"
         >
           <ion-segment-button value="to_evaluate">
-            À évaluer
+            <ng-container *ngIf="authService.isStudentMode">
+              À évaluer
+            </ng-container>
+            <ng-container *ngIf="authService.isEvaluatorMode">
+              En cours
+            </ng-container>
           </ion-segment-button>
-          <ion-segment-button value="all"> Toutes </ion-segment-button>
+          <ion-segment-button value="all">Toutes</ion-segment-button>
         </ion-segment>
 
         <button
@@ -42,7 +47,7 @@
   <div class="ion-margin-vertical">
     <div
       class="list-item"
-      [routerLink]="['/rotation-detail', rotation.id]"
+      [routerLink]="authService.isStudentMode ? ['/rotation-detail', rotation.id] : ['/evaluate', 1]"
       *ngFor="let rotation of rotations"
     >
       <div class="list-item-image" *ngIf="rotation.type == 'evaluator'">
@@ -119,7 +124,7 @@
     horizontal="end"
     slot="fixed"
     *ngIf="authService.isEvaluatorMode"
-    [routerLink]="['/create-evaluation']"
+    (click)="openModalScanEvaluation()"
   >
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>

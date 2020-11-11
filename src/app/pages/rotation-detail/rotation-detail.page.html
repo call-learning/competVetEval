@@ -5,7 +5,7 @@
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-buttons slot="end" *ngIf="authService.isStudentMode">
+    <ion-buttons slot="end">
       <button
         class="btn btn-transparent"
         (click)="openModalRotationChart()"
@@ -56,23 +56,7 @@
     </div>
   </div>
 
-  <div class="rotation-detail__student" *ngIf="authService.isEvaluatorMode">
-    <div class="list-item">
-      <div class="list-item-image">
-        <img [src]="rotation.student.image" />
-      </div>
-      <div class="list-item-content">
-        <div class="list-item-title">{{ rotation.student.name }}</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="page-subtitle">
-    <ng-container *ngIf="authService.isStudentMode"> Évaluations </ng-container>
-    <ng-container *ngIf="authService.isEvaluatorMode">
-      Autres évaluations
-    </ng-container>
-  </div>
+  <div class="page-subtitle">Évaluations</div>
 
   <div
     class="rotation-detail__no-evaluations"
@@ -115,10 +99,7 @@
     </a>
   </div>
 
-  <div
-    class="rotation-detail__ask-evaluation"
-    *ngIf="authService.isStudentMode"
-  >
+  <div class="rotation-detail__ask-evaluation">
     <button class="btn btn-primary btn-full" (click)="openModalAskEvaluation()">
       Demander une évaluation
     </button>

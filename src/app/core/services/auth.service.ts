@@ -27,7 +27,7 @@ export class AuthService {
 
   accessToken: string
 
-  currentUserRole: 'student' | 'evaluator' = 'student'
+  currentUserRole: 'student' | 'evaluator' = 'evaluator'
 
   constructor(
     private router: Router,

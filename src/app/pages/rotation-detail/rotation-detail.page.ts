@@ -29,18 +29,84 @@ export class RotationDetailPage implements OnInit {
           responsable: true,
           date: '30/09/2020',
           image: 'https://via.placeholder.com/50x50',
+          criteria: [
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+          ],
         },
         {
           title: 'Philip Payne',
           responsable: false,
           date: '30/09/2020',
           image: 'https://via.placeholder.com/50x50',
+          criteria: [
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+          ],
         },
         {
           title: 'Philip Payne',
           responsable: false,
           date: '30/09/2020',
           image: 'https://via.placeholder.com/50x50',
+          criteria: [
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+            {
+              title: 'Savoir être',
+              grade: 5,
+            },
+          ],
         },
       ],
       status: 'done',

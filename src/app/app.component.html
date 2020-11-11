@@ -15,10 +15,10 @@
       <ion-list>
         <ion-item button (click)="toggleUserRole()">
           Passer en mode
-          <ng-container *ngIf="authService.currentUserRole == 'student'">
+          <ng-container *ngIf="authService.isStudentMode">
             évaluateur
           </ng-container>
-          <ng-container *ngIf="authService.currentUserRole == 'evaluator'">
+          <ng-container *ngIf="authService.isEvaluatorMode">
             étudiant
           </ng-container>
         </ion-item>

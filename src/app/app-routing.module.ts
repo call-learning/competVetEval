@@ -56,28 +56,10 @@ const routes: Routes = [
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
-    path: 'create-evaluation',
+    path: 'evaluate',
     loadChildren: () =>
-      import('./pages/create-evaluation/create-evaluation.module').then(
-        (m) => m.CreateEvaluationPageModule
-      ),
-    canLoad: [ApplicationIsLoadedGuard],
-    canActivate: [SchoolGuard, AuthenticatedGuard],
-  },
-  {
-    path: 'start-evaluation',
-    loadChildren: () =>
-      import('./pages/start-evaluation/start-evaluation.module').then(
-        (m) => m.StartEvaluationPageModule
-      ),
-    canLoad: [ApplicationIsLoadedGuard],
-    canActivate: [SchoolGuard, AuthenticatedGuard],
-  },
-  {
-    path: 'precise-criterion',
-    loadChildren: () =>
-      import('./pages/precise-criterion/precise-criterion.module').then(
-        (m) => m.PreciseCriterionPageModule
+      import('./pages/evaluate/evaluate.module').then(
+        (m) => m.EvaluatePageModule
       ),
     canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],

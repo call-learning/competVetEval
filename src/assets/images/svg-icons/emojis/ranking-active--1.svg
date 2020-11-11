@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+    <g fill="none" fill-rule="evenodd">
+        <g>
+            <g>
+                <g transform="translate(-332 -242) translate(32 242) translate(300)">
+                    <circle cx="18" cy="18" r="18" fill="#FFCC4D" fill-rule="nonzero"/>
+                    <text fill="#664500" font-family="WorkSans-Regular_Bold, Work Sans" font-size="17" font-weight="bold">
+                        <tspan x="1.967" y="24">N/A</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

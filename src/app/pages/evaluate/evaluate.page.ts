@@ -1,33 +1,31 @@
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
-import { ModalController, ToastController } from '@ionic/angular'
+import { ModalController } from '@ionic/angular'
 
-import { AuthService } from 'src/app/core/services/auth.service'
-import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
+import { ModalEvaluateCriterionComponent } from './../../shared/modals/modal-evaluate-criterion/modal-evaluate-criterion.component'
 
 @Component({
-  selector: 'app-evaluation-detail',
-  templateUrl: './evaluation-detail.page.html',
-  styleUrls: ['./evaluation-detail.page.scss'],
+  selector: 'app-evaluate',
+  templateUrl: './evaluate.page.html',
+  styleUrls: ['./evaluate.page.scss'],
 })
-export class EvaluationDetailPage implements OnInit {
-  answerEvaluationForm: FormGroup
-
-  errorMsg = ''
-
-  formSubmitted = false
-
+export class EvaluatePage implements OnInit {
   evaluation: any
+
+  contextForm: FormGroup
+  commentForm: FormGroup
 
   constructor(
     private formBuilder: FormBuilder,
-    private toastController: ToastController,
-    public authService: AuthService,
     private modalController: ModalController
   ) {
-    this.answerEvaluationForm = this.formBuilder.group({
-      answer: ['', [Validators.required]],
+    this.contextForm = this.formBuilder.group({
+      context: ['', [Validators.required]],
+    })
+
+    this.commentForm = this.formBuilder.group({
+      comment: ['', [Validators.required]],
     })
   }
 
@@ -41,99 +39,15 @@ export class EvaluationDetailPage implements OnInit {
           title: 'Savoir être, qualités personnelles et professionnelles',
           evaluated: '3/4',
           comments: '1',
-          grade: 5,
+          grade: null,
           subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
             {
               title: 'Ponctualité',
               grade: null,
             },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 4,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
             {
               title: 'Ponctualité',
               grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 3,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 2,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 1,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
             },
             {
               title: 'Ponctualité',
@@ -150,11 +64,95 @@ export class EvaluationDetailPage implements OnInit {
           subcriteria: [
             {
               title: 'Ponctualité',
-              grade: 5,
+              grade: null,
             },
             {
               title: 'Ponctualité',
-              grade: 2,
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+          ],
+          comment: 'Définitivement un atout !',
+        },
+        {
+          title: 'Savoir être, qualités personnelles et professionnelles',
+          evaluated: '3/4',
+          comments: '1',
+          grade: null,
+          subcriteria: [
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+          ],
+          comment: 'Définitivement un atout !',
+        },
+        {
+          title: 'Savoir être, qualités personnelles et professionnelles',
+          evaluated: '3/4',
+          comments: '1',
+          grade: null,
+          subcriteria: [
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+          ],
+          comment: 'Définitivement un atout !',
+        },
+        {
+          title: 'Savoir être, qualités personnelles et professionnelles',
+          evaluated: '3/4',
+          comments: '1',
+          grade: null,
+          subcriteria: [
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+          ],
+          comment: 'Définitivement un atout !',
+        },
+        {
+          title: 'Savoir être, qualités personnelles et professionnelles',
+          evaluated: '3/4',
+          comments: '1',
+          grade: null,
+          subcriteria: [
+            {
+              title: 'Ponctualité',
+              grade: null,
+            },
+            {
+              title: 'Ponctualité',
+              grade: null,
             },
             {
               title: 'Ponctualité',
@@ -169,10 +167,29 @@ export class EvaluationDetailPage implements OnInit {
     }
   }
 
-  openModalCriterionDetail(criterion) {
+  evaluateCriterion(criterion, event: Event) {
+    event.stopPropagation()
+    criterion.evaluating = true
+  }
+
+  dismissEvaluateCriterion(criterion, event: Event) {
+    if (event) {
+      event.stopPropagation()
+    }
+
+    criterion.evaluating = false
+  }
+
+  selectGrade(criterion, grade, event) {
+    event.stopPropagation()
+    criterion.grade = grade
+    this.dismissEvaluateCriterion(criterion, null)
+  }
+
+  openModalEvaluateCriterion(criterion) {
     this.modalController
       .create({
-        component: ModalCriterionDetailComponent,
+        component: ModalEvaluateCriterionComponent,
         componentProps: {
           criterion,
         },
@@ -180,24 +197,5 @@ export class EvaluationDetailPage implements OnInit {
       .then((modal) => {
         modal.present()
       })
-  }
-
-  answerEvaluation() {
-    this.errorMsg = ''
-    this.formSubmitted = true
-
-    if (this.answerEvaluationForm.valid) {
-      this.toastController
-        .create({
-          message: 'Not implemented',
-          duration: 2000,
-          color: 'danger',
-        })
-        .then((toast) => {
-          toast.present()
-        })
-    } else {
-      this.errorMsg = 'Le formulaire est invalide'
-    }
   }
 }

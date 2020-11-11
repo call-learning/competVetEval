@@ -1,8 +1,13 @@
 import { Component, OnInit } from '@angular/core'
 
-import { MenuController, ToastController } from '@ionic/angular'
+import {
+  MenuController,
+  ModalController,
+  ToastController,
+} from '@ionic/angular'
 
 import { AuthService } from 'src/app/core/services/auth.service'
+import { ModalScanEvaluationComponent } from './../../shared/modals/modal-scan-evaluation/modal-scan-evaluation.component'
 
 @Component({
   selector: 'app-rotations-list',
@@ -15,55 +20,61 @@ export class RotationsListPage implements OnInit {
   constructor(
     private toastController: ToastController,
     private menuController: MenuController,
-    public authService: AuthService
+    public authService: AuthService,
+    private modalController: ModalController
   ) {}
 
   ngOnInit() {
-    this.rotations = [
-      {
-        id: 1,
-        title: 'Rotation chirurgie technique',
-        subtitle: '10-14 Juillet 2020',
-        type: 'student',
-        evaluated: '3/4',
-        comments: '1',
-        status: 'done',
-      },
-      {
-        id: 1,
-        title: 'Rotation chirurgie technique',
-        subtitle: '10-14 Juillet 2020',
-        type: 'student',
-        evaluated: '3/4',
-        comments: '1',
-        status: 'in_progress',
-      },
-      {
-        id: 1,
-        title: 'Rotation chirurgie technique',
-        subtitle: '10-14 Juillet 2020',
-        type: 'student',
-        evaluated: '3/4',
-        comments: '1',
-        status: 'todo',
-      },
-      {
-        id: 1,
-        title: 'Philip Payne',
-        subtitle: 'Rotation chirurgie technique',
-        type: 'evaluator',
-        status: 'in_progress',
-        image: 'https://via.placeholder.com/50x50',
-      },
-      {
-        id: 1,
-        title: 'Philip Payne',
-        subtitle: 'Rotation chirurgie technique',
-        type: 'evaluator',
-        status: 'done',
-        image: 'https://via.placeholder.com/50x50',
-      },
-    ]
+    if (this.authService.isStudentMode) {
+      this.rotations = [
+        {
+          id: 1,
+          title: 'Rotation chirurgie technique',
+          subtitle: '10-14 Juillet 2020',
+          type: 'student',
+          evaluated: '3/4',
+          comments: '1',
+          status: 'done',
+        },
+        {
+          id: 1,
+          title: 'Rotation chirurgie technique',
+          subtitle: '10-14 Juillet 2020',
+          type: 'student',
+          evaluated: '3/4',
+          comments: '1',
+          status: 'in_progress',
+        },
+        {
+          id: 1,
+          title: 'Rotation chirurgie technique',
+          subtitle: '10-14 Juillet 2020',
+          type: 'student',
+          evaluated: '3/4',
+          comments: '1',
+          status: 'todo',
+        },
+      ]
+    } else if (this.authService.isEvaluatorMode) {
+      this.rotations = [
+        {
+          id: 1,
+          title: 'Philip Payne',
+          subtitle: 'Rotation chirurgie technique',
+          type: 'evaluator',
+          status: 'in_progress',
+          image: 'https://via.placeholder.com/50x50',
+        },
+        {
+          id: 1,
+          title: 'Philip Payne',
+          subtitle: 'Rotation chirurgie technique',
+          type: 'evaluator',
+          status: 'done',
+          image: 'https://via.placeholder.com/50x50',
+        },
+      ]
+    }
   }
 
   openMenu() {
@@ -91,6 +102,16 @@ export class RotationsListPage implements OnInit {
       })
       .then((toast) => {
         toast.present()
+      })
+  }
+
+  openModalScanEvaluation() {
+    this.modalController
+      .create({
+        component: ModalScanEvaluationComponent,
+      })
+      .then((modal) => {
+        modal.present()
       })
   }
 }
