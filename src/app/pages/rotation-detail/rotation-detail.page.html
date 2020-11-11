@@ -8,13 +8,13 @@
     <ion-buttons slot="end" *ngIf="authService.isStudentMode">
       <button
         class="btn btn-transparent"
-        [routerLink]="['/rotation-stats', 1]"
+        (click)="openModalRotationChart()"
         color="primary"
         [disabled]="!rotation.evaluations.length"
       >
         <svg-icon
           src="assets/images/svg-icons/icon-chart.svg"
-          [svgStyle]="{ 'width.px':21 }"
+          [svgStyle]="{ 'width.px':31 }"
         ></svg-icon>
       </button>
     </ion-buttons>
@@ -28,11 +28,11 @@
 
   <div class="rotation-detail__header">
     <div class="rotation-detail__header-content">
-      <div class="rotation-detail__title">{{ rotation.title }}</div>
-      <div class="rotation-detail__subtitle">{{ rotation.subtitle }}</div>
+      <div class="page-title">{{ rotation.title }}</div>
+      <div class="page-text">{{ rotation.subtitle }}</div>
     </div>
     <div
-      class="rotation__item-icon"
+      class="list-item-icon"
       [class.-done]="rotation.status == 'done'"
       [class.-todo]="rotation.status == 'todo'"
     >
@@ -57,17 +57,17 @@
   </div>
 
   <div class="rotation-detail__student" *ngIf="authService.isEvaluatorMode">
-    <div class="rotation__item">
-      <div class="rotation__item-image">
+    <div class="list-item">
+      <div class="list-item-image">
         <img [src]="rotation.student.image" />
       </div>
-      <div class="rotation__item-content">
-        <div class="rotation__item-title">{{ rotation.student.name }}</div>
+      <div class="list-item-content">
+        <div class="list-item-title">{{ rotation.student.name }}</div>
       </div>
     </div>
   </div>
 
-  <div class="rotation-detail__evaluations-title">
+  <div class="page-subtitle">
     <ng-container *ngIf="authService.isStudentMode"> Évaluations </ng-container>
     <ng-container *ngIf="authService.isEvaluatorMode">
       Autres évaluations
@@ -81,21 +81,18 @@
     Cette rotation n’a pas encore été évaluée
   </div>
 
-  <div
-    class="rotation-detail__evaluations-list"
-    *ngIf="rotation.evaluations.length"
-  >
+  <div class="ion-margin-vertical" *ngIf="rotation.evaluations.length">
     <a
-      class="rotation__item"
+      class="list-item"
       [routerLink]="['/evaluation-detail', 1, 1]"
       *ngFor="let evaluation of rotation.evaluations"
     >
-      <div class="rotation__item-image">
+      <div class="list-item-image">
         <img [src]="evaluation.image" />
       </div>
-      <div class="rotation__item-content">
-        <div class="rotation__item-title">{{ evaluation.title }}</div>
-        <div class="rotation__item-subtitle">
+      <div class="list-item-content">
+        <div class="list-item-title">{{ evaluation.title }}</div>
+        <div class="list-item-subtitle">
           <ng-container *ngIf="evaluation.responsable">
             <span>Responsable</span>
             <svg-icon
@@ -108,7 +105,7 @@
           </ng-container>
         </div>
       </div>
-      <div class="rotation__item-info">
+      <div class="list-item-info">
         <svg-icon
           src="assets/images/svg-icons/icon-calendar.svg"
           [svgStyle]="{ 'width.px':16 }"
@@ -122,10 +119,7 @@
     class="rotation-detail__ask-evaluation"
     *ngIf="authService.isStudentMode"
   >
-    <button
-      class="btn btn-primary btn-full"
-      [routerLink]="['/ask-evaluation', 1]"
-    >
+    <button class="btn btn-primary btn-full" (click)="openModalAskEvaluation()">
       Demander une évaluation
     </button>
   </div>

@@ -39,28 +39,28 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="rotations-list__list">
+  <div class="ion-margin-vertical">
     <div
-      class="rotation__item"
+      class="list-item"
       [routerLink]="['/rotation-detail', rotation.id]"
       *ngFor="let rotation of rotations"
     >
-      <div class="rotation__item-image" *ngIf="rotation.type == 'evaluator'">
+      <div class="list-item-image" *ngIf="rotation.type == 'evaluator'">
         <img [src]="rotation.image" />
       </div>
-      <div class="rotation__item-content">
-        <div class="rotation__item-title">{{ rotation.title }}</div>
-        <div class="rotation__item-subtitle">{{ rotation.subtitle }}</div>
-        <div class="rotation__item-infos">
+      <div class="list-item-content">
+        <div class="list-item-title">{{ rotation.title }}</div>
+        <div class="list-item-subtitle">{{ rotation.subtitle }}</div>
+        <div class="list-item-infos">
           <ng-container *ngIf="rotation.type == 'student'">
-            <div class="rotation__item-info">
+            <div class="list-item-info">
               <svg-icon
                 src="assets/images/svg-icons/icon-smile.svg"
                 [svgStyle]="{ 'width.px':21 }"
               ></svg-icon>
               <span>{{ rotation.evaluated}}</span>
             </div>
-            <div class="rotation__item-info">
+            <div class="list-item-info">
               <svg-icon
                 src="assets/images/svg-icons/icon-comment.svg"
                 [svgStyle]="{ 'width.px':23 }"
@@ -69,7 +69,7 @@
             </div>
           </ng-container>
           <ng-container *ngIf="rotation.type == 'evaluator'">
-            <div class="rotations__item-info">
+            <div class="list-item-info">
               <ng-container *ngIf="rotation.status == 'in_progress'">
                 <svg-icon
                   src="assets/images/svg-icons/icon-times-light.svg"
@@ -89,7 +89,7 @@
         </div>
       </div>
       <div
-        class="rotation__item-icon"
+        class="list-item-icon"
         [class.-done]="rotation.status == 'done'"
         [class.-todo]="rotation.status == 'todo'"
       >

@@ -27,7 +27,7 @@ export class AuthService {
 
   accessToken: string
 
-  currentUserRole: 'student' | 'evaluator' = 'evaluator'
+  currentUserRole: 'student' | 'evaluator' = 'student'
 
   constructor(
     private router: Router,
@@ -72,7 +72,12 @@ export class AuthService {
   }
 
   setChosenSchool(school: School) {
-    localStorage.setItem(LocaleKeys.schoolChoiceId, school.id)
+    if (school) {
+      localStorage.setItem(LocaleKeys.schoolChoiceId, school.id)
+    } else {
+      localStorage.setItem(LocaleKeys.schoolChoiceId, null)
+    }
+
     this.chosenSchool = school
   }
 

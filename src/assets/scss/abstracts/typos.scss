@@ -1,0 +1,35 @@
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.page-subtitle {
+  font-style: 17px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.page-text {
+  font-size: 17px;
+}
+
+.quote {
+  font-style: italic;
+  padding-left: 22px;
+  position: relative;
+
+  svg-icon {
+    position: absolute;
+    top: -10px;
+    left: 0;
+  }
+}
+
+.button-link {
+  text-align: center;
+
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ion-color-primary);
+}

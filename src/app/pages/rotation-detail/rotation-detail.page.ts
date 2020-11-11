@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core'
 
-import { ToastController } from '@ionic/angular'
+import { ModalController } from '@ionic/angular'
 
 import { AuthService } from 'src/app/core/services/auth.service'
+import { ModalAskEvaluationComponent } from 'src/app/shared/modals/modal-ask-evaluation/modal-ask-evaluation.component'
+import { ModalRotationChartComponent } from 'src/app/shared/modals/modal-rotation-chart/modal-rotation-chart.component'
 
 @Component({
   selector: 'app-rotation-detail',
@@ -14,7 +16,7 @@ export class RotationDetailPage implements OnInit {
 
   constructor(
     public authService: AuthService,
-    private toastController: ToastController
+    private modalController: ModalController
   ) {}
 
   ngOnInit() {
@@ -49,15 +51,29 @@ export class RotationDetailPage implements OnInit {
     }
   }
 
-  saveForLater() {
-    this.toastController
+  openModalRotationChart() {
+    this.modalController
       .create({
-        message: 'Not implemented',
-        duration: 2000,
-        color: 'danger',
+        component: ModalRotationChartComponent,
+        componentProps: {
+          rotation: this.rotation,
+        },
       })
-      .then((toast) => {
-        toast.present()
+      .then((modal) => {
+        modal.present()
+      })
+  }
+
+  openModalAskEvaluation() {
+    this.modalController
+      .create({
+        component: ModalAskEvaluationComponent,
+        componentProps: {
+          rotation: this.rotation,
+        },
+      })
+      .then((modal) => {
+        modal.present()
       })
   }
 }

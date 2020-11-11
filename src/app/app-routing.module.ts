@@ -47,37 +47,10 @@ const routes: Routes = [
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
-    path: 'ask-evaluation',
-    loadChildren: () =>
-      import('./pages/ask-evaluation/ask-evaluation.module').then(
-        (m) => m.AskEvaluationPageModule
-      ),
-    canLoad: [ApplicationIsLoadedGuard],
-    canActivate: [SchoolGuard, AuthenticatedGuard],
-  },
-  {
     path: 'evaluation-detail',
     loadChildren: () =>
       import('./pages/evaluation-detail/evaluation-detail.module').then(
         (m) => m.EvaluationDetailPageModule
-      ),
-    canLoad: [ApplicationIsLoadedGuard],
-    canActivate: [SchoolGuard, AuthenticatedGuard],
-  },
-  {
-    path: 'rotation-stats',
-    loadChildren: () =>
-      import('./pages/rotation-stats/rotation-stats.module').then(
-        (m) => m.RotationStatsPageModule
-      ),
-    canLoad: [ApplicationIsLoadedGuard],
-    canActivate: [SchoolGuard, AuthenticatedGuard],
-  },
-  {
-    path: 'criterion-detail',
-    loadChildren: () =>
-      import('./pages/criterion-detail/criterion-detail.module').then(
-        (m) => m.CriterionDetailPageModule
       ),
     canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],

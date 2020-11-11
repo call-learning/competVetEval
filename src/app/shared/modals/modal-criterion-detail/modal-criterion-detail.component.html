@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()"> OK </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="page-title ion-text-center">
+    {{ criterion.title }}
+  </div>
+
+  <div class="ion-margin-vertical">
+    <div class="list-item" *ngFor="let subcriterion of criterion.subcriteria">
+      <div class="list-item-content">
+        <div class="list-item-title -regular">{{ subcriterion.title }}</div>
+      </div>
+      <div class="list-item-icon">
+        <svg-icon
+          src="assets/images/svg-icons/emojis/ranking-active-{{
+            subcriterion.grade ? subcriterion.grade : 'null'
+          }}.svg"
+          [svgStyle]="{ 'width.px': 36 }"
+        ></svg-icon>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-title">Commentaire</div>
+
+  <p class="page-text quote">
+    <svg-icon
+      src="assets/images/svg-icons/icon-quote.svg"
+      [svgStyle]="{ 'width.px': 16 }"
+    ></svg-icon>
+    {{ criterion.comment }}
+  </p>
+</ion-content>

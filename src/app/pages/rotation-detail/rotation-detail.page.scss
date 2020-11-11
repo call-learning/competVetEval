@@ -21,16 +21,6 @@
   .rotation-detail__header-content {
     flex-grow: 1;
   }
-
-  .rotation-detail__title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-
-  .rotation-detail__subtitle {
-    font-size: 17px;
-  }
 }
 
 .rotation-detail__evaluations-title {
@@ -50,7 +40,7 @@
   padding: 0 20px;
 }
 
-.rotation__item-subtitle {
+.list-item-subtitle {
   span {
     opacity: 0.5;
   }

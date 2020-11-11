@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 
+import { ToastController } from '@ionic/angular'
+
 import { SchoolsProviderService } from 'src/app/core/providers/schools-provider.service'
 import { School } from 'src/app/shared/models/school.model'
 import { AuthService } from './../../core/services/auth.service'
@@ -16,7 +18,8 @@ export class SchoolChoicePage implements OnInit {
   constructor(
     private schoolsProviderService: SchoolsProviderService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
@@ -26,5 +29,17 @@ export class SchoolChoicePage implements OnInit {
   chooseSchool(school: School) {
     this.authService.setChosenSchool(school)
     this.router.navigate(['/login'])
+  }
+
+  notImplemented() {
+    this.toastController
+      .create({
+        message: 'Not implemented',
+        duration: 2000,
+        color: 'danger',
+      })
+      .then((toast) => {
+        toast.present()
+      })
   }
 }

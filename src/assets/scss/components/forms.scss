@@ -17,6 +17,12 @@
     border: solid 1px var(--grey-five);
     background-color: var(--white);
 
+    textarea {
+      &.-big {
+        height: 150px;
+      }
+    }
+
     &.-backgroundIcon {
       position: relative;
 

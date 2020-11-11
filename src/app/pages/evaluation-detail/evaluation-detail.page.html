@@ -2,58 +2,82 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button [routerLink]="['/rotation-detail', 1]">
-        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title> Rotation #4 (Henri Chateau) </ion-title>
+    <ion-title>{{ evaluation.rotationTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list>
-    <ion-item
-      *ngFor="let criterion of [0, 0, 0, 0]"
-      [routerLink]="['/criterion-detail', 1, 1, 1]"
+  <div class="page-title">Contexte</div>
+
+  <p class="page-text">{{ evaluation.context }}</p>
+
+  <div class="page-title">Évaluations</div>
+
+  <div class="ion-margin-vertical">
+    <div
+      class="list-item"
+      *ngFor="let criterion of evaluation.criteria"
+      (click)="openCriterionDetail(criterion)"
     >
-      <ion-label>
-        <p>Savoir être, qualités personnelles et professionnelles</p>
-        <p>
-          <small>4/9 sous critères</small>
-        </p>
-      </ion-label>
-      <ion-icon name="happy" slot="end"></ion-icon>
-    </ion-item>
-  </ion-list>
+      <div class="list-item-content">
+        <div class="list-item-title -regular">{{ criterion.title }}</div>
+        <div class="list-item-infos">
+          <div class="list-item-info">
+            <svg-icon
+              src="assets/images/svg-icons/icon-smile.svg"
+              [svgStyle]="{ 'width.px':21 }"
+            ></svg-icon>
+            <span>{{ criterion.evaluated}}</span>
+          </div>
+          <div class="list-item-info">
+            <svg-icon
+              src="assets/images/svg-icons/icon-comment.svg"
+              [svgStyle]="{ 'width.px':23 }"
+            ></svg-icon>
+            <span>{{ criterion.comments }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="list-item-icon">
+        <svg-icon
+          src="assets/images/svg-icons/emojis/ranking-active-{{ criterion.grade ? criterion.grade : 'null' }}.svg"
+          [svgStyle]="{ 'width.px':36 }"
+        ></svg-icon>
+      </div>
+    </div>
+  </div>
 
-  <p>
-    <strong>Commentaires</strong>
-  </p>
+  <div class="page-title">Commentaire</div>
 
-  <p>
-    Courageux, autonome, Laurent a fait preuve de tenacité pendant cette
-    rotation.
+  <p class="page-text quote">
+    <svg-icon
+      src="assets/images/svg-icons/icon-quote.svg"
+      [svgStyle]="{ 'width.px':16 }"
+    ></svg-icon>
+    {{ evaluation.comment }}
   </p>
 
   <ng-container *ngIf="authService.isStudentMode">
-    <p>
-      <strong>Commentaire étudiant</strong>
-    </p>
+    <div class="page-subtitle">Répondre</div>
 
     <form
       [formGroup]="answerEvaluationForm"
       (ngSubmit)="answerEvaluation()"
-      (keyup.enter)="answerEvaluation()"
+      [class.-submitted]="formSubmitted"
+      class="form"
     >
-      <ion-item>
-        <ion-label position="floating">Droit de réponse</ion-label>
+      <ion-item class="form-input" lines="none">
         <ion-textarea formControlName="answer"></ion-textarea>
       </ion-item>
 
-      <ion-button color="primary" expand="block" (click)="answerEvaluation()">
-        Répondre
-      </ion-button>
+      <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
 
-      <div *ngIf="errorMsg">{{ errorMsg }}</div>
+      <button class="btn btn-primary" (click)="answerEvaluation()">
+        Envoyer
+      </button>
     </form>
   </ng-container>
 </ion-content>

@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/school-choice']">
+      <ion-button (click)="goToSchoolChoice()">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
         Écoles
       </ion-button>
@@ -11,9 +11,12 @@
 </ion-header>
 
 <ion-content class="ion-padding ion-text-center">
-  <img [src]="authService.chosenSchool.logo" class="login__school-logo" />
+  <img [src]="authService.chosenSchool?.logo" class="login__school-logo" />
 
-  <button class="btn btn-primary btn-full btn-icon-right">
+  <button
+    class="btn btn-primary btn-full btn-icon-right"
+    (click)="notImplemented()"
+  >
     Se connecter avec <img src="assets/images/logos/logo-cas.png" />
   </button>
 
@@ -52,7 +55,7 @@
       Se connecter
     </button>
 
-    <div class="login__reset-password ion-text-center">
+    <div class="button-link" (click)="notImplemented()">
       <a>Mot de passe oublié ?</a>
     </div>
   </form>
