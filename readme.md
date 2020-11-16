@@ -36,8 +36,6 @@ resources/android/icon-foreground.png
 
 # Build android
 
-android/app/build.gradle -> Modify version number + name
-
 ionic build --prod
 
 npx cap copy android OR npm cap sync android
@@ -46,7 +44,10 @@ npx cap copy android OR npm cap sync android
 
 npx cap open android
 
-From Android studio Build > Build bundle or APK
+From Android studio Build >
+
+android/app/build.gradle -> Modify version number + name
+Build bundle or APK
 
 # Build ios
 
