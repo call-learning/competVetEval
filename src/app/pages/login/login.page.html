@@ -33,7 +33,11 @@
   >
     <label class="form-label">Nom d'utilisateur</label>
     <ion-item class="form-input -backgroundIcon" lines="none">
-      <ion-input formControlName="username"></ion-input>
+      <ion-input
+        formControlName="username"
+        autocomplete="off"
+        spellcheck="false"
+      ></ion-input>
       <svg-icon
         src="assets/images/svg-icons/icon-email.svg"
         [svgStyle]="{ 'width.px':17 }"

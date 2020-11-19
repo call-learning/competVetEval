@@ -5,7 +5,6 @@ import { NgModule } from '@angular/core'
 import { AngularSvgIconModule } from 'angular-svg-icon'
 import { AddTokenInterceptor } from './interceptors/add-token.interceptor'
 import { FormatRequestInterceptor } from './interceptors/format-request.interceptor'
-import { UseSchoolUrlInterceptor } from './interceptors/use-school-url.interceptor'
 
 @NgModule({
   declarations: [],
@@ -14,11 +13,6 @@ import { UseSchoolUrlInterceptor } from './interceptors/use-school-url.intercept
     {
       provide: HTTP_INTERCEPTORS,
       useClass: FormatRequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: UseSchoolUrlInterceptor,
       multi: true,
     },
     {
