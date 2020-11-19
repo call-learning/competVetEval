@@ -13,15 +13,6 @@
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-item button (click)="toggleUserRole()">
-          Passer en mode
-          <ng-container *ngIf="authService.isStudentMode">
-            évaluateur
-          </ng-container>
-          <ng-container *ngIf="authService.isEvaluatorMode">
-            étudiant
-          </ng-container>
-        </ion-item>
         <ion-item button (click)="authService.logout()">Déconnexion</ion-item>
       </ion-list>
     </ion-content>

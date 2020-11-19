@@ -27,7 +27,7 @@ export class AuthService {
 
   accessToken: string
 
-  currentUserRole: 'student' | 'evaluator' = 'evaluator'
+  currentUserRole = new BehaviorSubject<'student' | 'evaluator'>(null)
 
   constructor(
     private router: Router,
@@ -69,6 +69,7 @@ export class AuthService {
     this.loggedUser.next(null)
 
     this.accessToken = null
+    this.currentUserRole.next(null)
   }
 
   setChosenSchool(school: School) {
@@ -164,10 +165,10 @@ export class AuthService {
   }
 
   get isStudentMode() {
-    return this.currentUserRole === 'student'
+    return this.currentUserRole.getValue() === 'student'
   }
 
   get isEvaluatorMode() {
-    return this.currentUserRole === 'evaluator'
+    return this.currentUserRole.getValue() === 'evaluator'
   }
 }

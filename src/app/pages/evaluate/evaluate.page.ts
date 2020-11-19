@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
-import { ModalController } from '@ionic/angular'
+import { ModalController, ToastController } from '@ionic/angular'
 
 import { ModalEvaluateCriterionComponent } from './../../shared/modals/modal-evaluate-criterion/modal-evaluate-criterion.component'
 
@@ -18,7 +18,8 @@ export class EvaluatePage implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private toastController: ToastController
   ) {
     this.contextForm = this.formBuilder.group({
       context: ['', [Validators.required]],
@@ -196,6 +197,18 @@ export class EvaluatePage implements OnInit {
       })
       .then((modal) => {
         modal.present()
+      })
+  }
+
+  notImplemented() {
+    this.toastController
+      .create({
+        message: 'Not implemented',
+        duration: 2000,
+        color: 'danger',
+      })
+      .then((toast) => {
+        toast.present()
       })
   }
 }

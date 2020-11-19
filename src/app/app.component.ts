@@ -22,12 +22,4 @@ export class AppComponent {
       }
     })
   }
-
-  toggleUserRole() {
-    if (this.authService.isStudentMode) {
-      this.authService.currentUserRole = 'evaluator'
-    } else if (this.authService.isEvaluatorMode) {
-      this.authService.currentUserRole = 'student'
-    }
-  }
 }
