@@ -29,7 +29,7 @@ export class ModalScanEvaluationComponent implements OnInit {
   scanQRCode() {
     this.barcodeScanner
       .scan({
-        preferFrontCamera: true,
+        preferFrontCamera: false,
         showFlipCameraButton: true,
         showTorchButton: true,
         torchOn: false,
@@ -38,7 +38,6 @@ export class ModalScanEvaluationComponent implements OnInit {
         formats: 'QR_CODE',
       })
       .then((barcodeData) => {
-        console.warn('Barcode data', barcodeData)
         this.toastController
           .create({
             message: 'Scan réussi !',
@@ -48,6 +47,7 @@ export class ModalScanEvaluationComponent implements OnInit {
           .then((toast) => {
             toast.present()
           })
+        this.dismissModal()
         this.router.navigate(['evaluate', barcodeData.text])
       })
       .catch((err) => {

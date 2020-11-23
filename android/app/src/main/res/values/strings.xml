@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CompetVetEval</string>
+    <string name="title_activity_main">CompetVetEval</string>
+    <string name="package_name">fr.calllearning.competveteval</string>
+    <string name="custom_url_scheme">fr.calllearning.competveteval</string>
+</resources>
