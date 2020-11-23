@@ -48,7 +48,11 @@
     </p>
 
     <div class="modal-ask-evaluation__qr-code ion-text-center">
-      <img src="https://via.placeholder.com/230x230" />
+      <qrcode
+        [qrdata]="'123456789adfggf'"
+        [width]="256"
+        [errorCorrectionLevel]="'M'"
+      ></qrcode>
     </div>
 
     <div class="button-link">

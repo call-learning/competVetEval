@@ -1,3 +1,4 @@
+import { Router } from '@angular/router'
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
@@ -19,7 +20,8 @@ export class EvaluatePage implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private modalController: ModalController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private router: Router
   ) {
     this.contextForm = this.formBuilder.group({
       context: ['', [Validators.required]],
@@ -198,6 +200,19 @@ export class EvaluatePage implements OnInit {
       .then((modal) => {
         modal.present()
       })
+  }
+
+  saveAndRedirect() {
+    this.toastController
+      .create({
+        message: 'Enregistré !',
+        duration: 2000,
+        color: 'success',
+      })
+      .then((toast) => {
+        toast.present()
+      })
+    this.router.navigate(['rotations-list'])
   }
 
   notImplemented() {
