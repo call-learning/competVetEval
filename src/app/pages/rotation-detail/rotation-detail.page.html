@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/rotations-list']">
+      <ion-button [routerLink]="['/rotations-list']" routerDirection="back">
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -69,6 +69,7 @@
     <a
       class="list-item"
       [routerLink]="['/evaluation-detail', 1, 1]"
+      routerDirection="forward"
       *ngFor="let evaluation of rotation.evaluations"
     >
       <div class="list-item-image">
@@ -100,7 +101,10 @@
   </div>
 
   <div class="rotation-detail__ask-evaluation">
-    <button class="btn btn-primary btn-full" (click)="openModalAskEvaluation()">
+    <button
+      class="btn btn-primary btn-full nnki-mb4"
+      (click)="openModalAskEvaluation()"
+    >
       Demander une évaluation
     </button>
   </div>

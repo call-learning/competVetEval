@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/rotation-detail', 1]">
+      <ion-button [routerLink]="['/rotation-detail', 1]" routerDirection="back">
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -74,7 +74,7 @@
 
     <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
 
-    <button class="btn btn-primary" (click)="answerEvaluation()">
+    <button class="btn btn-primary nnki-mb4" (click)="answerEvaluation()">
       Envoyer
     </button>
   </form>

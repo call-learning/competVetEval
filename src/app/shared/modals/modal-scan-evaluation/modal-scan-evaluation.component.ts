@@ -1,5 +1,5 @@
-import { Router } from '@angular/router'
 import { Component, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { ModalController, ToastController } from '@ionic/angular'

@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/rotations-list']">
+      <ion-button [routerLink]="['/rotations-list']" routerDirection="back">
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -81,7 +81,7 @@
     </ion-item>
   </form>
 
-  <button class="btn btn-primary btn-full" (click)="saveAndRedirect()">
+  <button class="btn btn-primary btn-full nnki-mb4" (click)="saveAndRedirect()">
     Enregistrer
   </button>
 </ion-content>

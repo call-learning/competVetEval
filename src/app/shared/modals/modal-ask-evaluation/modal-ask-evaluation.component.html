@@ -36,8 +36,16 @@
       </p>
 
       <ion-item class="form-input" lines="none">
-        <ion-textarea class="-big" formControlName="context"></ion-textarea>
+        <ion-textarea
+          class="-big"
+          formControlName="context"
+          #contextInput
+        ></ion-textarea>
       </ion-item>
+
+      <button class="btn btn-primary btn-full" (click)="nextStep()">
+        Suivant
+      </button>
     </form>
   </ng-container>
 
@@ -55,7 +63,7 @@
       ></qrcode>
     </div>
 
-    <div class="button-link">
+    <div class="button-link nnki-mb4">
       <a (click)="notImplemented()">Envoyer une demande par mail</a>
     </div>
   </ng-container>

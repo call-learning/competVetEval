@@ -54,6 +54,7 @@ export class LoginPage implements OnInit {
             (res) => {
               this.router.navigate(['/rotations-list'])
               this.loader.dismiss()
+              this.loginForm.reset()
               this.isLoading = false
             },
             (err: Error) => {

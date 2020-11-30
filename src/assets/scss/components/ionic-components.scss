@@ -22,6 +22,10 @@ ion-button {
   letter-spacing: normal;
 }
 
+ion-toolbar.menu-toolbar ion-title {
+  height: 126px;
+}
+
 // buttons
 
 ion-fab-button {
@@ -33,4 +37,14 @@ ion-fab-button {
 
 ion-segment.in-toolbar-color:not(.ion-color) {
   background: rgba(0, 0, 0, 0.3);
+}
+
+// fab
+
+ion-fab.fab-vertical-bottom {
+  bottom: 20px;
+}
+
+ion-fab.fab-horizontal-end {
+  right: calc(20px + var(--ion-safe-area-right, 0px));
 }

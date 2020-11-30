@@ -48,6 +48,7 @@
     <div
       class="list-item"
       [routerLink]="authService.isStudentMode ? ['/rotation-detail', rotation.id] : ['/evaluate', 1]"
+      routerDirection="forward"
       *ngFor="let rotation of rotations"
     >
       <div class="list-item-image" *ngIf="rotation.type == 'evaluator'">
