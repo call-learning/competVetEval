@@ -16,14 +16,13 @@ export class SchoolChoicePage implements OnInit {
   schoolsList: School[]
 
   constructor(
-    private schoolsProviderService: SchoolsProviderService,
     private router: Router,
     private authService: AuthService,
     private toastController: ToastController
   ) {}
 
   ngOnInit() {
-    this.schoolsList = this.schoolsProviderService.getSchoolsList()
+    this.schoolsList = SchoolsProviderService.getSchoolsList()
   }
 
   chooseSchool(school: School) {

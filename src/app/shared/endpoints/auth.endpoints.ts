@@ -1,5 +1,7 @@
-import { environment } from 'src/environments/environment'
+import { SchoolsProviderService } from '../../core/providers/schools-provider.service'
 
 export class AuthEndpoints {
-  static login = `${environment.apiUrl}/login/token.php`
+  static login() {
+    return `${SchoolsProviderService.getSelectedSchoolUrl()}/login/token.php`
+  }
 }

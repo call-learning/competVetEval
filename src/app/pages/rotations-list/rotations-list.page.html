@@ -9,7 +9,7 @@
           <ng-container *ngIf="authService.isStudentMode">
             Rotations
           </ng-container>
-          <ng-container *ngIf="authService.isEvaluatorMode">
+          <ng-container *ngIf="authService.isAppraiserMode">
             Évaluations
           </ng-container>
         </div>
@@ -24,7 +24,7 @@
             <ng-container *ngIf="authService.isStudentMode">
               À évaluer
             </ng-container>
-            <ng-container *ngIf="authService.isEvaluatorMode">
+            <ng-container *ngIf="authService.isAppraiserMode">
               En cours
             </ng-container>
           </ion-segment-button>
@@ -51,7 +51,7 @@
       routerDirection="forward"
       *ngFor="let rotation of rotations"
     >
-      <div class="list-item-image" *ngIf="rotation.type == 'evaluator'">
+      <div class="list-item-image" *ngIf="rotation.type == 'appraiser'">
         <img [src]="rotation.image" />
       </div>
       <div class="list-item-content">
@@ -74,7 +74,7 @@
               <span>{{ rotation.comments }}</span>
             </div>
           </ng-container>
-          <ng-container *ngIf="rotation.type == 'evaluator'">
+          <ng-container *ngIf="rotation.type == 'appraiser'">
             <div class="list-item-info">
               <ng-container *ngIf="rotation.status == 'in_progress'">
                 <svg-icon
@@ -124,7 +124,7 @@
     vertical="bottom"
     horizontal="end"
     slot="fixed"
-    *ngIf="authService.isEvaluatorMode"
+    *ngIf="authService.isAppraiserMode"
     (click)="openModalScanEvaluation()"
   >
     <ion-fab-button>

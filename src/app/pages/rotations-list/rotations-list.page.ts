@@ -10,6 +10,7 @@ import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
 import { ModalScanEvaluationComponent } from './../../shared/modals/modal-scan-evaluation/modal-scan-evaluation.component'
+import { SchoolsProviderService } from '../../core/providers/schools-provider.service'
 
 @Component({
   selector: 'app-rotations-list',
@@ -35,6 +36,7 @@ export class RotationsListPage extends BaseComponent implements OnInit {
         filter((mode) => !!mode)
       )
       .subscribe((mode) => {
+        this.rotations = SchoolsProviderService.getSchoolsList()
         if (mode === 'student') {
           this.rotations = [
             {
@@ -65,13 +67,13 @@ export class RotationsListPage extends BaseComponent implements OnInit {
               status: 'todo',
             },
           ]
-        } else if (mode === 'evaluator') {
+        } else if (mode === 'appraiser') {
           this.rotations = [
             {
               id: 1,
               title: 'Philip Payne',
               subtitle: 'Rotation chirurgie technique',
-              type: 'evaluator',
+              type: 'appraiser',
               status: 'in_progress',
               image: 'https://via.placeholder.com/50x50',
             },
@@ -79,7 +81,7 @@ export class RotationsListPage extends BaseComponent implements OnInit {
               id: 1,
               title: 'Philip Payne',
               subtitle: 'Rotation chirurgie technique',
-              type: 'evaluator',
+              type: 'appraiser',
               status: 'done',
               image: 'https://via.placeholder.com/50x50',
             },

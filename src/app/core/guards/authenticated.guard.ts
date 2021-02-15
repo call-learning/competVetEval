@@ -3,8 +3,9 @@ import { CanActivate, Router, UrlTree } from '@angular/router'
 
 import { AlertController } from '@ionic/angular'
 
-import { Observable } from 'rxjs'
+import { Observable, throwError } from 'rxjs'
 import { AuthService } from '../services/auth.service'
+import { catchError } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root',
@@ -23,28 +24,33 @@ export class AuthenticatedGuard implements CanActivate {
     | UrlTree {
     if (this.authService.loggedUserValue) {
       if (!this.authService.currentUserRole.getValue()) {
-        this.alertController
-          .create({
-            header: 'Choix du rôle',
-            message: 'Choisissez un rôle pour la session de démonstration',
-            buttons: [
-              {
-                text: 'Etudiant',
-                handler: () => {
-                  this.authService.currentUserRole.next('student')
-                },
-              },
-              {
-                text: 'Évaluateur',
-                handler: () => {
-                  this.authService.currentUserRole.next('evaluator')
-                },
-              },
-            ],
-          })
-          .then((alert) => {
-            alert.present()
-          })
+        this.authService.updateUserRole().subscribe(
+          () => null,
+          (error) => {
+            this.alertController
+              .create({
+                header: 'Choix du rôle',
+                message: 'Choisissez un rôle pour la session de démonstration',
+                buttons: [
+                  {
+                    text: 'Etudiant',
+                    handler: () => {
+                      this.authService.currentUserRole.next('student')
+                    },
+                  },
+                  {
+                    text: 'Évaluateur',
+                    handler: () => {
+                      this.authService.currentUserRole.next('appraiser')
+                    },
+                  },
+                ],
+              })
+              .then((alert) => {
+                alert.present()
+              })
+          }
+        )
       }
       return true
     } else {
