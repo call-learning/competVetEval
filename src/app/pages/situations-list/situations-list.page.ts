@@ -13,12 +13,12 @@ import { ModalScanEvaluationComponent } from './../../shared/modals/modal-scan-e
 import { SchoolsProviderService } from '../../core/providers/schools-provider.service'
 
 @Component({
-  selector: 'app-rotations-list',
-  templateUrl: './rotations-list.page.html',
-  styleUrls: ['./rotations-list.page.scss'],
+  selector: 'app-situations-list',
+  templateUrl: './situations-list.page.html',
+  styleUrls: ['./situations-list.page.scss'],
 })
-export class RotationsListPage extends BaseComponent implements OnInit {
-  rotations
+export class SituationsListPage extends BaseComponent implements OnInit {
+  situations
 
   constructor(
     private toastController: ToastController,
@@ -36,12 +36,12 @@ export class RotationsListPage extends BaseComponent implements OnInit {
         filter((mode) => !!mode)
       )
       .subscribe((mode) => {
-        this.rotations = SchoolsProviderService.getSchoolsList()
+        this.situations = SchoolsProviderService.getSchoolsList()
         if (mode === 'student') {
-          this.rotations = [
+          this.situations = [
             {
               id: 1,
-              title: 'Rotation chirurgie technique',
+              title: 'Situation chirurgie technique',
               subtitle: '10-14 Juillet 2020',
               type: 'student',
               evaluated: '3/4',
@@ -50,7 +50,7 @@ export class RotationsListPage extends BaseComponent implements OnInit {
             },
             {
               id: 1,
-              title: 'Rotation chirurgie technique',
+              title: 'Situation chirurgie technique',
               subtitle: '10-14 Juillet 2020',
               type: 'student',
               evaluated: '3/4',
@@ -59,7 +59,7 @@ export class RotationsListPage extends BaseComponent implements OnInit {
             },
             {
               id: 1,
-              title: 'Rotation chirurgie technique',
+              title: 'Situation chirurgie technique',
               subtitle: '10-14 Juillet 2020',
               type: 'student',
               evaluated: '3/4',
@@ -68,11 +68,11 @@ export class RotationsListPage extends BaseComponent implements OnInit {
             },
           ]
         } else if (mode === 'appraiser') {
-          this.rotations = [
+          this.situations = [
             {
               id: 1,
               title: 'Philip Payne',
-              subtitle: 'Rotation chirurgie technique',
+              subtitle: 'Situation chirurgie technique',
               type: 'appraiser',
               status: 'in_progress',
               image: 'https://via.placeholder.com/50x50',
@@ -80,7 +80,7 @@ export class RotationsListPage extends BaseComponent implements OnInit {
             {
               id: 1,
               title: 'Philip Payne',
-              subtitle: 'Rotation chirurgie technique',
+              subtitle: 'Situation chirurgie technique',
               type: 'appraiser',
               status: 'done',
               image: 'https://via.placeholder.com/50x50',
@@ -94,7 +94,7 @@ export class RotationsListPage extends BaseComponent implements OnInit {
     this.menuController.open('main')
   }
 
-  filterRotations() {
+  filterSituations() {
     this.toastController
       .create({
         message: 'Not implemented',

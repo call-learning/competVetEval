@@ -1,4 +1,4 @@
-.rotation-detail__illustration {
+.situation-detail__illustration {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,29 +11,29 @@
   }
 }
 
-.rotation-detail__header {
+.situation-detail__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 
   margin-bottom: 35px;
 
-  .rotation-detail__header-content {
+  .situation-detail__header-content {
     flex-grow: 1;
   }
 }
 
-.rotation-detail__evaluations-title {
+.situation-detail__evaluations-title {
   font-size: 17px;
   font-weight: 500;
   margin-bottom: 20px;
 }
 
-.rotation-detail__student {
+.situation-detail__student {
   margin-bottom: 20px;
 }
 
-.rotation-detail__no-evaluations {
+.situation-detail__no-evaluations {
   text-align: center;
   font-size: 14px;
   opacity: 0.5;
@@ -46,6 +46,6 @@
   }
 }
 
-.rotation-detail__ask-evaluation {
+.situation-detail__ask-evaluation {
   margin-top: 25px;
 }

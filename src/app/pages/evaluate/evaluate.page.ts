@@ -34,9 +34,9 @@ export class EvaluatePage implements OnInit {
 
   ngOnInit() {
     this.evaluation = {
-      rotationTitle: 'Rotation chirurgie technique',
+      situationTitle: 'Situation chirurgie technique',
       context:
-        'Rotation effectuée en hopital vétérinaire sur animaux de companie',
+        'Situation effectuée en hopital vétérinaire sur animaux de companie',
       criteria: [
         {
           title: 'Savoir être, qualités personnelles et professionnelles',
@@ -166,7 +166,7 @@ export class EvaluatePage implements OnInit {
         },
       ],
       comment:
-        'Courageux,  autonome, Michelle a fait preuve de tenacité pendant cette rotation.',
+        'Courageux,  autonome, Michelle a fait preuve de tenacité pendant cette situation.',
     }
   }
 
@@ -212,7 +212,7 @@ export class EvaluatePage implements OnInit {
       .then((toast) => {
         toast.present()
       })
-    this.router.navigate(['rotations-list'])
+    this.router.navigate(['situations-list'])
   }
 
   notImplemented() {

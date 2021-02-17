@@ -4,15 +4,15 @@ import { ModalController } from '@ionic/angular'
 
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskEvaluationComponent } from 'src/app/shared/modals/modal-ask-evaluation/modal-ask-evaluation.component'
-import { ModalRotationChartComponent } from 'src/app/shared/modals/modal-rotation-chart/modal-rotation-chart.component'
+import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
 
 @Component({
-  selector: 'app-rotation-detail',
-  templateUrl: './rotation-detail.page.html',
-  styleUrls: ['./rotation-detail.page.scss'],
+  selector: 'app-situation-detail',
+  templateUrl: './situation-detail.page.html',
+  styleUrls: ['./situation-detail.page.scss'],
 })
-export class RotationDetailPage implements OnInit {
-  rotation
+export class SituationDetailPage implements OnInit {
+  situation
 
   constructor(
     public authService: AuthService,
@@ -20,8 +20,8 @@ export class RotationDetailPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.rotation = {
-      title: 'Rotation chirurgie technique',
+    this.situation = {
+      title: 'Situation chirurgie technique',
       subtitle: '10-14 Juillet 2020',
       evaluations: [
         {
@@ -117,12 +117,12 @@ export class RotationDetailPage implements OnInit {
     }
   }
 
-  openModalRotationChart() {
+  openModalSituationChart() {
     this.modalController
       .create({
-        component: ModalRotationChartComponent,
+        component: ModalSituationChartComponent,
         componentProps: {
-          rotation: this.rotation,
+          situation: this.situation,
         },
       })
       .then((modal) => {
@@ -135,7 +135,7 @@ export class RotationDetailPage implements OnInit {
       .create({
         component: ModalAskEvaluationComponent,
         componentProps: {
-          rotation: this.rotation,
+          situation: this.situation,
         },
       })
       .then((modal) => {

@@ -15,7 +15,7 @@ import { IonTextarea, ModalController, ToastController } from '@ionic/angular'
   styleUrls: ['./modal-ask-evaluation.component.scss'],
 })
 export class ModalAskEvaluationComponent implements OnInit, AfterViewInit {
-  @Input() rotation: any
+  @Input() situation: any
 
   askEvaluationForm: FormGroup
 

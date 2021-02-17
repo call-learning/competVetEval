@@ -1,14 +1,14 @@
-.rotations-list__toolbar {
+.situations-list__toolbar {
   padding: 0 20px 10px 20px;
   width: 100%;
 }
 
-.rotations-list__top-toolbar {
+.situations-list__top-toolbar {
   display: flex;
   align-items: center;
   padding-top: 20px;
 
-  .rotations-list__avatar {
+  .situations-list__avatar {
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -26,13 +26,13 @@
     }
   }
 
-  .rotations-list__title {
+  .situations-list__title {
     font-size: 34px;
     font-weight: 700;
   }
 }
 
-.rotations-list__bottom-toolbar {
+.situations-list__bottom-toolbar {
   margin-top: 20px;
   display: flex;
   align-items: center;

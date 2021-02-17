@@ -9,14 +9,14 @@ import { QRCodeModule } from 'angularx-qrcode'
 import { ModalAskEvaluationComponent } from './modals/modal-ask-evaluation/modal-ask-evaluation.component'
 import { ModalCriterionDetailComponent } from './modals/modal-criterion-detail/modal-criterion-detail.component'
 import { ModalEvaluateCriterionComponent } from './modals/modal-evaluate-criterion/modal-evaluate-criterion.component'
-import { ModalRotationChartComponent } from './modals/modal-rotation-chart/modal-rotation-chart.component'
+import { ModalSituationChartComponent } from './modals/modal-situation-chart/modal-situation-chart.component'
 import { ModalScanEvaluationComponent } from './modals/modal-scan-evaluation/modal-scan-evaluation.component'
 
 @NgModule({
   declarations: [
     ModalAskEvaluationComponent,
     ModalCriterionDetailComponent,
-    ModalRotationChartComponent,
+    ModalSituationChartComponent,
     ModalScanEvaluationComponent,
     ModalEvaluateCriterionComponent,
   ],

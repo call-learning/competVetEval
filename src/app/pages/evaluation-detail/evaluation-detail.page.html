@@ -1,11 +1,14 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/rotation-detail', 1]" routerDirection="back">
+      <ion-button
+        [routerLink]="['/situation-detail', 1]"
+        routerDirection="back"
+      >
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ evaluation.rotationTitle }}</ion-title>
+    <ion-title>{{ evaluation.situationTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

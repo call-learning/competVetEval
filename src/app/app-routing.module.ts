@@ -9,7 +9,7 @@ import { SchoolGuard } from './core/guards/school.guard'
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'rotations-list',
+    redirectTo: 'situations-list',
     pathMatch: 'full',
   },
   {
@@ -29,19 +29,19 @@ const routes: Routes = [
     canActivate: [SchoolGuard, GuestGuard],
   },
   {
-    path: 'rotations-list',
+    path: 'situations-list',
     loadChildren: () =>
-      import('./pages/rotations-list/rotations-list.module').then(
-        (m) => m.RotationsListPageModule
+      import('./pages/situations-list/situations-list.module').then(
+        (m) => m.SituationsListPageModule
       ),
     canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
-    path: 'rotation-detail',
+    path: 'situation-detail',
     loadChildren: () =>
-      import('./pages/rotation-detail/rotation-detail.module').then(
-        (m) => m.RotationDetailPageModule
+      import('./pages/situation-detail/situation-detail.module').then(
+        (m) => m.SituationDetailPageModule
       ),
     canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
