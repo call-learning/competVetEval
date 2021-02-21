@@ -4,7 +4,8 @@ import { Router } from '@angular/router'
 
 import { ModalController, ToastController } from '@ionic/angular'
 
-import { ModalEvaluateCriterionComponent } from './../../shared/modals/modal-evaluate-criterion/modal-evaluate-criterion.component'
+import { ModalEvaluateCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-evaluate-criterion.component'
+import { AppraisalService } from '../../core/services/appraisal.service'
 
 @Component({
   selector: 'app-evaluate',
@@ -12,7 +13,7 @@ import { ModalEvaluateCriterionComponent } from './../../shared/modals/modal-eva
   styleUrls: ['./evaluate.page.scss'],
 })
 export class EvaluatePage implements OnInit {
-  evaluation: any
+  appraisal: any
 
   contextForm: FormGroup
   commentForm: FormGroup
@@ -21,7 +22,8 @@ export class EvaluatePage implements OnInit {
     private formBuilder: FormBuilder,
     private modalController: ModalController,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private appraisalService: AppraisalService
   ) {
     this.contextForm = this.formBuilder.group({
       context: ['', [Validators.required]],
@@ -33,18 +35,20 @@ export class EvaluatePage implements OnInit {
   }
 
   ngOnInit() {
-    this.evaluation = {
+    this.appraisal = {
       situationTitle: 'Situation chirurgie technique',
       context:
         'Situation effectuée en hopital vétérinaire sur animaux de companie',
       criteria: [
         {
+          id: 1,
           title: 'Savoir être, qualités personnelles et professionnelles',
           evaluated: '3/4',
           comments: '1',
           grade: null,
           subcriteria: [
             {
+              id: 15,
               title: 'Ponctualité',
               grade: null,
             },
@@ -203,16 +207,18 @@ export class EvaluatePage implements OnInit {
   }
 
   saveAndRedirect() {
-    this.toastController
-      .create({
-        message: 'Enregistré !',
-        duration: 2000,
-        color: 'success',
-      })
-      .then((toast) => {
-        toast.present()
-      })
-    this.router.navigate(['situations-list'])
+    this.appraisalService.submitAppraisal(this.appraisal).subscribe(() => {
+      this.toastController
+        .create({
+          message: 'Enregistré !',
+          duration: 2000,
+          color: 'success',
+        })
+        .then((toast) => {
+          toast.present()
+        })
+      this.router.navigate(['situations-list'])
+    })
   }
 
   notImplemented() {

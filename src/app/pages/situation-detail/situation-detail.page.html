@@ -10,7 +10,7 @@
         class="btn btn-transparent"
         (click)="openModalSituationChart()"
         color="primary"
-        [disabled]="!situation.evaluations.length"
+        [disabled]="!appraisals.length"
       >
         <svg-icon
           src="assets/images/svg-icons/icon-chart.svg"
@@ -29,7 +29,10 @@
   <div class="situation-detail__header">
     <div class="situation-detail__header-content">
       <div class="page-title">{{ situation.title }}</div>
-      <div class="page-text">{{ situation.subtitle }}</div>
+      <div class="page-dates">
+        {{ situation.startTime * 1000 | date:'d LLL yy' }}/{{ situation.endTime
+        * 1000 | date:'d LLL yy' }}
+      </div>
     </div>
     <div
       class="list-item-icon"
@@ -58,35 +61,32 @@
 
   <div class="page-subtitle">Évaluations</div>
 
-  <div
-    class="situation-detail__no-evaluations"
-    *ngIf="!situation.evaluations.length"
-  >
+  <div class="situation-detail__no-appraisals" *ngIf="!appraisals.length">
     Cette situation n’a pas encore été évaluée
   </div>
 
-  <div class="ion-margin-vertical" *ngIf="situation.evaluations.length">
+  <div class="ion-margin-vertical" *ngIf="appraisals.length">
     <a
       class="list-item"
-      [routerLink]="['/evaluation-detail', 1, 1]"
+      [routerLink]="['/appraisal-detail', situationId, appraisal.id]"
       routerDirection="forward"
-      *ngFor="let evaluation of situation.evaluations"
+      *ngFor="let appraisal of appraisals"
     >
       <div class="list-item-image">
-        <img [src]="evaluation.image" />
+        <img [src]="appraisal.image" />
       </div>
       <div class="list-item-content">
-        <div class="list-item-title">{{ evaluation.title }}</div>
+        <div class="list-item-title">{{ appraisal.appraiserName }}</div>
         <div class="list-item-subtitle">
-          <ng-container *ngIf="evaluation.responsable">
+          <ng-container *ngIf="appraisal.type == 1">
+            <span>Évaluateur</span>
+          </ng-container>
+          <ng-container *ngIf="appraisal.type == 2">
             <span>Responsable</span>
             <svg-icon
               src="assets/images/svg-icons/icon-star.svg"
               [svgStyle]="{ 'width.px':18 }"
             ></svg-icon>
-          </ng-container>
-          <ng-container *ngIf="!evaluation.responsable">
-            <span>Évaluateur</span>
           </ng-container>
         </div>
       </div>
@@ -95,15 +95,15 @@
           src="assets/images/svg-icons/icon-calendar.svg"
           [svgStyle]="{ 'width.px':16 }"
         ></svg-icon>
-        {{ evaluation.date }}
+        {{ appraisal.timeModified * 1000 | date:'d LLL yy' }}
       </div>
     </a>
   </div>
 
-  <div class="situation-detail__ask-evaluation">
+  <div class="situation-detail__ask-appraisal">
     <button
       class="btn btn-primary btn-full nnki-mb4"
-      (click)="openModalAskEvaluation()"
+      (click)="openModalAskAppraisal()"
     >
       Demander une évaluation
     </button>

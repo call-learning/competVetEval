@@ -9,8 +9,9 @@ import {
 import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
-import { ModalScanEvaluationComponent } from './../../shared/modals/modal-scan-evaluation/modal-scan-evaluation.component'
+import { ModalScanAppraisalComponent } from './../../shared/modals/modal-scan-appraisal/modal-scan-appraisal.component'
 import { SchoolsProviderService } from '../../core/providers/schools-provider.service'
+import { SituationService } from '../../core/services/situation.service'
 
 @Component({
   selector: 'app-situations-list',
@@ -24,6 +25,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     private toastController: ToastController,
     private menuController: MenuController,
     public authService: AuthService,
+    public situationService: SituationService,
     private modalController: ModalController
   ) {
     super()
@@ -36,57 +38,10 @@ export class SituationsListPage extends BaseComponent implements OnInit {
         filter((mode) => !!mode)
       )
       .subscribe((mode) => {
-        this.situations = SchoolsProviderService.getSchoolsList()
-        if (mode === 'student') {
-          this.situations = [
-            {
-              id: 1,
-              title: 'Situation chirurgie technique',
-              subtitle: '10-14 Juillet 2020',
-              type: 'student',
-              evaluated: '3/4',
-              comments: '1',
-              status: 'done',
-            },
-            {
-              id: 1,
-              title: 'Situation chirurgie technique',
-              subtitle: '10-14 Juillet 2020',
-              type: 'student',
-              evaluated: '3/4',
-              comments: '1',
-              status: 'in_progress',
-            },
-            {
-              id: 1,
-              title: 'Situation chirurgie technique',
-              subtitle: '10-14 Juillet 2020',
-              type: 'student',
-              evaluated: '3/4',
-              comments: '1',
-              status: 'todo',
-            },
-          ]
-        } else if (mode === 'appraiser') {
-          this.situations = [
-            {
-              id: 1,
-              title: 'Philip Payne',
-              subtitle: 'Situation chirurgie technique',
-              type: 'appraiser',
-              status: 'in_progress',
-              image: 'https://via.placeholder.com/50x50',
-            },
-            {
-              id: 1,
-              title: 'Philip Payne',
-              subtitle: 'Situation chirurgie technique',
-              type: 'appraiser',
-              status: 'done',
-              image: 'https://via.placeholder.com/50x50',
-            },
-          ]
-        }
+        this.situationService.retrieveSituations().subscribe()
+        this.situationService.currentSituations.subscribe((situations) => {
+          this.situations = situations
+        })
       })
   }
 
@@ -118,10 +73,10 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       })
   }
 
-  openModalScanEvaluation() {
+  openModalScanAppraisal() {
     this.modalController
       .create({
-        component: ModalScanEvaluationComponent,
+        component: ModalScanAppraisalComponent,
       })
       .then((modal) => {
         modal.present()

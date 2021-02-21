@@ -8,21 +8,21 @@
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ evaluation.situationTitle }}</ion-title>
+    <ion-title>{{ appraisal.situationTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <div class="page-title">Contexte</div>
 
-  <p class="page-text">{{ evaluation.context }}</p>
+  <p class="page-text">{{ appraisal.context }}</p>
 
   <div class="page-title">Évaluations</div>
 
   <div class="ion-margin-vertical">
     <div
       class="list-item"
-      *ngFor="let criterion of evaluation.criteria"
+      *ngFor="let criterion of appraisal.criteria"
       (click)="openModalCriterionDetail(criterion)"
     >
       <div class="list-item-content">
@@ -60,14 +60,14 @@
       src="assets/images/svg-icons/icon-quote.svg"
       [svgStyle]="{ 'width.px':16 }"
     ></svg-icon>
-    {{ evaluation.comment }}
+    {{ appraisal.comment }}
   </p>
 
   <div class="page-subtitle">Répondre</div>
 
   <form
-    [formGroup]="answerEvaluationForm"
-    (ngSubmit)="answerEvaluation()"
+    [formGroup]="answerAppraisalForm"
+    (ngSubmit)="answerAppraisal()"
     [class.-submitted]="formSubmitted"
     class="form"
   >
@@ -77,7 +77,7 @@
 
     <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
 
-    <button class="btn btn-primary nnki-mb4" (click)="answerEvaluation()">
+    <button class="btn btn-primary nnki-mb4" (click)="answerAppraisal()">
       Envoyer
     </button>
   </form>

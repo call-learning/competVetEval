@@ -5,7 +5,7 @@
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ evaluation.situationTitle }}</ion-title>
+    <ion-title>{{ appraisal.situationTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -23,7 +23,7 @@
   <div class="ion-margin-vertical">
     <div
       class="list-item"
-      *ngFor="let criterion of evaluation.criteria"
+      *ngFor="let criterion of appraisal.criteria"
       (click)="openModalEvaluateCriterion(criterion)"
     >
       <div class="list-item-content">

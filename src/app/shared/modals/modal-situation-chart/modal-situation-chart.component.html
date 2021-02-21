@@ -10,15 +10,15 @@
 
   <div class="table-container ion-margin-vertical">
     <table>
-      <tr *ngFor="let evaluation of situation.evaluations">
+      <tr *ngFor="let appraisal of situation.appraisals">
         <td>
           <div class="td-content">
             <div class="list-item-image">
-              <img [src]="evaluation.image" />
+              <img [src]="appraisal.image" />
             </div>
           </div>
         </td>
-        <td *ngFor="let criterion of evaluation.criteria">
+        <td *ngFor="let criterion of appraisal.criteria">
           <div class="td-content">
             <svg-icon
               src="assets/images/svg-icons/emojis/ranking-active-{{

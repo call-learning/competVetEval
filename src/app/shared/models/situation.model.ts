@@ -4,10 +4,12 @@ export class Situation {
   startTime: number
   endTime: number
   type: string
-  evaluationsRequired: number
-  evaluationsCompleted: number
+  appraisalsRequired: number
+  appraisalsCompleted?: number
   comments: string
-  status: string
+  status?: string
+  studentName?: string
+  studentId?: number
 
   constructor(input: any) {
     Object.assign(this, input)

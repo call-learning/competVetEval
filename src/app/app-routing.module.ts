@@ -47,10 +47,10 @@ const routes: Routes = [
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
-    path: 'evaluation-detail',
+    path: 'appraisal-detail',
     loadChildren: () =>
-      import('./pages/evaluation-detail/evaluation-detail.module').then(
-        (m) => m.EvaluationDetailPageModule
+      import('./pages/appraisal-detail/appraisal-detail.module').then(
+        (m) => m.AppraisalDetailPageModule
       ),
     canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],

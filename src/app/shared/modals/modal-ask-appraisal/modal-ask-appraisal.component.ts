@@ -10,14 +10,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { IonTextarea, ModalController, ToastController } from '@ionic/angular'
 
 @Component({
-  selector: 'app-modal-ask-evaluation',
-  templateUrl: './modal-ask-evaluation.component.html',
-  styleUrls: ['./modal-ask-evaluation.component.scss'],
+  selector: 'app-modal-ask-appraisal',
+  templateUrl: './modal-ask-appraisal.component.html',
+  styleUrls: ['./modal-ask-appraisal.component.scss'],
 })
-export class ModalAskEvaluationComponent implements OnInit, AfterViewInit {
+export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
   @Input() situation: any
 
-  askEvaluationForm: FormGroup
+  askAppraisalForm: FormGroup
 
   errorMsg = ''
 
@@ -32,7 +32,7 @@ export class ModalAskEvaluationComponent implements OnInit, AfterViewInit {
     private formBuilder: FormBuilder,
     private toastController: ToastController
   ) {
-    this.askEvaluationForm = this.formBuilder.group({
+    this.askAppraisalForm = this.formBuilder.group({
       context: ['', [Validators.required]],
     })
   }
@@ -55,7 +55,7 @@ export class ModalAskEvaluationComponent implements OnInit, AfterViewInit {
     this.errorMsg = ''
     this.formSubmitted = true
 
-    if (this.askEvaluationForm.valid) {
+    if (this.askAppraisalForm.valid) {
       this.step = 'qr-code'
     } else {
       this.errorMsg = 'Le formulaire est invalide'

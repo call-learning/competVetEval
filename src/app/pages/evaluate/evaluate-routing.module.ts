@@ -5,7 +5,7 @@ import { EvaluatePage } from './evaluate.page'
 
 const routes: Routes = [
   {
-    path: ':situationId',
+    path: ':situationId/:studentId',
     component: EvaluatePage,
   },
 ]

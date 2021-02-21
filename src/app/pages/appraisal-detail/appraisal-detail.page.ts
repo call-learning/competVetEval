@@ -7,18 +7,18 @@ import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
 
 @Component({
-  selector: 'app-evaluation-detail',
-  templateUrl: './evaluation-detail.page.html',
-  styleUrls: ['./evaluation-detail.page.scss'],
+  selector: 'app-appraisal-detail',
+  templateUrl: './appraisal-detail.page.html',
+  styleUrls: ['./appraisal-detail.page.scss'],
 })
-export class EvaluationDetailPage implements OnInit {
-  answerEvaluationForm: FormGroup
+export class AppraisalDetailPage implements OnInit {
+  answerAppraisalForm: FormGroup
 
   errorMsg = ''
 
   formSubmitted = false
 
-  evaluation: any
+  appraisal: any
 
   constructor(
     private formBuilder: FormBuilder,
@@ -26,13 +26,13 @@ export class EvaluationDetailPage implements OnInit {
     public authService: AuthService,
     private modalController: ModalController
   ) {
-    this.answerEvaluationForm = this.formBuilder.group({
+    this.answerAppraisalForm = this.formBuilder.group({
       answer: ['', [Validators.required]],
     })
   }
 
   ngOnInit() {
-    this.evaluation = {
+    this.appraisal = {
       situationTitle: 'Situation chirurgie technique',
       context:
         'Situation effectuée en hopital vétérinaire sur animaux de companie',
@@ -182,11 +182,11 @@ export class EvaluationDetailPage implements OnInit {
       })
   }
 
-  answerEvaluation() {
+  answerAppraisal() {
     this.errorMsg = ''
     this.formSubmitted = true
 
-    if (this.answerEvaluationForm.valid) {
+    if (this.answerAppraisalForm.valid) {
       this.toastController
         .create({
           message: 'Not implemented',

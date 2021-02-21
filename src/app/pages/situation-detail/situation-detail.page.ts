@@ -3,118 +3,58 @@ import { Component, OnInit } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 
 import { AuthService } from 'src/app/core/services/auth.service'
-import { ModalAskEvaluationComponent } from 'src/app/shared/modals/modal-ask-evaluation/modal-ask-evaluation.component'
+import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
+import { filter, takeUntil } from 'rxjs/operators'
+import { BaseComponent } from '../../shared/components/base/base.component'
+import { AppraisalService } from '../../core/services/appraisal.service'
+import { ActivatedRoute } from '@angular/router'
+import { SituationService } from '../../core/services/situation.service'
 
 @Component({
   selector: 'app-situation-detail',
   templateUrl: './situation-detail.page.html',
   styleUrls: ['./situation-detail.page.scss'],
 })
-export class SituationDetailPage implements OnInit {
+export class SituationDetailPage extends BaseComponent implements OnInit {
+  situationId
   situation
+  appraisals
 
   constructor(
     public authService: AuthService,
-    private modalController: ModalController
-  ) {}
+    private modalController: ModalController,
+    public appraisalService: AppraisalService,
+    public situationService: SituationService,
+    private activatedRoute: ActivatedRoute
+  ) {
+    super()
+  }
 
   ngOnInit() {
-    this.situation = {
-      title: 'Situation chirurgie technique',
-      subtitle: '10-14 Juillet 2020',
-      evaluations: [
-        {
-          title: 'Philip Payne',
-          responsable: true,
-          date: '30/09/2020',
-          image: 'https://via.placeholder.com/50x50',
-          criteria: [
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-          ],
-        },
-        {
-          title: 'Philip Payne',
-          responsable: false,
-          date: '30/09/2020',
-          image: 'https://via.placeholder.com/50x50',
-          criteria: [
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-          ],
-        },
-        {
-          title: 'Philip Payne',
-          responsable: false,
-          date: '30/09/2020',
-          image: 'https://via.placeholder.com/50x50',
-          criteria: [
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-            {
-              title: 'Savoir être',
-              grade: 5,
-            },
-          ],
-        },
-      ],
-      status: 'done',
-      student: {
-        image: 'https://via.placeholder.com/50x50',
-        name: 'Derrick Simmons',
-      },
-    }
+    this.situationId = parseInt(
+      this.activatedRoute.snapshot.paramMap.get('situationId')
+    )
+    this.appraisals = []
+    this.authService.currentUserRole
+      .pipe(
+        takeUntil(this.alive$),
+        filter((mode) => !!mode)
+      )
+      .subscribe((mode) => {
+        this.appraisalService.currentAppraisals.subscribe((appraisals) => {
+          this.situation = this.situationService.currentSituations
+            .getValue()
+            .find((sit) => sit.id === this.situationId)
+          this.appraisals = []
+          appraisals.forEach((appraisal) => {
+            if (appraisal.situationId === this.situation.id) {
+              this.appraisals.push(appraisal)
+            }
+          })
+        })
+      })
+    this.appraisalService.retrieveAppraisals().subscribe()
   }
 
   openModalSituationChart() {
@@ -130,10 +70,10 @@ export class SituationDetailPage implements OnInit {
       })
   }
 
-  openModalAskEvaluation() {
+  openModalAskAppraisal() {
     this.modalController
       .create({
-        component: ModalAskEvaluationComponent,
+        component: ModalAskAppraisalComponent,
         componentProps: {
           situation: this.situation,
         },

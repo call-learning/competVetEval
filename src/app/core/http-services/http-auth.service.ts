@@ -4,10 +4,10 @@ import { Injectable } from '@angular/core'
 import { throwError } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
 import { AuthEndpoints } from 'src/app/shared/endpoints/auth.endpoints'
-import { ServerEndpoints } from 'src/app/shared/endpoints/server.endpoints'
 import { LoginResult } from 'src/app/shared/models/auth.model'
 import { CevUser } from 'src/app/shared/models/cev-user.model'
 import { UserType } from '../../shared/models/user-type.model'
+import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
 
 @Injectable({
   providedIn: 'root',
@@ -33,50 +33,53 @@ export class HttpAuthService {
   }
 
   getUserProfile() {
-    const formData: FormData = new FormData()
-    formData.append('moodlewssettingfilter', 'true')
-    formData.append('moodlewssettingfileurl', 'true')
-    formData.append('wsfunction', 'core_webservice_get_site_info')
-
-    return this.http
-      .post(ServerEndpoints.server(), formData, {
-        params: {
-          moodlewsrestformat: 'json',
-        },
+    return MoodleApiUtils.apiCall(
+      'core_webservice_get_site_info',
+      {},
+      this.http
+    ).pipe(
+      map((res) => {
+        return new CevUser(res)
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
       })
-      .pipe(
-        map((res) => {
-          return new CevUser(res)
-        }),
-        catchError((err) => {
-          console.error(err)
-          return throwError(err)
-        })
-      )
+    )
   }
 
   getUserType(userid) {
-    const formData: FormData = new FormData()
-    formData.append('moodlewssettingfilter', 'true')
-    formData.append('moodlewssettingfileurl', 'true')
-    formData.append('wsfunction', 'local_cveteval_get_user_type')
-    formData.append('userid', userid)
-
-    return this.http
-      .post(ServerEndpoints.server(), formData, {
-        params: {
-          moodlewsrestformat: 'json',
-        },
+    return MoodleApiUtils.apiCall(
+      'local_cveteval_get_user_type',
+      { userid: userid },
+      this.http
+    ).pipe(
+      map((res): 'student' | 'appraiser' => {
+        const userType = new UserType(res)
+        return userType.type == 'student' ? 'student' : 'appraiser'
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
       })
-      .pipe(
-        map((res): 'student' | 'appraiser' => {
-          const userType = new UserType(res)
-          return userType.type == 'student' ? 'student' : 'appraiser'
-        }),
-        catchError((err) => {
-          console.error(err)
-          return throwError(err)
+    )
+  }
+
+  getUserSituations(userid) {
+    return MoodleApiUtils.apiCall(
+      'local_cveteval_get_user_situations',
+      { userid: userid },
+      this.http
+    ).pipe(
+      map((res) => {
+        return res.map((sit) => {
+          return sit
         })
-      )
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
+      })
+    )
   }
 }

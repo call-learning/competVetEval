@@ -5,17 +5,17 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 
 import { SharedModule } from 'src/app/shared/shared.module'
-import { EvaluationDetailPageRoutingModule } from './evaluation-detail-routing.module'
-import { EvaluationDetailPage } from './evaluation-detail.page'
+import { AppraisalDetailPageRoutingModule } from './appraisal-detail-routing.module'
+import { AppraisalDetailPage } from './appraisal-detail.page'
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    EvaluationDetailPageRoutingModule,
+    AppraisalDetailPageRoutingModule,
     SharedModule,
   ],
-  declarations: [EvaluationDetailPage],
+  declarations: [AppraisalDetailPage],
 })
-export class EvaluationDetailPageModule {}
+export class AppraisalDetailPageModule {}

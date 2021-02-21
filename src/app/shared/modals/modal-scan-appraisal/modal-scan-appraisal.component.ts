@@ -5,12 +5,12 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { ModalController, ToastController } from '@ionic/angular'
 
 @Component({
-  selector: 'app-modal-scan-evaluation',
-  templateUrl: './modal-scan-evaluation.component.html',
-  styleUrls: ['./modal-scan-evaluation.component.scss'],
+  selector: 'app-modal-scan-appraisal',
+  templateUrl: './modal-scan-appraisal.component.html',
+  styleUrls: ['./modal-scan-appraisal.component.scss'],
   providers: [BarcodeScanner],
 })
-export class ModalScanEvaluationComponent implements OnInit {
+export class ModalScanAppraisalComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private toastController: ToastController,
