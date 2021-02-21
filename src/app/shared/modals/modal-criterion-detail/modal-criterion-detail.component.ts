@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
 
 import { ModalController } from '@ionic/angular'
+import { CriterionAppraisal } from '../../models/criterion-appraisal.model'
 
 @Component({
   selector: 'app-modal-modal-criterion-detail',
@@ -8,7 +9,7 @@ import { ModalController } from '@ionic/angular'
   styleUrls: ['./modal-criterion-detail.component.scss'],
 })
 export class ModalCriterionDetailComponent implements OnInit {
-  @Input() criterion: any
+  @Input() criterion: CriterionAppraisal
 
   constructor(private modalController: ModalController) {}
 

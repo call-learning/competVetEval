@@ -68,7 +68,7 @@
   <div class="ion-margin-vertical" *ngIf="appraisals.length">
     <a
       class="list-item"
-      [routerLink]="['/appraisal-detail', situationId, appraisal.id]"
+      [routerLink]="['/appraisal-detail', appraisal.id]"
       routerDirection="forward"
       *ngFor="let appraisal of appraisals"
     >

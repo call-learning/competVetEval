@@ -3,12 +3,12 @@ import { catchError, map } from 'rxjs/operators'
 import { BehaviorSubject, throwError } from 'rxjs'
 import { AuthService } from './auth.service'
 import { MoodleApiService } from '../http-services/moodle-api.service'
-import { EvalGrid } from '../../shared/models/eval-grid.model'
+import { Criterion } from '../../shared/models/criterion.model'
 
 @Injectable({
   providedIn: 'root',
 })
-export class EvalGridService {
+export class CriteriaService {
   constructor(
     private moodleApiService: MoodleApiService,
     private authService: AuthService
@@ -16,21 +16,25 @@ export class EvalGridService {
     // Retrieve situations from localStorage if any ?
   }
 
-  evalGrids = new BehaviorSubject<EvalGrid[]>([])
+  criteria = new BehaviorSubject<Criterion[]>([])
 
-  get getEvalGrids(): EvalGrid[] {
-    return this.evalGrids.getValue()
+  get getCriteria(): Criterion[] {
+    return this.criteria.getValue()
   }
 
-  retrieveEvalGrids() {
-    return this.moodleApiService.getEvalGrids().pipe(
-      map((evalgrids: EvalGrid[]) => {
-        this.evalGrids.next(evalgrids)
+  retrieveCriteria() {
+    return this.moodleApiService.getCriteria().pipe(
+      map((criteria: Criterion[]) => {
+        this.criteria.next(criteria)
       }),
       catchError((err) => {
         console.error(err)
         return throwError(err)
       })
     )
+  }
+
+  public getLabelForCriteria(critid) {
+    this.criteria.getValue()
   }
 }

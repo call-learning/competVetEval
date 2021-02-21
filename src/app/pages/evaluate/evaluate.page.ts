@@ -6,6 +6,7 @@ import { ModalController, ToastController } from '@ionic/angular'
 
 import { ModalEvaluateCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-evaluate-criterion.component'
 import { AppraisalService } from '../../core/services/appraisal.service'
+import { AuthService } from '../../core/services/auth.service'
 
 @Component({
   selector: 'app-evaluate',
@@ -23,7 +24,8 @@ export class EvaluatePage implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController,
     private router: Router,
-    private appraisalService: AppraisalService
+    private appraisalService: AppraisalService,
+    public authService: AuthService
   ) {
     this.contextForm = this.formBuilder.group({
       context: ['', [Validators.required]],
@@ -207,18 +209,23 @@ export class EvaluatePage implements OnInit {
   }
 
   saveAndRedirect() {
-    this.appraisalService.submitAppraisal(this.appraisal).subscribe(() => {
-      this.toastController
-        .create({
-          message: 'Enregistré !',
-          duration: 2000,
-          color: 'success',
-        })
-        .then((toast) => {
-          toast.present()
-        })
-      this.router.navigate(['situations-list'])
-    })
+    this.appraisalService
+      .submitAppraisal(
+        this.appraisal,
+        this.authService.loggedUser.getValue().userid
+      )
+      .subscribe(() => {
+        this.toastController
+          .create({
+            message: 'Enregistré !',
+            duration: 2000,
+            color: 'success',
+          })
+          .then((toast) => {
+            toast.present()
+          })
+        this.router.navigate(['situations-list'])
+      })
   }
 
   notImplemented() {

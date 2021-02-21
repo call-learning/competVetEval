@@ -1,53 +1,66 @@
 import { Injectable } from '@angular/core'
 import { Situation } from 'src/app/shared/models/situation.model'
 import { catchError, map } from 'rxjs/operators'
-import { BehaviorSubject, throwError } from 'rxjs'
+import { BehaviorSubject, of, throwError } from 'rxjs'
 import { AuthService } from './auth.service'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { Appraisal } from '../../shared/models/appraisal.model'
-import { EvalGrid } from '../../shared/models/eval-grid.model'
+import { CriteriaService } from './criteria.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppraisalService {
-  constructor(
-    private moodleApiService: MoodleApiService,
-    private authService: AuthService
-  ) {
+  constructor(private moodleApiService: MoodleApiService) {
     // Retrieve situations from localStorage if any ?
   }
 
-  currentAppraisals = new BehaviorSubject<Appraisal[]>([])
+  private appraisalEntities = new BehaviorSubject<Appraisal[]>([])
 
-  get getAppraisals(): Appraisal[] {
-    return this.currentAppraisals.getValue()
+  get appraisals(): Appraisal[] {
+    return this.appraisalEntities.getValue()
   }
 
-  retrieveAppraisals() {
-    return this.moodleApiService
-      .getUserAppraisals(this.authService.loggedUserValue.userid)
-      .pipe(
-        map((appraisals: Appraisal[]) => {
-          this.currentAppraisals.next(appraisals)
-        }),
-        catchError((err) => {
-          console.error(err)
-          return throwError(err)
-        })
-      )
+  retrieveAppraisals(userid) {
+    return this.moodleApiService.getUserAppraisals(userid).pipe(
+      map((appraisals: Appraisal[]) => {
+        this.appraisalEntities.next(appraisals)
+        return appraisals
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
+      })
+    )
   }
-  submitAppraisal(appraisal: Appraisal) {
-    return this.moodleApiService
-      .submitUserAppraisal(this.authService.loggedUserValue.userid, appraisal)
-      .pipe(
-        map((appraisals: Appraisal[]) => {
-          this.currentAppraisals.next(appraisals)
-        }),
-        catchError((err) => {
-          console.error(err)
-          return throwError(err)
-        })
-      )
+
+  submitAppraisal(appraisal: Appraisal, userid: number) {
+    return this.moodleApiService.submitUserAppraisal(userid, appraisal).pipe(
+      map((appraisals: Appraisal[]) => {
+        this.appraisalEntities.next(appraisals)
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
+      })
+    )
+  }
+
+  retrieveAppraisal(appraisalId) {
+    const localAppraisal = this.appraisalEntities
+      .getValue()
+      .find((appraisal) => appraisal.id === appraisalId)
+    if (localAppraisal) {
+      return of(localAppraisal)
+    }
+    return this.moodleApiService.getAppraisal(appraisalId).pipe(
+      map((appraisal: Appraisal) => {
+        return appraisal
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
+      })
+    )
   }
 }

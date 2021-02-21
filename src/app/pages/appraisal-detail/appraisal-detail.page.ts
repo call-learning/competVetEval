@@ -5,168 +5,57 @@ import { ModalController, ToastController } from '@ionic/angular'
 
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
+import { Appraisal } from '../../shared/models/appraisal.model'
+import { filter, takeUntil } from 'rxjs/operators'
+import { AppraisalService } from '../../core/services/appraisal.service'
+import { ActivatedRoute } from '@angular/router'
+import { BaseComponent } from '../../shared/components/base/base.component'
 
 @Component({
   selector: 'app-appraisal-detail',
   templateUrl: './appraisal-detail.page.html',
   styleUrls: ['./appraisal-detail.page.scss'],
 })
-export class AppraisalDetailPage implements OnInit {
+export class AppraisalDetailPage extends BaseComponent implements OnInit {
   answerAppraisalForm: FormGroup
 
   errorMsg = ''
 
   formSubmitted = false
 
-  appraisal: any
+  appraisalId
+  appraisal: Appraisal
 
   constructor(
     private formBuilder: FormBuilder,
     private toastController: ToastController,
     public authService: AuthService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private appraisalService: AppraisalService,
+    private activatedRoute: ActivatedRoute
   ) {
+    super()
     this.answerAppraisalForm = this.formBuilder.group({
       answer: ['', [Validators.required]],
     })
   }
 
   ngOnInit() {
-    this.appraisal = {
-      situationTitle: 'Situation chirurgie technique',
-      context:
-        'Situation effectuée en hopital vétérinaire sur animaux de companie',
-      criteria: [
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 5,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 4,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 3,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 2,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: 1,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-        {
-          title: 'Savoir être, qualités personnelles et professionnelles',
-          evaluated: '3/4',
-          comments: '1',
-          grade: null,
-          subcriteria: [
-            {
-              title: 'Ponctualité',
-              grade: 5,
-            },
-            {
-              title: 'Ponctualité',
-              grade: 2,
-            },
-            {
-              title: 'Ponctualité',
-              grade: null,
-            },
-          ],
-          comment: 'Définitivement un atout !',
-        },
-      ],
-      comment:
-        'Courageux,  autonome, Michelle a fait preuve de tenacité pendant cette situation.',
-    }
+    this.appraisalId = parseInt(
+      this.activatedRoute.snapshot.paramMap.get('appraisalId')
+    )
+    this.authService.currentUserRole
+      .pipe(
+        takeUntil(this.alive$),
+        filter((mode) => !!mode)
+      )
+      .subscribe((mode) => {
+        this.appraisalService
+          .retrieveAppraisal(this.appraisalId)
+          .subscribe((appraisal) => {
+            this.appraisal = appraisal
+          })
+      })
   }
 
   openModalCriterionDetail(criterion) {

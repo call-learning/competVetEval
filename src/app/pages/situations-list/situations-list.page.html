@@ -47,7 +47,7 @@
   <div class="ion-margin-vertical">
     <div
       class="list-item"
-      [routerLink]="authService.isStudentMode ? ['/situation-detail', situation.id] : ['/evaluate', situation.id, situation.studentId ]"
+      [routerLink]="authService.isStudentMode ? ['/situation-detail', situation.id] : ['/situation-detail', situation.id, situation.studentId ]"
       routerDirection="forward"
       *ngFor="let situation of situations"
     >

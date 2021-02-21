@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button
-        [routerLink]="['/situation-detail', 1]"
+        [routerLink]="authService.isStudentMode ? ['/situation-detail', appraisal.situationId] : ['/situation-detail', appraisal.situationId, appraisal.studentId ]"
         routerDirection="back"
       >
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
@@ -26,21 +26,21 @@
       (click)="openModalCriterionDetail(criterion)"
     >
       <div class="list-item-content">
-        <div class="list-item-title -regular">{{ criterion.title }}</div>
+        <div class="list-item-title -regular">{{ criterion.label }}</div>
         <div class="list-item-infos">
           <div class="list-item-info">
             <svg-icon
               src="assets/images/svg-icons/icon-smile.svg"
               [svgStyle]="{ 'width.px':21 }"
             ></svg-icon>
-            <span>{{ criterion.evaluated}}</span>
+            <span>{{ criterion.grade }}</span>
           </div>
           <div class="list-item-info">
             <svg-icon
               src="assets/images/svg-icons/icon-comment.svg"
               [svgStyle]="{ 'width.px':23 }"
             ></svg-icon>
-            <span>{{ criterion.comments }}</span>
+            <span>{{ criterion.comment }}</span>
           </div>
         </div>
       </div>

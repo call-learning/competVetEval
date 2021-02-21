@@ -9,7 +9,7 @@ import { CevUser } from 'src/app/shared/models/cev-user.model'
 import { UserType } from '../../shared/models/user-type.model'
 import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
 import { Appraisal } from '../../shared/models/appraisal.model'
-import { CriteriaAppraisal } from '../../shared/models/criteria-appraisal.model'
+import { CriterionAppraisal } from '../../shared/models/criterion-appraisal.model'
 
 @Injectable({
   providedIn: 'root',
@@ -61,6 +61,7 @@ export class MoodleApiService {
           return {
             id: appr.id,
             situationId: appr.situationid,
+            situationTitle: appr.situationtitle,
             studentId: appr.studentid,
             appraiserId: appr.appraiserid,
             type: appr.type,
@@ -80,6 +81,36 @@ export class MoodleApiService {
     )
   }
 
+  getAppraisal(appraisalId) {
+    return MoodleApiUtils.apiCall(
+      'local_cveteval_get_appraisal',
+      { appraisalid: appraisalId },
+      this.http
+    ).pipe(
+      map((appr) => {
+        // API in Moodle do not use camelcase
+        return {
+          id: appr.id,
+          situationId: appr.situationid,
+          situationTitle: appr.situationtitle,
+          studentId: appr.studentid,
+          appraiserId: appr.appraiserid,
+          type: appr.type,
+          appraiserName: appr.appraisername,
+          studentName: appr.studentid,
+          context: appr.context,
+          comment: appr.comment,
+          criteria: this.convertCriteriaAppraisal(appr.criteria),
+          timeModified: appr.timemodified,
+        }
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
+      })
+    )
+  }
+
   private convertCriteriaAppraisal(crits) {
     if (typeof crits === 'undefined') {
       return []
@@ -89,6 +120,7 @@ export class MoodleApiService {
         id: crit.id,
         criterionId: crit.criterionid,
         grade: crit.grade,
+        label: crit.label,
         comment: crit.comment,
         timeModified: crit.timemodified,
         subcriteria: this.convertCriteriaAppraisal(crit.subcriteria),
@@ -115,21 +147,13 @@ export class MoodleApiService {
     )
   }
 
-  getEvalGrids() {
+  getCriteria() {
     return MoodleApiUtils.apiCall(
-      'local_cveteval_get_eval_grids',
+      'local_cveteval_get_criteria',
       {},
       this.http
     ).pipe(
-      map((res) => {
-        // API in Moodle do not use camelcase
-        return res.map((grid) => {
-          return {
-            id: grid.id,
-            criteria: this.convertCriteria(grid.criteria),
-          }
-        })
-      }),
+      map((res) => this.convertCriteria(res)),
       catchError((err) => {
         console.error(err)
         return throwError(err)
@@ -146,6 +170,7 @@ export class MoodleApiService {
         id: crit.id,
         label: crit.label,
         sort: crit.sort,
+        gridId: crit.gridid,
         subcriteria: this.convertCriteria(crit.subcriteria),
       }
     })

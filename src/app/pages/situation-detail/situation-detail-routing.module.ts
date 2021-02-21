@@ -5,6 +5,10 @@ import { SituationDetailPage } from './situation-detail.page'
 
 const routes: Routes = [
   {
+    path: ':situationId/:studentId',
+    component: SituationDetailPage,
+  },
+  {
     path: ':situationId',
     component: SituationDetailPage,
   },

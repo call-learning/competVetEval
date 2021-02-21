@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 import { ModalController } from '@ionic/angular'
+import { CriterionAppraisal } from '../../models/criterion-appraisal.model'
 
 @Component({
   selector: 'app-modal-evaluate-criterion',
@@ -9,7 +10,7 @@ import { ModalController } from '@ionic/angular'
   styleUrls: ['./modal-evaluate-criterion.component.scss'],
 })
 export class ModalEvaluateCriterionComponent implements OnInit {
-  @Input() criterion: any
+  @Input() criterion: CriterionAppraisal
 
   commentForm: FormGroup
 

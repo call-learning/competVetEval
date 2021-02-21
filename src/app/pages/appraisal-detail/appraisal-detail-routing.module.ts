@@ -5,7 +5,7 @@ import { AppraisalDetailPage } from './appraisal-detail.page'
 
 const routes: Routes = [
   {
-    path: ':situationId/:appraiserId',
+    path: ':appraisalId',
     component: AppraisalDetailPage,
   },
 ]

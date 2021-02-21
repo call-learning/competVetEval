@@ -20,7 +20,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
   situationId
   situation
   appraisals
-
+  studentId
   constructor(
     public authService: AuthService,
     private modalController: ModalController,
@@ -35,26 +35,37 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
     this.situationId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('situationId')
     )
+    if (this.activatedRoute.snapshot.paramMap.has('studentId')) {
+      this.studentId = parseInt(
+        this.activatedRoute.snapshot.paramMap.get('studentId')
+      )
+    } else {
+      this.studentId = null
+    }
     this.appraisals = []
+    this.situation = this.situationService.situations.find(
+      (sit) => sit.id === this.situationId
+    )
     this.authService.currentUserRole
       .pipe(
         takeUntil(this.alive$),
         filter((mode) => !!mode)
       )
       .subscribe((mode) => {
-        this.appraisalService.currentAppraisals.subscribe((appraisals) => {
-          this.situation = this.situationService.currentSituations
-            .getValue()
-            .find((sit) => sit.id === this.situationId)
-          this.appraisals = []
-          appraisals.forEach((appraisal) => {
-            if (appraisal.situationId === this.situation.id) {
-              this.appraisals.push(appraisal)
-            }
+        const userId = this.studentId
+          ? this.studentId
+          : this.authService.loggedUser.getValue().userid
+        this.appraisalService
+          .retrieveAppraisals(userId)
+          .subscribe((appraisals) => {
+            this.appraisals = []
+            appraisals.forEach((appraisal) => {
+              if (appraisal.situationId === this.situation.id) {
+                this.appraisals.push(appraisal)
+              }
+            })
           })
-        })
       })
-    this.appraisalService.retrieveAppraisals().subscribe()
   }
 
   openModalSituationChart() {

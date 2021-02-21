@@ -38,8 +38,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
         filter((mode) => !!mode)
       )
       .subscribe((mode) => {
-        this.situationService.retrieveSituations().subscribe()
-        this.situationService.currentSituations.subscribe((situations) => {
+        this.situationService.retrieveSituations().subscribe((situations) => {
           this.situations = situations
         })
       })

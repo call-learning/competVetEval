@@ -1,8 +1,9 @@
-import { CriteriaAppraisal } from './criteria-appraisal.model'
+import { CriterionAppraisal } from './criterion-appraisal.model'
 
 export class Appraisal {
   id: number
   situationId: number
+  situationTitle: string
   context: string
   comment: string
   appraiserId: number
@@ -11,7 +12,7 @@ export class Appraisal {
   studentId: number
   studentName: string
   timeModified: number
-  criteria: CriteriaAppraisal[]
+  criteria: CriterionAppraisal[]
 
   constructor(input: any) {
     Object.assign(this, input)
