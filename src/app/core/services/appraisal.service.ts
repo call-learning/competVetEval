@@ -34,16 +34,22 @@ export class AppraisalService {
     )
   }
 
-  submitAppraisal(appraisal: Appraisal, userid: number) {
-    return this.moodleApiService.submitUserAppraisal(userid, appraisal).pipe(
-      map((appraisals: Appraisal[]) => {
-        this.appraisalEntities.next(appraisals)
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
-      })
-    )
+  submitAppraisal(
+    appraisal: Appraisal,
+    appraiserId: number,
+    studentId: number
+  ) {
+    return this.moodleApiService
+      .submitUserAppraisal(appraisal, appraiserId, studentId)
+      .pipe(
+        map((appraisals: Appraisal[]) => {
+          this.appraisalEntities.next(appraisals)
+        }),
+        catchError((err) => {
+          console.error(err)
+          return throwError(err)
+        })
+      )
   }
 
   retrieveAppraisal(appraisalId) {

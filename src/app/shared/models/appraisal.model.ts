@@ -1,17 +1,18 @@
 import { CriterionAppraisal } from './criterion-appraisal.model'
 
 export class Appraisal {
-  id: number
+  id?: number // Not set at creation.
   situationId: number
-  situationTitle: string
+  situationTitle?: string
   context: string
   comment: string
   appraiserId: number
   type: number
-  appraiserName: string
+  appraiserName?: string // When creating a new appraisal we don't need all the values set as they are mostly used
+  // for display
   studentId: number
-  studentName: string
-  timeModified: number
+  studentName?: string // When creating a new appraisal we don't need all the values set.
+  timeModified?: number // Can be absent at creation.
   criteria: CriterionAppraisal[]
 
   constructor(input: any) {

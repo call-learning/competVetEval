@@ -5,11 +5,11 @@ export class Situation {
   endTime: number
   type: string
   appraisalsRequired: number
-  appraisalsCompleted?: number
+  appraisalsCompleted?: number // This is a calculated field for display.
   comments: string
-  status?: string
-  studentName?: string
-  studentId?: number
+  status?: string // This is a calculated field for display.
+  studentName?: string // This is a calculated field for display.
+  studentId: number
 
   constructor(input: any) {
     Object.assign(this, input)

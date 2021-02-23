@@ -33,6 +33,12 @@
         {{ situation.startTime * 1000 | date:'d LLL yy' }}/{{ situation.endTime
         * 1000 | date:'d LLL yy' }}
       </div>
+      <div *ngIf="studentId != null">
+        <div class="situation-detail__student">Etudiant</div>
+        <div class="situation-detail__student_name">
+          {{situation.studentName}}
+        </div>
+      </div>
     </div>
     <div
       class="list-item-icon"
@@ -100,12 +106,21 @@
     </a>
   </div>
 
-  <div class="situation-detail__ask-appraisal">
+  <div class="situation-detail__ask-appraisal" *ngIf="currentMode == 'student'">
     <button
       class="btn btn-primary btn-full nnki-mb4"
       (click)="openModalAskAppraisal()"
+      *ngIf="currentMode == 'student'"
     >
       Demander une évaluation
     </button>
   </div>
+
+  <ion-button
+    [routerLink]="['/evaluate', situationId, studentId]"
+    *ngIf="currentMode == 'appraiser'"
+  >
+    <ion-icon name="chevron-forward"></ion-icon>
+    Démarrer l'évaluation
+  </ion-button>
 </ion-content>

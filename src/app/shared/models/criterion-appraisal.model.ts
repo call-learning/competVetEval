@@ -1,7 +1,7 @@
 export class CriterionAppraisal {
-  id: number
+  id?: number // Not set at creation.
   criterionId: number
-  label?: string
+  label?: string // This is a field for display only.
   comment: string
   grade: number
   timeModified?: number

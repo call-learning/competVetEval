@@ -21,6 +21,8 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
   situation
   appraisals
   studentId
+  currentMode
+
   constructor(
     public authService: AuthService,
     private modalController: ModalController,
@@ -55,6 +57,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         const userId = this.studentId
           ? this.studentId
           : this.authService.loggedUser.getValue().userid
+        this.currentMode = mode
         this.appraisalService
           .retrieveAppraisals(userId)
           .subscribe((appraisals) => {

@@ -12,13 +12,30 @@ export class MoodleApiUtils {
     formData.append('moodlewssettingfilter', 'true')
     formData.append('moodlewssettingfileurl', 'true')
     formData.append('wsfunction', functionName)
-    for (let prop in args) {
-      formData.append(prop, args[prop])
-    }
+    MoodleApiUtils.convertArguments(formData, null, args)
     return http.post(ServerEndpoints.server(), formData, {
       params: {
         moodlewsrestformat: 'json',
       },
     })
+  }
+
+  protected static convertArguments(formData, argumentName, value) {
+    if (Array.isArray(value)) {
+      value.forEach((itemValue, index) => {
+        MoodleApiUtils.convertArguments(
+          formData,
+          `${argumentName}[${index}]`,
+          itemValue
+        )
+      })
+    } else if (value instanceof Object) {
+      for (let prop in value) {
+        const propName = argumentName ? `${argumentName}[${prop}]` : prop
+        MoodleApiUtils.convertArguments(formData, propName, value[prop])
+      }
+    } else {
+      formData.append(argumentName, value)
+    }
   }
 }

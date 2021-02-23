@@ -26,6 +26,7 @@ export class CriteriaService {
     return this.moodleApiService.getCriteria().pipe(
       map((criteria: Criterion[]) => {
         this.criteria.next(criteria)
+        return criteria
       }),
       catchError((err) => {
         console.error(err)

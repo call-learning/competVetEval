@@ -128,9 +128,30 @@ export class MoodleApiService {
     })
   }
 
-  submitUserAppraisal(appraiserId: number, appraisal: Appraisal) {
+  submitUserAppraisal(
+    appraisal: Appraisal,
+    appraiserId: number,
+    studentId: number
+  ) {
+    const formatCriterionForApi = (criteria) => {
+      let apiCrit = {
+        grade: criteria.grade,
+        criterionid: criteria.criterionId,
+        comment: criteria.comment,
+        subcriteria: criteria.subcriteria.map(formatCriterionForApi),
+      }
+      if (typeof criteria.id != 'undefined') {
+        apiCrit['id'] = criteria.id
+      }
+      return apiCrit
+    }
     const args = {
-      appraiserId: appraiserId,
+      situationid: appraisal.situationId,
+      appraiserid: appraiserId,
+      studentid: studentId,
+      context: appraisal.context,
+      comment: appraisal.comment,
+      criteria: appraisal.criteria.map(formatCriterionForApi),
     }
     return MoodleApiUtils.apiCall(
       'local_cveteval_set_user_appraisal',

@@ -5,7 +5,7 @@
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ appraisal.situationTitle }}</ion-title>
+    <ion-title>{{ appraisal?.situationTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -23,25 +23,25 @@
   <div class="ion-margin-vertical">
     <div
       class="list-item"
-      *ngFor="let criterion of appraisal.criteria"
+      *ngFor="let criterion of appraisal?.criteria"
       (click)="openModalEvaluateCriterion(criterion)"
     >
       <div class="list-item-content">
-        <div class="list-item-title -regular">{{ criterion.title }}</div>
+        <div class="list-item-title -regular">{{ criterion.label }}</div>
         <div class="list-item-infos">
           <div class="list-item-info">
             <svg-icon
               src="assets/images/svg-icons/icon-smile.svg"
               [svgStyle]="{ 'width.px':21 }"
             ></svg-icon>
-            <span>{{ criterion.evaluated}}</span>
+            <span>{{ criterion.grade }}</span>
           </div>
           <div class="list-item-info">
             <svg-icon
               src="assets/images/svg-icons/icon-comment.svg"
               [svgStyle]="{ 'width.px':23 }"
             ></svg-icon>
-            <span>{{ criterion.comments }}</span>
+            <span>{{ criterion.comment }}</span>
           </div>
         </div>
       </div>

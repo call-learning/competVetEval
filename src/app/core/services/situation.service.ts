@@ -13,22 +13,13 @@ import { CriteriaService } from './criteria.service'
 export class SituationService {
   constructor(
     private moodleApiService: MoodleApiService,
-    private authService: AuthService,
-    private appraisalService: AppraisalService
-  ) {
-    // Load appraisals first.
-    // this.authService.loginState.subscribe(
-    //     (state) => {
-    //         if (state == null) {
-    //             this.currentSituations.next([])
-    //         }
-    //     }
-    // )
-  }
+    private authService: AuthService
+  ) {}
 
   private situationsEntities = new BehaviorSubject<Situation[]>([])
 
   get situations(): Situation[] {
+    // This might be used as a buffer to store values locally so not to call the API each time.
     return this.situationsEntities.getValue()
   }
 
