@@ -1,3 +1,5 @@
+import { Appraisal } from './../../shared/models/appraisal.model'
+import { Situation } from 'src/app/shared/models/situation.model'
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 
@@ -17,11 +19,11 @@ import { BaseComponent } from '../../shared/components/base/base.component'
   styleUrls: ['./situation-detail.page.scss'],
 })
 export class SituationDetailPage extends BaseComponent implements OnInit {
-  situationId
-  situation
-  appraisals
-  studentId
-  currentMode
+  situationId: number
+  situation: Situation
+  appraisals: Appraisal[]
+  studentId: number
+  currentMode: 'student' | 'appraiser'
 
   constructor(
     public authService: AuthService,

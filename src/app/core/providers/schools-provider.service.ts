@@ -36,14 +36,14 @@ export class SchoolsProviderService {
         logo: 'assets/images/schools/logo-vetagro.png',
         moodleUrl: 'https://vetagrotice.vetagro-sup.fr/',
       },
-    ]
-    const devschool = [
       {
         id: 'dev-instance',
         name: 'Development Instance',
         logo: 'assets/images/schools/logo-calllearning.png',
         moodleUrl: 'https://cveteval.call-learning.fr',
       },
+    ]
+    const devschool = [
       {
         id: 'local-instance',
         name: 'Local development Instance',

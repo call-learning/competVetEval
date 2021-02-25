@@ -52,9 +52,10 @@
       routerDirection="forward"
       *ngFor="let situation of situationsDisplayed"
     >
-      <div class="list-item-image" *ngIf="situation.type == 'appraiser'">
+      <!-- todo : implement -->
+      <!-- <div class="list-item-image" *ngIf="situation.type == 'appraiser'">
         <img [src]="situation.image" />
-      </div>
+      </div> -->
       <div class="list-item-content">
         <div class="list-item-title">{{ situation.title }}</div>
         <div class="list-item-dates">

@@ -38,7 +38,7 @@ export class SituationService {
             (a) => a.situationId === sit.id
           ).length
           sit.status =
-            sit.appraisalsCompleted - sit.appraisalsRequired
+            sit.appraisalsRequired - sit.appraisalsCompleted > 0
               ? sit.appraisalsCompleted
                 ? 'in_progress'
                 : 'todo'
