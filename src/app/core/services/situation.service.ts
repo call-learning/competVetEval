@@ -13,12 +13,17 @@ export class SituationService {
   constructor(
     private moodleApiService: MoodleApiService,
     private authService: AuthService
-  ) {}
+  ) {
+    this.authService.loggedUser.subscribe((res) => {
+      if (!res) {
+        this.situationsEntities.next(null)
+      }
+    })
+  }
 
   private situationsEntities = new BehaviorSubject<Situation[]>(null)
 
   get situations$(): Observable<Situation[]> {
-    // This might be used as a buffer to store values locally so not to call the API each time.
     if (this.situationsEntities.getValue() !== null) {
       return this.situationsEntities.asObservable()
     } else {
@@ -36,7 +41,6 @@ export class SituationService {
       )
     ).pipe(
       map(([situations, appraisals]) => {
-        console.log(situations, appraisals)
         const situationWithEvals = situations.map((sit) => {
           sit.appraisalsCompleted = appraisals.filter(
             (a) => a.situationId === sit.id
@@ -53,5 +57,9 @@ export class SituationService {
         return situationWithEvals as Situation[]
       })
     )
+  }
+
+  reset() {
+    this.situationsEntities.next(null)
   }
 }

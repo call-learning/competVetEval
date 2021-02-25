@@ -25,8 +25,7 @@ export class LoginPage implements OnInit {
     private formBuilder: FormBuilder,
     public authService: AuthService,
     private router: Router,
-    private loadingController: LoadingController,
-    private toastController: ToastController
+    private loadingController: LoadingController
   ) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],

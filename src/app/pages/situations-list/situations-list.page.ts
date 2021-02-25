@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 
 import {
+  LoadingController,
   MenuController,
   ModalController,
   ToastController,
@@ -22,27 +23,29 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   situations: Situation[]
   situationsDisplayed: Situation[]
 
+  loader: HTMLIonLoadingElement
+
   constructor(
     private menuController: MenuController,
     public authService: AuthService,
     public situationService: SituationService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private loadingController: LoadingController
   ) {
     super()
   }
 
   ngOnInit() {
-    this.authService.currentUserRole
-      .pipe(
-        takeUntil(this.alive$),
-        filter((mode) => !!mode)
-      )
-      .subscribe((mode) => {
-        this.situationService.retrieveSituations().subscribe((situations) => {
-          this.situations = situations
-          this.filterSituations('to_evaluate')
-        })
+    this.loadingController.create().then((res) => {
+      this.loader = res
+      this.loader.present()
+
+      this.situationService.retrieveSituations().subscribe((situations) => {
+        this.situations = situations
+        this.filterSituations('to_evaluate')
+        this.loader.dismiss()
       })
+    })
   }
 
   openMenu() {
