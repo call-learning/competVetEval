@@ -33,7 +33,10 @@
                 src="assets/images/svg-icons/icon-smile.svg"
                 [svgStyle]="{ 'width.px':21 }"
               ></svg-icon>
-              <span>{{ criterion.subcriteria.length }}</span>
+              <span
+                >{{ getSubcriteriaGradedNumber(criterion) }} / {{
+                criterion.subcriteria.length }}</span
+              >
             </div>
             <div class="list-item-info">
               <svg-icon
@@ -53,29 +56,31 @@
       </div>
     </div>
 
-    <div class="page-title">Commentaire</div>
-    <p class="page-text quote">
-      <svg-icon
-        src="assets/images/svg-icons/icon-quote.svg"
-        [svgStyle]="{ 'width.px':16 }"
-      ></svg-icon>
-      {{ appraisal.comment }}
-    </p>
-    <!-- todo : implement -->
-    <!-- <div class="page-subtitle">Répondre</div>
-    <form
-      [formGroup]="answerAppraisalForm"
-      (ngSubmit)="answerAppraisal()"
-      [class.-submitted]="formSubmitted"
-      class="form"
-    >
-      <ion-item class="form-input" lines="none">
-        <ion-textarea formControlName="answer"></ion-textarea>
-      </ion-item>
-      <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
-      <button class="btn btn-primary nnki-mb4" (click)="answerAppraisal()">
-        Envoyer
-      </button>
-    </form> -->
+    <ng-container *ngIf="appraisal.comment">
+      <div class="page-title">Commentaire</div>
+      <p class="page-text quote">
+        <svg-icon
+          src="assets/images/svg-icons/icon-quote.svg"
+          [svgStyle]="{ 'width.px':16 }"
+        ></svg-icon>
+        {{ appraisal.comment }}
+      </p>
+      <!-- todo : implement -->
+      <!-- <div class="page-subtitle">Répondre</div>
+      <form
+        [formGroup]="answerAppraisalForm"
+        (ngSubmit)="answerAppraisal()"
+        [class.-submitted]="formSubmitted"
+        class="form"
+      >
+        <ion-item class="form-input" lines="none">
+          <ion-textarea formControlName="answer"></ion-textarea>
+        </ion-item>
+        <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
+        <button class="btn btn-primary nnki-mb4" (click)="answerAppraisal()">
+          Envoyer
+        </button>
+      </form> -->
+    </ng-container>
   </ng-container>
 </ion-content>

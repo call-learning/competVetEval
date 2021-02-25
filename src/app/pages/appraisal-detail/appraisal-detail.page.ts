@@ -1,3 +1,4 @@
+import { CriterionAppraisal } from './../../shared/models/criterion-appraisal.model'
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
@@ -57,6 +58,12 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
           this.loader.dismiss()
         })
     })
+  }
+
+  getSubcriteriaGradedNumber(criterion: CriterionAppraisal) {
+    return criterion.subcriteria.filter((sc) => {
+      return sc.grade !== 0
+    }).length
   }
 
   openModalCriterionDetail(criterion) {

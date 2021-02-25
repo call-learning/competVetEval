@@ -26,13 +26,14 @@
     </div>
   </div>
 
-  <div class="page-title">Commentaire</div>
-
-  <p class="page-text quote">
-    <svg-icon
-      src="assets/images/svg-icons/icon-quote.svg"
-      [svgStyle]="{ 'width.px': 16 }"
-    ></svg-icon>
-    {{ criterion.comment }}
-  </p>
+  <ng-container *ngIf="criterion.comment">
+    <div class="page-title">Commentaire</div>
+    <p class="page-text quote">
+      <svg-icon
+        src="assets/images/svg-icons/icon-quote.svg"
+        [svgStyle]="{ 'width.px': 16 }"
+      ></svg-icon>
+      {{ criterion.comment }}
+    </p>
+  </ng-container>
 </ion-content>

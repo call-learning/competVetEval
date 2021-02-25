@@ -2,7 +2,11 @@ import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 
-import { ModalController, ToastController } from '@ionic/angular'
+import {
+  LoadingController,
+  ModalController,
+  ToastController,
+} from '@ionic/angular'
 
 import { filter, takeUntil } from 'rxjs/operators'
 import { AppraisalService } from '../../core/services/appraisal.service'
@@ -21,12 +25,14 @@ import { Criterion } from '../../shared/models/criterion.model'
   styleUrls: ['./evaluate.page.scss'],
 })
 export class EvaluatePage extends BaseComponent implements OnInit {
-  appraisal
-  situationId
-  studentId
+  appraisal: Appraisal
+  situationId: number
+  studentId: number
 
   contextForm: FormGroup
   commentForm: FormGroup
+
+  loader: HTMLIonLoadingElement
 
   constructor(
     private formBuilder: FormBuilder,
@@ -37,7 +43,8 @@ export class EvaluatePage extends BaseComponent implements OnInit {
     private situationService: SituationService,
     private appraisalService: AppraisalService,
     public authService: AuthService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private loadingController: LoadingController
   ) {
     super()
     this.contextForm = this.formBuilder.group({
@@ -52,7 +59,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
   ngOnInit() {
     // Create a new evaluation/appraisal.
     // TODO : add a workflow so to enable edition of an existing evaluation.
-    // TODO: check if user is an appraiser or evaluator (i.e. can create a new appraisal)
+
     this.situationId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('situationId'),
       10
@@ -61,13 +68,12 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       this.activatedRoute.snapshot.paramMap.get('studentId'),
       10
     )
-    this.appraisal = null
-    this.authService.currentUserRole
-      .pipe(
-        takeUntil(this.alive$),
-        filter((mode) => !!mode)
-      )
-      .subscribe((mode) => {
+
+    if (this.authService.isAppraiserMode) {
+      this.loadingController.create().then((res) => {
+        this.loader = res
+        this.loader.present()
+
         this.criteriaService
           .retrieveCriteria()
           .subscribe((criteria: Criterion[]) => {
@@ -101,9 +107,16 @@ export class EvaluatePage extends BaseComponent implements OnInit {
                 timeModified: Date.now(),
                 criteria: criterionAppraisal,
               })
+
+              console.log(this.appraisal)
+
+              this.loader.dismiss()
             })
           })
       })
+    } else {
+      this.router.navigate(['/situation-detail', this.situationId])
+    }
   }
 
   evaluateCriterion(criterion, event: Event) {
@@ -139,6 +152,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
   }
 
   saveAndRedirect() {
+    console.log(this.appraisal)
     this.appraisalService
       .submitAppraisal(
         this.appraisal,
@@ -159,15 +173,9 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       })
   }
 
-  notImplemented() {
-    this.toastController
-      .create({
-        message: 'Not implemented',
-        duration: 2000,
-        color: 'danger',
-      })
-      .then((toast) => {
-        toast.present()
-      })
+  getSubcriteriaGradedNumber(criterion: CriterionAppraisal) {
+    return criterion.subcriteria.filter((sc) => {
+      return sc.grade !== 0
+    }).length
   }
 }

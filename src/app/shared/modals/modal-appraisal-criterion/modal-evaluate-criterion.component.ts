@@ -24,9 +24,17 @@ export class ModalEvaluateCriterionComponent implements OnInit {
     })
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (this.criterion.comment) {
+      this.commentForm.patchValue({
+        comment: this.criterion.comment,
+      })
+    }
+  }
 
   dismissModal() {
+    this.criterion.comment = this.commentForm.value.comment
+
     this.modalController.dismiss({
       dismissed: true,
     })

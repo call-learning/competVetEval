@@ -34,14 +34,17 @@
               src="assets/images/svg-icons/icon-smile.svg"
               [svgStyle]="{ 'width.px':21 }"
             ></svg-icon>
-            <span>{{ criterion.grade }}</span>
+            <span
+              >{{ getSubcriteriaGradedNumber(criterion) }} / {{
+              criterion.subcriteria.length }}</span
+            >
           </div>
           <div class="list-item-info">
             <svg-icon
               src="assets/images/svg-icons/icon-comment.svg"
               [svgStyle]="{ 'width.px':23 }"
             ></svg-icon>
-            <span>{{ criterion.comment }}</span>
+            <span>{{ criterion.comment ? 1 : 0 }}</span>
           </div>
         </div>
       </div>
