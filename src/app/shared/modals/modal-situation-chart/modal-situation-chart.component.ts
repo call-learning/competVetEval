@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
 
 import { ModalController } from '@ionic/angular'
+import { Appraisal } from '../../models/appraisal.model'
 
 @Component({
   selector: 'app-modal-situation-chart',
@@ -8,11 +9,13 @@ import { ModalController } from '@ionic/angular'
   styleUrls: ['./modal-situation-chart.component.scss'],
 })
 export class ModalSituationChartComponent implements OnInit {
-  @Input() situation: any
+  @Input() appraisals: Appraisal[]
 
   constructor(private modalController: ModalController) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.appraisals)
+  }
 
   dismissModal() {
     this.modalController.dismiss({

@@ -10,12 +10,14 @@
 
   <div class="table-container ion-margin-vertical">
     <table>
-      <tr *ngFor="let appraisal of situation.appraisals">
+      <tr *ngFor="let appraisal of appraisals">
         <td>
           <div class="td-content">
-            <div class="list-item-image">
+            <!-- todo : implement -->
+            <!-- <div class="list-item-image">
               <img [src]="appraisal.image" />
-            </div>
+            </div> -->
+            {{ appraisal.appraiserName }}
           </div>
         </td>
         <td *ngFor="let criterion of appraisal.criteria">

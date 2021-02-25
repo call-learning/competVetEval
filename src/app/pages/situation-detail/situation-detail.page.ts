@@ -84,7 +84,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       .create({
         component: ModalSituationChartComponent,
         componentProps: {
-          situation: this.situation,
+          appraisals: this.appraisals,
         },
       })
       .then((modal) => {

@@ -153,24 +153,40 @@ export class EvaluatePage extends BaseComponent implements OnInit {
 
   saveAndRedirect() {
     console.log(this.appraisal)
+    this.loader.present()
     this.appraisalService
       .submitAppraisal(
         this.appraisal,
         this.authService.loggedUser.getValue().userid,
         this.studentId
       )
-      .subscribe(() => {
-        this.toastController
-          .create({
-            message: 'Enregistré !',
-            duration: 2000,
-            color: 'success',
-          })
-          .then((toast) => {
-            toast.present()
-          })
-        this.router.navigate(['situations-list'])
-      })
+      .subscribe(
+        () => {
+          this.loader.dismiss()
+          this.toastController
+            .create({
+              message: 'Enregistré !',
+              duration: 2000,
+              color: 'success',
+            })
+            .then((toast) => {
+              toast.present()
+            })
+          this.router.navigate(['situations-list'])
+        },
+        () => {
+          this.toastController
+            .create({
+              message: `Une erreur s'est produite !`,
+              duration: 2000,
+              color: 'danger',
+            })
+            .then((toast) => {
+              toast.present()
+            })
+          this.loader.dismiss()
+        }
+      )
   }
 
   getSubcriteriaGradedNumber(criterion: CriterionAppraisal) {
