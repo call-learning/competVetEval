@@ -31,13 +31,14 @@
           <ion-segment-button value="all">Toutes</ion-segment-button>
         </ion-segment>
 
-        <button
+        <!-- todo : implement -->
+        <!-- <button
           class="btn btn-primary btn-icon-left btn-light"
           (click)="filterSituations()"
         >
           <ion-icon name="filter"></ion-icon>
           Filtrer
-        </button>
+        </button> -->
       </div>
     </div>
   </ion-toolbar>
@@ -49,7 +50,7 @@
       class="list-item"
       [routerLink]="authService.isStudentMode ? ['/situation-detail', situation.id] : ['/situation-detail', situation.id, situation.studentId ]"
       routerDirection="forward"
-      *ngFor="let situation of situations"
+      *ngFor="let situation of situationsDisplayed"
     >
       <div class="list-item-image" *ngIf="situation.type == 'appraiser'">
         <img [src]="situation.image" />
@@ -72,13 +73,14 @@
                 situation.appraisalsRequired }}</span
               >
             </div>
-            <div class="list-item-info">
+            <!-- todo : implement -->
+            <!-- <div class="list-item-info">
               <svg-icon
                 src="assets/images/svg-icons/icon-comment.svg"
                 [svgStyle]="{ 'width.px':23 }"
               ></svg-icon>
               <span>{{ situation.comments }}</span>
-            </div>
+            </div> -->
           </ng-container>
           <ng-container *ngIf="situation.type == 'appraiser'">
             <div class="list-item-info">

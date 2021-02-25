@@ -9,6 +9,7 @@ import {
 import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
+import { Situation } from 'src/app/shared/models/situation.model'
 import { SituationService } from '../../core/services/situation.service'
 import { ModalScanAppraisalComponent } from './../../shared/modals/modal-scan-appraisal/modal-scan-appraisal.component'
 
@@ -18,10 +19,10 @@ import { ModalScanAppraisalComponent } from './../../shared/modals/modal-scan-ap
   styleUrls: ['./situations-list.page.scss'],
 })
 export class SituationsListPage extends BaseComponent implements OnInit {
-  situations
+  situations: Situation[]
+  situationsDisplayed: Situation[]
 
   constructor(
-    private toastController: ToastController,
     private menuController: MenuController,
     public authService: AuthService,
     public situationService: SituationService,
@@ -37,10 +38,9 @@ export class SituationsListPage extends BaseComponent implements OnInit {
         filter((mode) => !!mode)
       )
       .subscribe((mode) => {
-        // console.log('current user type', mode)
         this.situationService.retrieveSituations().subscribe((situations) => {
-          // console.log('situations list', situations);
           this.situations = situations
+          this.filterSituations('to_evaluate')
         })
       })
   }
@@ -49,28 +49,18 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     this.menuController.open('main')
   }
 
-  filterSituations() {
-    this.toastController
-      .create({
-        message: 'Not implemented',
-        duration: 2000,
-        color: 'danger',
-      })
-      .then((toast) => {
-        toast.present()
-      })
+  segmentChanged(event) {
+    this.filterSituations(event.detail.value)
   }
 
-  segmentChanged(event) {
-    this.toastController
-      .create({
-        message: 'Not implemented',
-        duration: 2000,
-        color: 'danger',
+  filterSituations(status: 'to_evaluate' | 'all') {
+    if (status === 'to_evaluate') {
+      this.situationsDisplayed = this.situations.filter((situation) => {
+        return situation.status !== 'done'
       })
-      .then((toast) => {
-        toast.present()
-      })
+    } else {
+      this.situationsDisplayed = this.situations
+    }
   }
 
   openModalScanAppraisal() {

@@ -10,8 +10,4 @@ export class Situation {
   status?: string // This is a calculated field for display.
   studentName?: string // This is a calculated field for display.
   studentId: number
-
-  constructor(input: any) {
-    Object.assign(this, input)
-  }
 }

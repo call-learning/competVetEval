@@ -32,6 +32,7 @@ export class SituationService {
       )
     ).pipe(
       map(([situations, appraisals]) => {
+        console.log(situations, appraisals)
         const situationWithEvals = situations.map((sit) => {
           sit.appraisalsCompleted = appraisals.filter(
             (a) => a.situationId === sit.id
@@ -45,7 +46,7 @@ export class SituationService {
           return sit
         })
         this.situationsEntities.next(situationWithEvals)
-        return situationWithEvals
+        return situationWithEvals as Situation[]
       })
     )
   }
