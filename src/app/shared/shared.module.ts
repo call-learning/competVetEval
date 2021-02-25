@@ -6,7 +6,7 @@ import { IonicModule } from '@ionic/angular'
 
 import { AngularSvgIconModule } from 'angular-svg-icon'
 import { QRCodeModule } from 'angularx-qrcode'
-import { ModalEvaluateCriterionComponent } from './modals/modal-appraisal-criterion/modal-evaluate-criterion.component'
+import { ModalAppraisalCriterionComponent } from './modals/modal-appraisal-criterion/modal-appraisal-criterion.component'
 import { ModalAskAppraisalComponent } from './modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalCriterionDetailComponent } from './modals/modal-criterion-detail/modal-criterion-detail.component'
 import { ModalScanAppraisalComponent } from './modals/modal-scan-appraisal/modal-scan-appraisal.component'
@@ -18,7 +18,7 @@ import { ModalSituationChartComponent } from './modals/modal-situation-chart/mod
     ModalCriterionDetailComponent,
     ModalSituationChartComponent,
     ModalScanAppraisalComponent,
-    ModalEvaluateCriterionComponent,
+    ModalAppraisalCriterionComponent,
   ],
   imports: [
     CommonModule,

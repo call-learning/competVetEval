@@ -65,16 +65,4 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
   previousStep() {
     this.step = 'context'
   }
-
-  notImplemented() {
-    this.toastController
-      .create({
-        message: 'Not implemented',
-        duration: 2000,
-        color: 'danger',
-      })
-      .then((toast) => {
-        toast.present()
-      })
-  }
 }

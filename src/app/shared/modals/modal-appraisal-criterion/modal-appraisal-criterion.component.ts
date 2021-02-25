@@ -6,11 +6,11 @@ import { ModalController } from '@ionic/angular'
 import { CriterionAppraisal } from '../../models/criterion-appraisal.model'
 
 @Component({
-  selector: 'app-modal-evaluate-criterion',
-  templateUrl: './modal-evaluate-criterion.component.html',
-  styleUrls: ['./modal-evaluate-criterion.component.scss'],
+  selector: 'app-modal-appraisal-criterion',
+  templateUrl: './modal-appraisal-criterion.component.html',
+  styleUrls: ['./modal-appraisal-criterion.component.scss'],
 })
-export class ModalEvaluateCriterionComponent implements OnInit {
+export class ModalAppraisalCriterionComponent implements OnInit {
   @Input() criterion: CriterionAppraisal
 
   commentForm: FormGroup

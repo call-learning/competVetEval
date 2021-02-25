@@ -13,9 +13,7 @@ export class ModalSituationChartComponent implements OnInit {
 
   constructor(private modalController: ModalController) {}
 
-  ngOnInit() {
-    console.log(this.appraisals)
-  }
+  ngOnInit() {}
 
   dismissModal() {
     this.modalController.dismiss({

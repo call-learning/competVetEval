@@ -14,7 +14,7 @@ import { AuthService } from '../../core/services/auth.service'
 import { CriteriaService } from '../../core/services/criteria.service'
 import { SituationService } from '../../core/services/situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
-import { ModalEvaluateCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-evaluate-criterion.component'
+import { ModalAppraisalCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-appraisal-criterion.component'
 import { Appraisal } from '../../shared/models/appraisal.model'
 import { CriterionAppraisal } from '../../shared/models/criterion-appraisal.model'
 import { Criterion } from '../../shared/models/criterion.model'
@@ -108,8 +108,6 @@ export class EvaluatePage extends BaseComponent implements OnInit {
                 criteria: criterionAppraisal,
               })
 
-              console.log(this.appraisal)
-
               this.loader.dismiss()
             })
           })
@@ -141,7 +139,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
   openModalEvaluateCriterion(criterion) {
     this.modalController
       .create({
-        component: ModalEvaluateCriterionComponent,
+        component: ModalAppraisalCriterionComponent,
         componentProps: {
           criterion,
         },
@@ -152,7 +150,6 @@ export class EvaluatePage extends BaseComponent implements OnInit {
   }
 
   saveAndRedirect() {
-    console.log(this.appraisal)
     this.loader.present()
     this.appraisalService
       .submitAppraisal(
