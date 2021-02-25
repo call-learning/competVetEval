@@ -15,11 +15,7 @@ import { AuthService } from './../../core/services/auth.service'
 export class SchoolChoicePage implements OnInit {
   schoolsList: School[]
 
-  constructor(
-    private router: Router,
-    private authService: AuthService,
-    private toastController: ToastController
-  ) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit() {
     this.schoolsList = SchoolsProviderService.getSchoolsList()

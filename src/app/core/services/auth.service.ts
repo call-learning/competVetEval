@@ -45,16 +45,11 @@ export class AuthService {
       tap((res) => {
         this.setSession(res)
       }),
-      concatMap((res) => {
+      concatMap(() => {
         return this.loadUserProfile()
       }),
-      map((resUserProfile) => {
-        if (resUserProfile) {
-          this.loginState.next(LOGIN_STATE.LOGGED)
-          return resUserProfile
-        } else {
-          throw new Error('Api data is not valid')
-        }
+      tap(() => {
+        this.loginState.next(LOGIN_STATE.LOGGED)
       })
     )
   }
@@ -121,42 +116,26 @@ export class AuthService {
     this.accessToken = localStorage.getItem(LocaleKeys.tokenId)
     return this.loadUserProfile().pipe(
       map((res) => {
-        if (res) {
-          return true
-        } else {
-          return false
-        }
+        return true
       })
     )
   }
 
-  updateUser() {
-    this.loadUserProfile().subscribe()
-  }
-
-  updateUserRole() {
-    return this.httpAuthService
-      .getUserType(this.loggedUser.getValue().userid)
-      .pipe(
-        map((sttype) => {
-          this.currentUserRole.next(sttype)
-          return sttype
-        }),
-        catchError((err) => {
-          return throwError(err)
-        })
-      )
-  }
-
   private loadUserProfile() {
     return this.httpAuthService.getUserProfile().pipe(
-      map((res) => {
-        if (res) {
-          this.setUserProfile(res)
-          return res
+      map((user) => {
+        if (user) {
+          this.setUserProfile(user)
+          return user
         } else {
           throw new Error('Api data is not valid')
         }
+      }),
+      concatMap((user) => {
+        return this.httpAuthService.getUserType(user.userid)
+      }),
+      tap((role) => {
+        this.setUserRole(role)
       })
     )
   }
@@ -164,6 +143,10 @@ export class AuthService {
   private setUserProfile(userProfile: CevUser) {
     this.loggedUser.next(userProfile)
     localStorage.setItem(LocaleKeys.authProfile, JSON.stringify(userProfile))
+  }
+
+  private setUserRole(role: 'student' | 'appraiser') {
+    this.currentUserRole.next(role)
   }
 
   private cleanAuthLocalStorage() {
