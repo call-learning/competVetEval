@@ -7,13 +7,13 @@
 </ion-header>
 <ion-content class="ion-padding">
   <div class="page-title ion-text-center">
-    {{ criterion.title }}
+    {{ criterion.label }}
   </div>
 
   <div class="ion-margin-vertical">
     <div class="list-item" *ngFor="let subcriterion of criterion.subcriteria">
       <div class="list-item-content">
-        <div class="list-item-title -regular">{{ subcriterion.title }}</div>
+        <div class="list-item-title -regular">{{ subcriterion.label }}</div>
       </div>
       <div class="list-item-icon">
         <svg-icon

@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()"> OK </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="page-title ion-text-center">
+    {{ criterion.label }}
+  </div>
+
+  <div class="ion-margin-vertical">
+    <div class="list-item" *ngFor="let subcriterion of criterion.subcriteria">
+      <div class="list-item-content">
+        <div class="list-item-title -regular">{{ subcriterion.label }}</div>
+      </div>
+      <div class="list-item-icon">
+        <svg-icon
+          class="nnki-pointer"
+          src="assets/images/svg-icons/emojis/ranking-active-{{
+            subcriterion.grade ? subcriterion.grade : 'add'
+          }}.svg"
+          [svgStyle]="{ 'width.px': 36 }"
+          (click)="evaluateSubcriterion(subcriterion)"
+        ></svg-icon>
+
+        <div class="evaluate-criterion" *ngIf="subcriterion.evaluating">
+          <div
+            class="mask"
+            (click)="dismissEvaluateSubcriterion(subcriterion)"
+          ></div>
+          <div class="emojis-list">
+            <svg-icon
+              *ngFor="let grade of [5, 4, 3, 2, 1, -1]"
+              src="assets/images/svg-icons/emojis/ranking-active-{{
+                grade
+              }}.svg"
+              [svgStyle]="{ 'width.px': 36 }"
+              (click)="selectGrade(subcriterion, grade)"
+              class="nnki-pointer"
+              [class.-selected]="subcriterion.grade == grade"
+            ></svg-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-title">Commentaire</div>
+
+  <form [formGroup]="commentForm" class="form">
+    <ion-item class="form-input" lines="none">
+      <ion-textarea formControlName="comment"></ion-textarea>
+    </ion-item>
+  </form>
+</ion-content>

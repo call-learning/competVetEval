@@ -1,0 +1,145 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <div class="situations-list__toolbar">
+      <div class="situations-list__top-toolbar">
+        <div class="situations-list__avatar" (click)="openMenu()">
+          <img src="https://via.placeholder.com/50x50" />
+        </div>
+        <div class="situations-list__title">
+          <ng-container *ngIf="authService.isStudentMode">
+            Situations
+          </ng-container>
+          <ng-container *ngIf="authService.isAppraiserMode">
+            Évaluations
+          </ng-container>
+        </div>
+      </div>
+      <div class="situations-list__bottom-toolbar">
+        <ion-segment
+          (ionChange)="segmentChanged($event)"
+          value="to_evaluate"
+          mode="ios"
+        >
+          <ion-segment-button value="to_evaluate">
+            <ng-container *ngIf="authService.isStudentMode">
+              À évaluer
+            </ng-container>
+            <ng-container *ngIf="authService.isAppraiserMode">
+              En cours
+            </ng-container>
+          </ion-segment-button>
+          <ion-segment-button value="all">Toutes</ion-segment-button>
+        </ion-segment>
+
+        <button
+          class="btn btn-primary btn-icon-left btn-light"
+          (click)="filterSituations()"
+        >
+          <ion-icon name="filter"></ion-icon>
+          Filtrer
+        </button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="ion-margin-vertical">
+    <div
+      class="list-item"
+      [routerLink]="authService.isStudentMode ? ['/situation-detail', situation.id] : ['/situation-detail', situation.id, situation.studentId ]"
+      routerDirection="forward"
+      *ngFor="let situation of situations"
+    >
+      <div class="list-item-image" *ngIf="situation.type == 'appraiser'">
+        <img [src]="situation.image" />
+      </div>
+      <div class="list-item-content">
+        <div class="list-item-title">{{ situation.title }}</div>
+        <div class="list-item-dates">
+          {{ situation.startTime * 1000 | date:'d LLL yyyy' }} au {{
+          situation.endTime * 1000 | date:'d LLL yyyy' }}
+        </div>
+        <div class="list-item-infos">
+          <ng-container *ngIf="situation.type == 'student'">
+            <div class="list-item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-smile.svg"
+                [svgStyle]="{ 'width.px':21 }"
+              ></svg-icon>
+              <span
+                >{{ situation.appraisalsCompleted }}/{{
+                situation.appraisalsRequired }}</span
+              >
+            </div>
+            <div class="list-item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-comment.svg"
+                [svgStyle]="{ 'width.px':23 }"
+              ></svg-icon>
+              <span>{{ situation.comments }}</span>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="situation.type == 'appraiser'">
+            <div class="list-item-info">
+              <span>{{ situation.studentName }}</span>
+            </div>
+            <div class="list-item-info">
+              <ng-container
+                *ngIf="situation.status == 'in_progress' || situation.status == 'todo'"
+              >
+                <svg-icon
+                  src="assets/images/svg-icons/icon-times-light.svg"
+                  [svgStyle]="{ 'width.px':21 }"
+                ></svg-icon>
+                <span>Situation non validée</span>
+              </ng-container>
+              <ng-container *ngIf="situation.status == 'done'">
+                <svg-icon
+                  src="assets/images/svg-icons/icon-check-light.svg"
+                  [svgStyle]="{ 'width.px':21 }"
+                ></svg-icon>
+                <span>Situation validée</span>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div
+        class="list-item-icon"
+        [class.-done]="situation.status == 'done'"
+        [class.-todo]="situation.status == 'todo'"
+      >
+        <svg-icon
+          src="assets/images/svg-icons/icon-check.svg"
+          [svgStyle]="{ 'width.px':26 }"
+          *ngIf="situation.status == 'done'"
+        ></svg-icon>
+
+        <svg-icon
+          src="assets/images/svg-icons/icon-donut.svg"
+          [svgStyle]="{ 'width.px':24 }"
+          *ngIf="situation.status == 'in_progress'"
+        ></svg-icon>
+
+        <svg-icon
+          src="assets/images/svg-icons/icon-warning.svg"
+          [svgStyle]="{ 'width.px':26 }"
+          *ngIf="situation.status == 'todo'"
+        ></svg-icon>
+      </div>
+    </div>
+  </div>
+
+  <ion-fab
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed"
+    *ngIf="authService.isAppraiserMode"
+    (click)="openModalScanAppraisal()"
+  >
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

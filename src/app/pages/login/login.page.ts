@@ -52,7 +52,7 @@ export class LoginPage implements OnInit {
           .login(this.loginForm.value.username, this.loginForm.value.password)
           .subscribe(
             (res) => {
-              this.router.navigate(['/rotations-list'])
+              this.router.navigate(['/situations-list'])
               this.loader.dismiss()
               this.loginForm.reset()
               this.isLoading = false

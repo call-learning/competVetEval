@@ -6,18 +6,18 @@ import { IonicModule } from '@ionic/angular'
 
 import { AngularSvgIconModule } from 'angular-svg-icon'
 import { QRCodeModule } from 'angularx-qrcode'
-import { ModalAskEvaluationComponent } from './modals/modal-ask-evaluation/modal-ask-evaluation.component'
+import { ModalAskAppraisalComponent } from './modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalCriterionDetailComponent } from './modals/modal-criterion-detail/modal-criterion-detail.component'
-import { ModalEvaluateCriterionComponent } from './modals/modal-evaluate-criterion/modal-evaluate-criterion.component'
-import { ModalRotationChartComponent } from './modals/modal-rotation-chart/modal-rotation-chart.component'
-import { ModalScanEvaluationComponent } from './modals/modal-scan-evaluation/modal-scan-evaluation.component'
+import { ModalEvaluateCriterionComponent } from './modals/modal-appraisal-criterion/modal-evaluate-criterion.component'
+import { ModalSituationChartComponent } from './modals/modal-situation-chart/modal-situation-chart.component'
+import { ModalScanAppraisalComponent } from './modals/modal-scan-appraisal/modal-scan-appraisal.component'
 
 @NgModule({
   declarations: [
-    ModalAskEvaluationComponent,
+    ModalAskAppraisalComponent,
     ModalCriterionDetailComponent,
-    ModalRotationChartComponent,
-    ModalScanEvaluationComponent,
+    ModalSituationChartComponent,
+    ModalScanAppraisalComponent,
     ModalEvaluateCriterionComponent,
   ],
   imports: [
