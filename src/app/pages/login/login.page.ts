@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 
 import { LoadingController, ToastController } from '@ionic/angular'
-import { finalize } from 'rxjs/operators'
 
+import { finalize } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 
 @Component({

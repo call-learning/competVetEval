@@ -51,12 +51,12 @@ export class HttpAuthService {
   getUserType(userid) {
     return MoodleApiUtils.apiCall(
       'local_cveteval_get_user_type',
-      { userid: userid },
+      { userid },
       this.http
     ).pipe(
       map((res): 'student' | 'appraiser' => {
         const userType = new UserType(res)
-        return userType.type == 'student' ? 'student' : 'appraiser'
+        return userType.type === 'student' ? 'student' : 'appraiser'
       }),
       catchError((err) => {
         console.error(err)
@@ -68,7 +68,7 @@ export class HttpAuthService {
   getUserSituations(userid) {
     return MoodleApiUtils.apiCall(
       'local_cveteval_get_user_situations',
-      { userid: userid },
+      { userid },
       this.http
     ).pipe(
       map((res) => {

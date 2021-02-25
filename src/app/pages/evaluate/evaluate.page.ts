@@ -4,15 +4,15 @@ import { ActivatedRoute, Router } from '@angular/router'
 
 import { ModalController, ToastController } from '@ionic/angular'
 
-import { ModalEvaluateCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-evaluate-criterion.component'
+import { filter, takeUntil } from 'rxjs/operators'
 import { AppraisalService } from '../../core/services/appraisal.service'
 import { AuthService } from '../../core/services/auth.service'
 import { CriteriaService } from '../../core/services/criteria.service'
-import { filter, takeUntil } from 'rxjs/operators'
+import { SituationService } from '../../core/services/situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
+import { ModalEvaluateCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-evaluate-criterion.component'
 import { Appraisal } from '../../shared/models/appraisal.model'
 import { CriterionAppraisal } from '../../shared/models/criterion-appraisal.model'
-import { SituationService } from '../../core/services/situation.service'
 import { Criterion } from '../../shared/models/criterion.model'
 
 @Component({
@@ -54,10 +54,12 @@ export class EvaluatePage extends BaseComponent implements OnInit {
     // TODO : add a workflow so to enable edition of an existing evaluation.
     // TODO: check if user is an appraiser or evaluator (i.e. can create a new appraisal)
     this.situationId = parseInt(
-      this.activatedRoute.snapshot.paramMap.get('situationId')
+      this.activatedRoute.snapshot.paramMap.get('situationId'),
+      10
     )
     this.studentId = parseInt(
-      this.activatedRoute.snapshot.paramMap.get('studentId')
+      this.activatedRoute.snapshot.paramMap.get('studentId'),
+      10
     )
     this.appraisal = null
     this.authService.currentUserRole

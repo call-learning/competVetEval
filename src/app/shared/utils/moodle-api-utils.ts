@@ -1,11 +1,12 @@
-import { ServerEndpoints } from 'src/app/shared/endpoints/server.endpoints'
 import { HttpClient } from '@angular/common/http'
+
 import { Observable } from 'rxjs'
+import { ServerEndpoints } from 'src/app/shared/endpoints/server.endpoints'
 
 export class MoodleApiUtils {
   static apiCall(
     functionName: string,
-    args: Object,
+    args: any,
     http: HttpClient
   ): Observable<any> {
     const formData: FormData = new FormData()
@@ -30,9 +31,11 @@ export class MoodleApiUtils {
         )
       })
     } else if (value instanceof Object) {
-      for (let prop in value) {
-        const propName = argumentName ? `${argumentName}[${prop}]` : prop
-        MoodleApiUtils.convertArguments(formData, propName, value[prop])
+      for (const prop in value) {
+        if (value[prop]) {
+          const propName = argumentName ? `${argumentName}[${prop}]` : prop
+          MoodleApiUtils.convertArguments(formData, propName, value[prop])
+        }
       }
     } else {
       formData.append(argumentName, value)

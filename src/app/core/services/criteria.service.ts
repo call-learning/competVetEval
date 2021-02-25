@@ -1,18 +1,15 @@
 import { Injectable } from '@angular/core'
+
+import { throwError, BehaviorSubject } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
-import { BehaviorSubject, throwError } from 'rxjs'
-import { AuthService } from './auth.service'
-import { MoodleApiService } from '../http-services/moodle-api.service'
 import { Criterion } from '../../shared/models/criterion.model'
+import { MoodleApiService } from '../http-services/moodle-api.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class CriteriaService {
-  constructor(
-    private moodleApiService: MoodleApiService,
-    private authService: AuthService
-  ) {
+  constructor(private moodleApiService: MoodleApiService) {
     // Retrieve situations from localStorage if any ?
   }
 

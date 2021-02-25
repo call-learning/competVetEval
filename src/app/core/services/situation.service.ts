@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core'
+
+import { zip, BehaviorSubject } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { Situation } from 'src/app/shared/models/situation.model'
-import { catchError, map } from 'rxjs/operators'
-import { BehaviorSubject, throwError, zip } from 'rxjs'
-import { AuthService } from './auth.service'
 import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AppraisalService } from './appraisal.service'
-import { CriteriaService } from './criteria.service'
+import { AuthService } from './auth.service'
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +34,7 @@ export class SituationService {
       map(([situations, appraisals]) => {
         const situationWithEvals = situations.map((sit) => {
           sit.appraisalsCompleted = appraisals.filter(
-            (a) => a.situationId == sit.id
+            (a) => a.situationId === sit.id
           ).length
           sit.status =
             sit.appraisalsCompleted - sit.appraisalsRequired

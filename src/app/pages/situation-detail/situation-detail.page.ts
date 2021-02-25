@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
 
 import { ModalController } from '@ionic/angular'
 
+import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
-import { filter, takeUntil } from 'rxjs/operators'
-import { BaseComponent } from '../../shared/components/base/base.component'
 import { AppraisalService } from '../../core/services/appraisal.service'
-import { ActivatedRoute } from '@angular/router'
 import { SituationService } from '../../core/services/situation.service'
+import { BaseComponent } from '../../shared/components/base/base.component'
 
 @Component({
   selector: 'app-situation-detail',
@@ -35,11 +35,13 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.situationId = parseInt(
-      this.activatedRoute.snapshot.paramMap.get('situationId')
+      this.activatedRoute.snapshot.paramMap.get('situationId'),
+      10
     )
     if (this.activatedRoute.snapshot.paramMap.has('studentId')) {
       this.studentId = parseInt(
-        this.activatedRoute.snapshot.paramMap.get('studentId')
+        this.activatedRoute.snapshot.paramMap.get('studentId'),
+        10
       )
     } else {
       this.studentId = null

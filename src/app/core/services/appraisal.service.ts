@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core'
-import { Situation } from 'src/app/shared/models/situation.model'
+
+import { of, throwError, BehaviorSubject } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
-import { BehaviorSubject, of, throwError } from 'rxjs'
-import { AuthService } from './auth.service'
-import { MoodleApiService } from '../http-services/moodle-api.service'
 import { Appraisal } from '../../shared/models/appraisal.model'
-import { CriteriaService } from './criteria.service'
+import { MoodleApiService } from '../http-services/moodle-api.service'
 
 @Injectable({
   providedIn: 'root',

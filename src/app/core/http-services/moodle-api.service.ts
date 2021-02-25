@@ -3,13 +3,8 @@ import { Injectable } from '@angular/core'
 
 import { throwError } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
-import { AuthEndpoints } from 'src/app/shared/endpoints/auth.endpoints'
-import { LoginResult } from 'src/app/shared/models/auth.model'
-import { CevUser } from 'src/app/shared/models/cev-user.model'
-import { UserType } from '../../shared/models/user-type.model'
-import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
 import { Appraisal } from '../../shared/models/appraisal.model'
-import { CriterionAppraisal } from '../../shared/models/criterion-appraisal.model'
+import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +15,7 @@ export class MoodleApiService {
   getUserSituations(userid) {
     return MoodleApiUtils.apiCall(
       'local_cveteval_get_user_situations',
-      { userid: userid },
+      { userid },
       this.http
     ).pipe(
       map((res) => {
@@ -52,7 +47,7 @@ export class MoodleApiService {
   getUserAppraisals(userid) {
     return MoodleApiUtils.apiCall(
       'local_cveteval_get_user_appraisals',
-      { userid: userid },
+      { userid },
       this.http
     ).pipe(
       map((res) => {
@@ -134,14 +129,14 @@ export class MoodleApiService {
     studentId: number
   ) {
     const formatCriterionForApi = (criteria) => {
-      let apiCrit = {
+      const apiCrit: any = {
         grade: criteria.grade,
         criterionid: criteria.criterionId,
         comment: criteria.comment,
         subcriteria: criteria.subcriteria.map(formatCriterionForApi),
       }
-      if (typeof criteria.id != 'undefined') {
-        apiCrit['id'] = criteria.id
+      if (typeof criteria.id !== 'undefined') {
+        apiCrit.id = criteria.id
       }
       return apiCrit
     }

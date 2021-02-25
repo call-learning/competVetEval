@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 import { ModalController } from '@ionic/angular'
+
 import { CriterionAppraisal } from '../../models/criterion-appraisal.model'
 
 @Component({

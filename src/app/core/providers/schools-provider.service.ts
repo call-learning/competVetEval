@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
-import { environment } from 'src/environments/environment'
 
 import { School } from 'src/app/shared/models/school.model'
+import { environment } from 'src/environments/environment'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 
 @Injectable({
