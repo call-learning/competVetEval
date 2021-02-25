@@ -27,11 +27,10 @@ export class AuthService {
 
   accessToken: string
 
-  currentUserRole = new BehaviorSubject<'student' | 'evaluator'>(null)
+  currentUserRole = new BehaviorSubject<'student' | 'appraiser'>(null)
 
   constructor(
     private router: Router,
-    private schoolsProviderService: SchoolsProviderService,
     private httpAuthService: HttpAuthService
   ) {}
 
@@ -84,7 +83,7 @@ export class AuthService {
 
   recoverSession() {
     if (localStorage.getItem(LocaleKeys.schoolChoiceId)) {
-      this.chosenSchool = this.schoolsProviderService.getSchoolFromId(
+      this.chosenSchool = SchoolsProviderService.getSchoolFromId(
         localStorage.getItem(LocaleKeys.schoolChoiceId)
       )
     }
@@ -135,6 +134,20 @@ export class AuthService {
     this.loadUserProfile().subscribe()
   }
 
+  updateUserRole() {
+    return this.httpAuthService
+      .getUserType(this.loggedUser.getValue().userid)
+      .pipe(
+        map((sttype) => {
+          this.currentUserRole.next(sttype)
+          return sttype
+        }),
+        catchError((err) => {
+          return throwError(err)
+        })
+      )
+  }
+
   private loadUserProfile() {
     return this.httpAuthService.getUserProfile().pipe(
       map((res) => {
@@ -168,7 +181,7 @@ export class AuthService {
     return this.currentUserRole.getValue() === 'student'
   }
 
-  get isEvaluatorMode() {
-    return this.currentUserRole.getValue() === 'evaluator'
+  get isAppraiserMode() {
+    return this.currentUserRole.getValue() === 'appraiser'
   }
 }

@@ -1,5 +1,7 @@
-import { environment } from 'src/environments/environment'
+import { SchoolsProviderService } from '../../core/providers/schools-provider.service'
 
 export class ServerEndpoints {
-  static server = `${environment.apiUrl}/webservice/rest/server.php`
+  static server() {
+    return `${SchoolsProviderService.getSelectedSchoolUrl()}/webservice/rest/server.php`
+  }
 }

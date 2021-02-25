@@ -3,6 +3,7 @@ export class CevUser {
   fullname: string
   lastname: string
   username: string
+  userid: number
   userpictureurl: string
 
   constructor(input: any) {

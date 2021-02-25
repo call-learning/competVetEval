@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()"> OK </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="page-title ion-text-center">Évaluations</div>
+
+  <div class="table-container ion-margin-vertical">
+    <table>
+      <tr *ngFor="let appraisal of situation.appraisals">
+        <td>
+          <div class="td-content">
+            <div class="list-item-image">
+              <img [src]="appraisal.image" />
+            </div>
+          </div>
+        </td>
+        <td *ngFor="let criterion of appraisal.criteria">
+          <div class="td-content">
+            <svg-icon
+              src="assets/images/svg-icons/emojis/ranking-active-{{
+                criterion.grade ? criterion.grade : 'null'
+              }}.svg"
+              [svgStyle]="{ 'width.px': 32 }"
+            ></svg-icon>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</ion-content>

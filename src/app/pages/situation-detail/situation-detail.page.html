@@ -1,0 +1,126 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button [routerLink]="['/situations-list']" routerDirection="back">
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <button
+        class="btn btn-transparent"
+        (click)="openModalSituationChart()"
+        color="primary"
+        [disabled]="!appraisals.length"
+      >
+        <svg-icon
+          src="assets/images/svg-icons/icon-chart.svg"
+          [svgStyle]="{ 'width.px':31 }"
+        ></svg-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="situation-detail__illustration">
+    <img src="assets/images/illustrations/illustration-surgeon.png" />
+  </div>
+
+  <div class="situation-detail__header">
+    <div class="situation-detail__header-content">
+      <div class="page-title">{{ situation.title }}</div>
+      <div class="page-dates">
+        {{ situation.startTime * 1000 | date:'d LLL yy' }}/{{ situation.endTime
+        * 1000 | date:'d LLL yy' }}
+      </div>
+      <div *ngIf="studentId != null">
+        <div class="situation-detail__student">Etudiant</div>
+        <div class="situation-detail__student_name">
+          {{situation.studentName}}
+        </div>
+      </div>
+    </div>
+    <div
+      class="list-item-icon"
+      [class.-done]="situation.status == 'done'"
+      [class.-todo]="situation.status == 'todo'"
+    >
+      <svg-icon
+        src="assets/images/svg-icons/icon-check.svg"
+        [svgStyle]="{ 'width.px':26 }"
+        *ngIf="situation.status == 'done'"
+      ></svg-icon>
+
+      <svg-icon
+        src="assets/images/svg-icons/icon-donut.svg"
+        [svgStyle]="{ 'width.px':24 }"
+        *ngIf="situation.status == 'in_progress'"
+      ></svg-icon>
+
+      <svg-icon
+        src="assets/images/svg-icons/icon-warning.svg"
+        [svgStyle]="{ 'width.px':26 }"
+        *ngIf="situation.status == 'todo'"
+      ></svg-icon>
+    </div>
+  </div>
+
+  <div class="page-subtitle">Évaluations</div>
+
+  <div class="situation-detail__no-appraisals" *ngIf="!appraisals.length">
+    Cette situation n’a pas encore été évaluée
+  </div>
+
+  <div class="ion-margin-vertical" *ngIf="appraisals.length">
+    <a
+      class="list-item"
+      [routerLink]="['/appraisal-detail', appraisal.id]"
+      routerDirection="forward"
+      *ngFor="let appraisal of appraisals"
+    >
+      <div class="list-item-image">
+        <img [src]="appraisal.image" />
+      </div>
+      <div class="list-item-content">
+        <div class="list-item-title">{{ appraisal.appraiserName }}</div>
+        <div class="list-item-subtitle">
+          <ng-container *ngIf="appraisal.type == 1">
+            <span>Évaluateur</span>
+          </ng-container>
+          <ng-container *ngIf="appraisal.type == 2">
+            <span>Responsable</span>
+            <svg-icon
+              src="assets/images/svg-icons/icon-star.svg"
+              [svgStyle]="{ 'width.px':18 }"
+            ></svg-icon>
+          </ng-container>
+        </div>
+      </div>
+      <div class="list-item-info">
+        <svg-icon
+          src="assets/images/svg-icons/icon-calendar.svg"
+          [svgStyle]="{ 'width.px':16 }"
+        ></svg-icon>
+        {{ appraisal.timeModified * 1000 | date:'d LLL yy' }}
+      </div>
+    </a>
+  </div>
+
+  <div class="situation-detail__ask-appraisal" *ngIf="currentMode == 'student'">
+    <button
+      class="btn btn-primary btn-full nnki-mb4"
+      (click)="openModalAskAppraisal()"
+      *ngIf="currentMode == 'student'"
+    >
+      Demander une évaluation
+    </button>
+  </div>
+
+  <ion-button
+    [routerLink]="['/evaluate', situationId, studentId]"
+    *ngIf="currentMode == 'appraiser'"
+  >
+    <ion-icon name="chevron-forward"></ion-icon>
+    Démarrer l'évaluation
+  </ion-button>
+</ion-content>

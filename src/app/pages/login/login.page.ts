@@ -58,7 +58,7 @@ export class LoginPage implements OnInit {
           )
           .subscribe(
             () => {
-              this.router.navigate(['/rotations-list'])
+              this.router.navigate(['/situations-list'])
               this.loader.dismiss()
               this.loginForm.reset()
             },
