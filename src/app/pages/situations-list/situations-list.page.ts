@@ -4,10 +4,8 @@ import {
   LoadingController,
   MenuController,
   ModalController,
-  ToastController,
 } from '@ionic/angular'
 
-import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
 import { Situation } from 'src/app/shared/models/situation.model'

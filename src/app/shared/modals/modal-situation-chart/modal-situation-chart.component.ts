@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
 
 import { ModalController } from '@ionic/angular'
+
 import { Appraisal } from '../../models/appraisal.model'
 
 @Component({

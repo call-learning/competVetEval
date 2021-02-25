@@ -1,17 +1,17 @@
-import { Appraisal } from './../../shared/models/appraisal.model'
-import { Situation } from 'src/app/shared/models/situation.model'
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
 
-import { filter, first, takeUntil } from 'rxjs/operators'
+import { first } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
+import { Situation } from 'src/app/shared/models/situation.model'
 import { AppraisalService } from '../../core/services/appraisal.service'
 import { SituationService } from '../../core/services/situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
+import { Appraisal } from './../../shared/models/appraisal.model'
 
 @Component({
   selector: 'app-situation-detail',

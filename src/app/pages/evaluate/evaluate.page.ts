@@ -8,7 +8,6 @@ import {
   ToastController,
 } from '@ionic/angular'
 
-import { filter, takeUntil } from 'rxjs/operators'
 import { AppraisalService } from '../../core/services/appraisal.service'
 import { AuthService } from '../../core/services/auth.service'
 import { CriteriaService } from '../../core/services/criteria.service'

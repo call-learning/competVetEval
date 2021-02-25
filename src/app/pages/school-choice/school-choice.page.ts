@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 
-import { ToastController } from '@ionic/angular'
-
 import { SchoolsProviderService } from 'src/app/core/providers/schools-provider.service'
 import { School } from 'src/app/shared/models/school.model'
 import { AuthService } from './../../core/services/auth.service'

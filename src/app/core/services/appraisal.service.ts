@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 
 import { of, throwError, BehaviorSubject } from 'rxjs'
-import { catchError, map, tap } from 'rxjs/operators'
+import { catchError, tap } from 'rxjs/operators'
 import { Appraisal } from '../../shared/models/appraisal.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'

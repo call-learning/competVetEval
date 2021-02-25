@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core'
 import { CanActivate, Router, UrlTree } from '@angular/router'
 
-import { AlertController } from '@ionic/angular'
-
 import { Observable } from 'rxjs'
 import { AuthService } from '../services/auth.service'
 
@@ -10,11 +8,7 @@ import { AuthService } from '../services/auth.service'
   providedIn: 'root',
 })
 export class AuthenticatedGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private alertController: AlertController
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   canActivate():
     | Observable<boolean | UrlTree>

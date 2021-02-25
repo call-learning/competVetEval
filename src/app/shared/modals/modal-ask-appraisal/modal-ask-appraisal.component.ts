@@ -7,7 +7,7 @@ import {
 } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
-import { IonTextarea, ModalController, ToastController } from '@ionic/angular'
+import { IonTextarea, ModalController } from '@ionic/angular'
 
 @Component({
   selector: 'app-modal-ask-appraisal',
@@ -29,8 +29,7 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
 
   constructor(
     private modalController: ModalController,
-    private formBuilder: FormBuilder,
-    private toastController: ToastController
+    private formBuilder: FormBuilder
   ) {
     this.askAppraisalForm = this.formBuilder.group({
       context: ['', [Validators.required]],

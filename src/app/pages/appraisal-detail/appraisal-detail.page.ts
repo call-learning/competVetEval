@@ -1,16 +1,15 @@
-import { CriterionAppraisal } from './../../shared/models/criterion-appraisal.model'
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
 
-import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
 import { AppraisalService } from '../../core/services/appraisal.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
 import { Appraisal } from '../../shared/models/appraisal.model'
+import { CriterionAppraisal } from './../../shared/models/criterion-appraisal.model'
 
 @Component({
   selector: 'app-appraisal-detail',
