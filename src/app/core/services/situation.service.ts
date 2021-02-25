@@ -19,7 +19,7 @@ export class SituationService {
 
   get situations$(): Observable<Situation[]> {
     // This might be used as a buffer to store values locally so not to call the API each time.
-    if (this.situationsEntities) {
+    if (this.situationsEntities.getValue() !== null) {
       return this.situationsEntities.asObservable()
     } else {
       return this.retrieveSituations()

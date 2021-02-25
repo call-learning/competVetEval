@@ -67,6 +67,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
             .retrieveAppraisals(userId)
             .subscribe((appraisals) => {
               this.appraisals = []
+              console.log(appraisals)
               appraisals.forEach((appraisal) => {
                 if (appraisal.situationId === this.situation.id) {
                   this.appraisals.push(appraisal)
