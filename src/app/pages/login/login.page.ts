@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 
 import { LoadingController, ToastController } from '@ionic/angular'
+import { finalize } from 'rxjs/operators'
 
 import { AuthService } from 'src/app/core/services/auth.service'
 
@@ -50,12 +51,16 @@ export class LoginPage implements OnInit {
 
         this.authService
           .login(this.loginForm.value.username, this.loginForm.value.password)
+          .pipe(
+            finalize(() => {
+              this.isLoading = false
+            })
+          )
           .subscribe(
-            (res) => {
+            () => {
               this.router.navigate(['/rotations-list'])
               this.loader.dismiss()
               this.loginForm.reset()
-              this.isLoading = false
             },
             (err: Error) => {
               if (err.message === 'invalidlogin') {
@@ -65,7 +70,6 @@ export class LoginPage implements OnInit {
               }
 
               this.loader.dismiss()
-              this.isLoading = false
             }
           )
       } else {

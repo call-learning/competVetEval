@@ -64,6 +64,10 @@ const routes: Routes = [
     canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
+  {
+    path: '**',
+    redirectTo: 'rotations-list',
+  },
 ]
 
 @NgModule({
