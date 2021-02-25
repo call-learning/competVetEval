@@ -78,15 +78,18 @@
       routerDirection="forward"
       *ngFor="let appraisal of appraisals"
     >
-      <div class="list-item-image">
+      <!-- todo : implement -->
+      <!-- <div class="list-item-image">
         <img [src]="appraisal.image" />
-      </div>
+      </div> -->
       <div class="list-item-content">
         <div class="list-item-title">{{ appraisal.appraiserName }}</div>
         <div class="list-item-subtitle">
           <ng-container *ngIf="appraisal.type == 1">
             <span>Évaluateur</span>
           </ng-container>
+
+          <!-- todo : implement -->
           <ng-container *ngIf="appraisal.type == 2">
             <span>Responsable</span>
             <svg-icon

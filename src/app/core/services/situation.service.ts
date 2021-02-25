@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-import { zip, BehaviorSubject } from 'rxjs'
+import { zip, BehaviorSubject, Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Situation } from 'src/app/shared/models/situation.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
@@ -15,11 +15,15 @@ export class SituationService {
     private authService: AuthService
   ) {}
 
-  private situationsEntities = new BehaviorSubject<Situation[]>([])
+  private situationsEntities = new BehaviorSubject<Situation[]>(null)
 
-  get situations(): Situation[] {
+  get situations$(): Observable<Situation[]> {
     // This might be used as a buffer to store values locally so not to call the API each time.
-    return this.situationsEntities.getValue()
+    if (this.situationsEntities) {
+      return this.situationsEntities.asObservable()
+    } else {
+      return this.retrieveSituations()
+    }
   }
 
   retrieveSituations() {

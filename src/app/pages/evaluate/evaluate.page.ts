@@ -71,32 +71,36 @@ export class EvaluatePage extends BaseComponent implements OnInit {
         this.criteriaService
           .retrieveCriteria()
           .subscribe((criteria: Criterion[]) => {
-            const situation = this.situationService.situations.find(
-              (sit) => sit.id === this.situationId
-            )
-            const transformCriteriaIntoAppraisalCriteria = (crit: Criterion) =>
-              new CriterionAppraisal({
-                criterionId: crit.id,
-                label: crit.label,
+            this.situationService.situations$.subscribe((situations) => {
+              const situation = situations.find(
+                (sit) => sit.id === this.situationId
+              )
+              const transformCriteriaIntoAppraisalCriteria = (
+                crit: Criterion
+              ) =>
+                new CriterionAppraisal({
+                  criterionId: crit.id,
+                  label: crit.label,
+                  comment: '',
+                  grade: 0,
+                  subcriteria: crit.subcriteria.map(
+                    transformCriteriaIntoAppraisalCriteria
+                  ),
+                })
+              const criterionAppraisal = criteria.map(
+                transformCriteriaIntoAppraisalCriteria
+              )
+              this.appraisal = new Appraisal({
+                situationId: this.situationId,
+                situationTitle: situation.title,
+                context: '',
                 comment: '',
-                grade: 0,
-                subcriteria: crit.subcriteria.map(
-                  transformCriteriaIntoAppraisalCriteria
-                ),
+                appraiserId: this.authService.loggedUser.getValue().userid,
+                type: 1,
+                studentId: this.studentId,
+                timeModified: Date.now(),
+                criteria: criterionAppraisal,
               })
-            const criterionAppraisal = criteria.map(
-              transformCriteriaIntoAppraisalCriteria
-            )
-            this.appraisal = new Appraisal({
-              situationId: this.situationId,
-              situationTitle: situation.title,
-              context: '',
-              comment: '',
-              appraiserId: this.authService.loggedUser.getValue().userid,
-              type: 1,
-              studentId: this.studentId,
-              timeModified: Date.now(),
-              criteria: criterionAppraisal,
             })
           })
       })

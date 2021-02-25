@@ -71,20 +71,13 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
       })
   }
 
+  // todo implement
   // answerAppraisal() {
   //   this.errorMsg = ''
   //   this.formSubmitted = true
 
   //   if (this.answerAppraisalForm.valid) {
-  //     this.toastController
-  //       .create({
-  //         message: 'Not implemented',
-  //         duration: 2000,
-  //         color: 'danger',
-  //       })
-  //       .then((toast) => {
-  //         toast.present()
-  //       })
+
   //   } else {
   //     this.errorMsg = 'Le formulaire est invalide'
   //   }

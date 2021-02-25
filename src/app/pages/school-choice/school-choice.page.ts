@@ -29,16 +29,4 @@ export class SchoolChoicePage implements OnInit {
     this.authService.setChosenSchool(school)
     this.router.navigate(['/login'])
   }
-
-  notImplemented() {
-    this.toastController
-      .create({
-        message: 'Not implemented',
-        duration: 2000,
-        color: 'danger',
-      })
-      .then((toast) => {
-        toast.present()
-      })
-  }
 }

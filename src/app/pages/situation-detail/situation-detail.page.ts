@@ -49,30 +49,32 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       this.studentId = null
     }
     this.appraisals = []
-    this.situation = this.situationService.situations.find(
-      (sit) => sit.id === this.situationId
-    )
-    this.authService.currentUserRole
-      .pipe(
-        takeUntil(this.alive$),
-        filter((mode) => !!mode)
-      )
-      .subscribe((mode) => {
-        const userId = this.studentId
-          ? this.studentId
-          : this.authService.loggedUser.getValue().userid
-        this.currentMode = mode
-        this.appraisalService
-          .retrieveAppraisals(userId)
-          .subscribe((appraisals) => {
-            this.appraisals = []
-            appraisals.forEach((appraisal) => {
-              if (appraisal.situationId === this.situation.id) {
-                this.appraisals.push(appraisal)
-              }
+
+    this.situationService.situations$.subscribe((situations) => {
+      this.situation = situations.find((sit) => sit.id === this.situationId)
+
+      this.authService.currentUserRole
+        .pipe(
+          takeUntil(this.alive$),
+          filter((mode) => !!mode)
+        )
+        .subscribe((mode) => {
+          const userId = this.studentId
+            ? this.studentId
+            : this.authService.loggedUser.getValue().userid
+          this.currentMode = mode
+          this.appraisalService
+            .retrieveAppraisals(userId)
+            .subscribe((appraisals) => {
+              this.appraisals = []
+              appraisals.forEach((appraisal) => {
+                if (appraisal.situationId === this.situation.id) {
+                  this.appraisals.push(appraisal)
+                }
+              })
             })
-          })
-      })
+        })
+    })
   }
 
   openModalSituationChart() {
