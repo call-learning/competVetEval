@@ -64,22 +64,4 @@ export class HttpAuthService {
       })
     )
   }
-
-  getUserSituations(userid) {
-    return MoodleApiUtils.apiCall(
-      'local_cveteval_get_user_situations',
-      { userid },
-      this.http
-    ).pipe(
-      map((res) => {
-        return res.map((sit) => {
-          return sit
-        })
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
-      })
-    )
-  }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 
-import { ModalController } from '@ionic/angular'
+import { LoadingController, ModalController } from '@ionic/angular'
 
 import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
@@ -18,20 +18,21 @@ import { Appraisal } from '../../shared/models/appraisal.model'
 })
 export class AppraisalDetailPage extends BaseComponent implements OnInit {
   answerAppraisalForm: FormGroup
-
   errorMsg = ''
-
   formSubmitted = false
 
-  appraisalId
+  appraisalId: number
   appraisal: Appraisal
+
+  loader: HTMLIonLoadingElement
 
   constructor(
     private formBuilder: FormBuilder,
     public authService: AuthService,
     private modalController: ModalController,
     private appraisalService: AppraisalService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private loadingController: LoadingController
   ) {
     super()
     this.answerAppraisalForm = this.formBuilder.group({
@@ -44,18 +45,18 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
       this.activatedRoute.snapshot.paramMap.get('appraisalId'),
       10
     )
-    this.authService.currentUserRole
-      .pipe(
-        takeUntil(this.alive$),
-        filter((mode) => !!mode)
-      )
-      .subscribe((mode) => {
-        this.appraisalService
-          .retrieveAppraisal(this.appraisalId)
-          .subscribe((appraisal) => {
-            this.appraisal = appraisal
-          })
-      })
+
+    this.loadingController.create().then((res) => {
+      this.loader = res
+      this.loader.present()
+
+      this.appraisalService
+        .retrieveAppraisal(this.appraisalId)
+        .subscribe((appraisal) => {
+          this.appraisal = appraisal
+          this.loader.dismiss()
+        })
+    })
   }
 
   openModalCriterionDetail(criterion) {

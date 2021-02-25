@@ -10,6 +10,8 @@ import { AuthService } from './auth.service'
   providedIn: 'root',
 })
 export class SituationService {
+  private situationsEntities = new BehaviorSubject<Situation[]>(null)
+
   constructor(
     private moodleApiService: MoodleApiService,
     private authService: AuthService
@@ -20,8 +22,6 @@ export class SituationService {
       }
     })
   }
-
-  private situationsEntities = new BehaviorSubject<Situation[]>(null)
 
   get situations$(): Observable<Situation[]> {
     if (this.situationsEntities.getValue() !== null) {
