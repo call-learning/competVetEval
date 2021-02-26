@@ -1,3 +1,4 @@
+import { Situation } from './../../models/situation.model'
 import {
   AfterViewInit,
   Component,
@@ -15,7 +16,8 @@ import { IonTextarea, ModalController } from '@ionic/angular'
   styleUrls: ['./modal-ask-appraisal.component.scss'],
 })
 export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
-  @Input() situation: any
+  @Input() situation: Situation
+  qrCodeData: string
 
   askAppraisalForm: FormGroup
 
@@ -36,7 +38,9 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
     })
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.qrCodeData = `${this.situation.id}|${this.situation.studentId}`
+  }
 
   ngAfterViewInit() {
     setTimeout(() => {

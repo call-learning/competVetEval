@@ -48,7 +48,13 @@ export class ModalScanAppraisalComponent implements OnInit {
             toast.present()
           })
         this.dismissModal()
-        this.router.navigate(['evaluate', barcodeData.text])
+
+        const barcodeDataSplit = barcodeData.text.split('|')
+        this.router.navigate([
+          'situation-detail',
+          barcodeDataSplit[0],
+          barcodeDataSplit[1],
+        ])
       })
       .catch((err) => {
         console.error('Error', err)
