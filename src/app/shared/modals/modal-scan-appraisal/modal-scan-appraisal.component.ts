@@ -51,7 +51,7 @@ export class ModalScanAppraisalComponent implements OnInit {
 
         const barcodeDataSplit = barcodeData.text.split('|')
         this.router.navigate([
-          'situation-detail',
+          'evaluate',
           barcodeDataSplit[0],
           barcodeDataSplit[1],
         ])
