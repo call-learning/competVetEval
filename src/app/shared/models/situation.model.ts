@@ -6,6 +6,7 @@ export class Situation {
   type: string
   appraisalsRequired: number
   appraisalsCompleted?: number // This is a calculated field for display.
+  appraisalAverage?: number
   comments: string
   status?: string // This is a calculated field for display.
   studentName?: string // This is a calculated field for display.
