@@ -17,7 +17,11 @@
 
   <form [formGroup]="contextForm" class="form">
     <ion-item class="form-input" lines="none">
-      <ion-textarea formControlName="context"></ion-textarea>
+      <ion-textarea
+        formControlName="context"
+        (ionBlur)="updateContext()"
+        spellcheck="true"
+      ></ion-textarea>
     </ion-item>
   </form>
 
@@ -83,7 +87,11 @@
 
   <form [formGroup]="commentForm" class="form">
     <ion-item class="form-input" lines="none">
-      <ion-textarea formControlName="comment"></ion-textarea>
+      <ion-textarea
+        formControlName="comment"
+        (ionBlur)="updateComment()"
+        spellcheck="true"
+      ></ion-textarea>
     </ion-item>
   </form>
 

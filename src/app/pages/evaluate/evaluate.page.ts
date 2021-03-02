@@ -190,4 +190,11 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       return sc.grade !== 0
     }).length
   }
+
+  updateContext() {
+    this.appraisal.context = this.contextForm.get('context').value
+  }
+  updateComment() {
+    this.appraisal.context = this.commentForm.get('comment').value
+  }
 }
