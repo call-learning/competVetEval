@@ -10,8 +10,10 @@ export class Appraisal {
   type: number
   appraiserName?: string // When creating a new appraisal we don't need all the values set as they are mostly used
   // for display
+  appraiserPictureUrl?: string
   studentId: number
   studentName?: string // When creating a new appraisal we don't need all the values set.
+  studentPictureUrl?: string
   timeModified?: number // Can be absent at creation.
   criteria: CriterionAppraisal[]
 

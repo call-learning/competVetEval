@@ -37,7 +37,12 @@
         <div *ngIf="studentId != null">
           <div class="situation-detail__student">Etudiant</div>
           <div class="situation-detail__student_name">
-            {{situation.studentName}}
+            <ion-item lines="none">
+              <ion-avatar slot="start"
+                ><img src="{{situation.studentPictureUrl}}"
+              /></ion-avatar>
+              <ion-label>{{ situation.studentName }}</ion-label>
+            </ion-item>
           </div>
         </div>
       </div>
@@ -79,7 +84,14 @@
           <img [src]="appraisal.image" />
         </div> -->
         <div class="list-item-content">
-          <div class="list-item-title">{{ appraisal.appraiserName }}</div>
+          <div class="list-item-title">
+            <ion-item lines="none">
+              <ion-avatar slot="start"
+                ><img src="{{appraisal.appraiserPictureUrl}}"
+              /></ion-avatar>
+              <ion-label>{{ appraisal.appraiserName }}</ion-label>
+            </ion-item>
+          </div>
           <div class="list-item-subtitle">
             <ng-container *ngIf="appraisal.type == 1">
               <span>Évaluateur</span>

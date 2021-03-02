@@ -31,6 +31,7 @@ export class MoodleApiService {
               endTime: sit.endtime,
               type: sit.type,
               studentName: sit.studentname,
+              studentPictureUrl: sit.studentpictureurl,
               studentId: sit.studentid,
               appraisalsRequired: sit.appraisalsrequired,
             }
@@ -61,7 +62,9 @@ export class MoodleApiService {
             appraiserId: appr.appraiserid,
             type: appr.type,
             appraiserName: appr.appraisername,
+            appraiserPictureUrl: appr.appraiserpictureurl,
             studentName: appr.studentid,
+            studentPictureUrl: appr.studentpictureurl,
             context: appr.context,
             comment: appr.comment,
             criteria: this.convertCriteriaAppraisal(appr.criteria),
