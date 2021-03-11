@@ -59,8 +59,12 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       this.situationsDisplayed = this.situations.filter((situation) => {
         return situation.status !== 'done'
       })
+      this.situationsDisplayed.sort((sit1, sit2) => sit1.endTime - sit2.endTime)
     } else {
       this.situationsDisplayed = this.situations
+      this.situationsDisplayed.sort(
+        (sit1, sit2) => sit1.startTime - sit2.startTime
+      )
     }
   }
 

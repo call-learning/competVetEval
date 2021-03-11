@@ -27,6 +27,7 @@ export class MoodleApiService {
             return {
               id: sit.id,
               title: sit.title,
+              description: sit.description,
               startTime: sit.starttime,
               endTime: sit.endtime,
               type: sit.type,

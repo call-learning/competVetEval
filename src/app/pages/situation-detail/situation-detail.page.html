@@ -30,6 +30,7 @@
     <div class="situation-detail__header">
       <div class="situation-detail__header-content">
         <div class="page-title">{{ situation.title }}</div>
+        <div class="page-descr">{{ situation.description }}</div>
         <div class="page-dates">
           {{ situation.startTime * 1000 | date:'d LLL yy' }}/{{
           situation.endTime * 1000 | date:'d LLL yy' }}

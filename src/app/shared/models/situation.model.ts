@@ -1,6 +1,7 @@
 export class Situation {
   id: number
   title: string
+  description: string
   startTime: number
   endTime: number
   type: string

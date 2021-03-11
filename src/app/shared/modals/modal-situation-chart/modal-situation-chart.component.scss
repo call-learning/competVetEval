@@ -14,6 +14,16 @@
   margin: 1px;
 }
 
+.criteria-label {
+  div {
+    transform: translate(1em, 15em) rotate(-90deg);
+    width: 2em;
+  }
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 20em;
+}
+
 td:nth-child(2n + 2) {
   .td-content {
     background: var(--primary-background);
