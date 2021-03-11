@@ -68,7 +68,7 @@
         ></svg-icon>
       </div>
     </div>
-    <div class="page-subtitle">Évaluations</div>
+    <div class="page-subtitle">Observations</div>
     <div class="situation-detail__no-appraisals" *ngIf="!appraisals.length">
       Cette situation n’a pas encore été évaluée
     </div>
@@ -94,7 +94,7 @@
           </div>
           <div class="list-item-subtitle">
             <ng-container *ngIf="appraisal.type == 1">
-              <span>Évaluateur</span>
+              <span>Observateur</span>
             </ng-container>
             <!-- todo : implement -->
             <ng-container *ngIf="appraisal.type == 2">
@@ -123,7 +123,7 @@
         class="btn btn-primary btn-full nnki-mb4"
         (click)="openModalAskAppraisal()"
       >
-        Demander une évaluation
+        Demander une observation
       </button>
     </div>
     <ion-button
@@ -132,7 +132,7 @@
       *ngIf="authService.isAppraiserMode"
     >
       <ion-icon name="chevron-forward"></ion-icon>
-      Démarrer l'évaluation
+      Démarrer l'observation
     </ion-button>
   </ng-container>
 </ion-content>

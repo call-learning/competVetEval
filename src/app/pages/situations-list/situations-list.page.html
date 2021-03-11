@@ -10,7 +10,7 @@
             Situations
           </ng-container>
           <ng-container *ngIf="authService.isAppraiserMode">
-            Évaluations
+            Observations
           </ng-container>
         </div>
       </div>
@@ -66,7 +66,7 @@
         <div class="list-item-infos">
           <ng-container *ngIf="situation.type == 'student'">
             <div class="list-item-info">
-              {{ situation.appraisalsCompleted }} évaluation(s) sur
+              {{ situation.appraisalsCompleted }} observation(s) sur
               {{situation.appraisalsRequired }} réalisée(s)
             </div>
           </ng-container>
