@@ -40,7 +40,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
 
       this.situationService.retrieveSituations().subscribe((situations) => {
         this.situations = situations
-        this.filterSituations('to_evaluate')
+        this.filterSituations('all')
         this.loader.dismiss()
       })
     })
