@@ -42,15 +42,36 @@ export class SituationService {
     ).pipe(
       map(([situations, appraisals]) => {
         const situationWithEvals = situations.map((sit) => {
-          sit.appraisalsCompleted = appraisals.filter(
+          const allAppraisals = appraisals.filter(
             (a) => a.situationId === sit.id
-          ).length
+          )
+          sit.appraisalsCompleted = allAppraisals.length
           sit.status =
             sit.appraisalsRequired - sit.appraisalsCompleted > 0
               ? sit.appraisalsCompleted
                 ? 'in_progress'
                 : 'todo'
               : 'done'
+          let numberCriteria = 0
+          let score = 0
+          const recurseAppraisalScore = (criteria) => {
+            criteria.forEach((criteria) => {
+              if (criteria.grade) {
+                score += criteria.grade
+                numberCriteria++
+              }
+              if (criteria.subcriteria) {
+                recurseAppraisalScore(criteria.subcriteria)
+              }
+            })
+          }
+          allAppraisals.forEach((appraisal) => {
+            recurseAppraisalScore(appraisal.criteria)
+          })
+
+          sit.appraisalAverage =
+            numberCriteria == 0 ? 0 : Math.floor(score / numberCriteria)
+
           return sit
         })
         this.situationsEntities.next(situationWithEvals)

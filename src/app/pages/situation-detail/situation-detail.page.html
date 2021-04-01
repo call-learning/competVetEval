@@ -30,6 +30,7 @@
     <div class="situation-detail__header">
       <div class="situation-detail__header-content">
         <div class="page-title">{{ situation.title }}</div>
+        <div class="page-descr">{{ situation.description }}</div>
         <div class="page-dates">
           {{ situation.startTime * 1000 | date:'d LLL yy' }}/{{
           situation.endTime * 1000 | date:'d LLL yy' }}
@@ -37,7 +38,12 @@
         <div *ngIf="studentId != null">
           <div class="situation-detail__student">Etudiant</div>
           <div class="situation-detail__student_name">
-            {{situation.studentName}}
+            <ion-item lines="none">
+              <ion-avatar slot="start"
+                ><img src="{{situation.studentPictureUrl}}"
+              /></ion-avatar>
+              <ion-label>{{ situation.studentName }}</ion-label>
+            </ion-item>
           </div>
         </div>
       </div>
@@ -63,7 +69,7 @@
         ></svg-icon>
       </div>
     </div>
-    <div class="page-subtitle">Évaluations</div>
+    <div class="page-subtitle">Observations</div>
     <div class="situation-detail__no-appraisals" *ngIf="!appraisals.length">
       Cette situation n’a pas encore été évaluée
     </div>
@@ -79,10 +85,17 @@
           <img [src]="appraisal.image" />
         </div> -->
         <div class="list-item-content">
-          <div class="list-item-title">{{ appraisal.appraiserName }}</div>
+          <div class="list-item-title">
+            <ion-item lines="none">
+              <ion-avatar slot="start"
+                ><img src="{{appraisal.appraiserPictureUrl}}"
+              /></ion-avatar>
+              <ion-label>{{ appraisal.appraiserName }}</ion-label>
+            </ion-item>
+          </div>
           <div class="list-item-subtitle">
             <ng-container *ngIf="appraisal.type == 1">
-              <span>Évaluateur</span>
+              <span>Observateur</span>
             </ng-container>
             <!-- todo : implement -->
             <ng-container *ngIf="appraisal.type == 2">
@@ -111,15 +124,16 @@
         class="btn btn-primary btn-full nnki-mb4"
         (click)="openModalAskAppraisal()"
       >
-        Demander une évaluation
+        Demander une observation
       </button>
     </div>
     <ion-button
+      class="btn-full"
       [routerLink]="['/evaluate', situationId, studentId]"
       *ngIf="authService.isAppraiserMode"
     >
       <ion-icon name="chevron-forward"></ion-icon>
-      Démarrer l'évaluation
+      Démarrer l'observation
     </ion-button>
   </ng-container>
 </ion-content>

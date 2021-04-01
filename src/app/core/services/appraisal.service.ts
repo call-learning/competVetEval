@@ -54,25 +54,24 @@ export class AppraisalService {
   }
 
   retrieveAppraisal(appraisalId) {
-    if (this.appraisalEntities.getValue()) {
-      const localAppraisal = this.appraisalEntities
-        .getValue()
-        .find((appraisal) => appraisal.id === appraisalId)
-      if (localAppraisal) {
-        return of(localAppraisal)
-      }
-    }
+    // if (this.appraisalEntities.getValue()) {
+    //   const localAppraisal = this.appraisalEntities
+    //     .getValue()
+    //     .find((appraisal) => appraisal.id === appraisalId)
+    //   if (localAppraisal) {
+    //     return of(localAppraisal)
+    //   }
+    // }
 
-    // todo : fix this api function
-    // return this.moodleApiService.getAppraisal(appraisalId).pipe(
-    //   map((appraisal: Appraisal) => {
-    //     return appraisal
-    //   }),
-    //   catchError((err) => {
-    //     console.error(err)
-    //     return throwError(err)
-    //   })
-    // )
+    return this.moodleApiService.getAppraisal(appraisalId).pipe(
+      tap((appraisal: Appraisal) => {
+        return appraisal
+      }),
+      catchError((err) => {
+        console.error(err)
+        return throwError(err)
+      })
+    )
     return null
   }
 }

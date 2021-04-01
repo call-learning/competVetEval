@@ -6,10 +6,18 @@
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
-  <div class="page-title ion-text-center">Évaluations</div>
+  <div class="page-title ion-text-center">Observations</div>
 
   <div class="table-container ion-margin-vertical">
     <table>
+      <tr>
+        <th><!--empty --></th>
+        <th *ngFor="let label of labels">
+          <div class="criteria-label">
+            <div>{{ label }}</div>
+          </div>
+        </th>
+      </tr>
       <tr *ngFor="let appraisal of appraisals">
         <td>
           <div class="td-content">

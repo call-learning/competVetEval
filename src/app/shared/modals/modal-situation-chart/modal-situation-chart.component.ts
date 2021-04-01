@@ -11,7 +11,7 @@ import { Appraisal } from '../../models/appraisal.model'
 })
 export class ModalSituationChartComponent implements OnInit {
   @Input() appraisals: Appraisal[]
-
+  @Input() labels: String[]
   constructor(private modalController: ModalController) {}
 
   ngOnInit() {}
