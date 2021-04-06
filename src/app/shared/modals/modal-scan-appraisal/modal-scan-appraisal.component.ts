@@ -3,6 +3,9 @@ import { Router } from '@angular/router'
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { ModalController, ToastController } from '@ionic/angular'
+import { Appraisal } from '../../models/appraisal.model'
+import { AppraisalService } from '../../../core/services/appraisal.service'
+import { AuthService } from '../../../core/services/auth.service'
 
 @Component({
   selector: 'app-modal-scan-appraisal',
@@ -15,6 +18,8 @@ export class ModalScanAppraisalComponent implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController,
     private barcodeScanner: BarcodeScanner,
+    private appraisalService: AppraisalService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -50,11 +55,20 @@ export class ModalScanAppraisalComponent implements OnInit {
         this.dismissModal()
 
         const barcodeDataSplit = barcodeData.text.split('|')
-        this.router.navigate([
-          'evaluate',
-          barcodeDataSplit[0],
-          barcodeDataSplit[1],
-        ])
+        this.appraisalService
+          .createBlankAppraisal(
+            barcodeDataSplit[0],
+            barcodeDataSplit[1],
+            this.authService.loggedUser.getValue().userid
+          )
+          .subscribe((appraisal: Appraisal) => {
+            appraisal.context = barcodeDataSplit[2]
+            this.appraisalService
+              .submitAppraisal(appraisal)
+              .subscribe((appraisal) => {
+                this.router.navigate(['appraisal-edit', appraisal.id])
+              })
+          })
       })
       .catch((err) => {
         console.error('Error', err)

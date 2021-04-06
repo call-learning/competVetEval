@@ -127,11 +127,7 @@ export class MoodleApiService {
     })
   }
 
-  submitUserAppraisal(
-    appraisal: Appraisal,
-    appraiserId: number,
-    studentId: number
-  ) {
+  submitUserAppraisal(appraisal: Appraisal) {
     const formatCriterionForApi = (criteria) => {
       const apiCrit: any = {
         grade: criteria.grade,
@@ -147,8 +143,8 @@ export class MoodleApiService {
     let args = {
       id: appraisal.id,
       situationid: appraisal.situationId,
-      appraiserid: appraiserId,
-      studentid: studentId,
+      appraiserid: appraisal.appraiserId,
+      studentid: appraisal.studentId,
       context: appraisal.context,
       comment: appraisal.comment,
       criteria: appraisal.criteria.map(formatCriterionForApi),

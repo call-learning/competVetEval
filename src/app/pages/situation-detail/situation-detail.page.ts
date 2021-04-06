@@ -50,11 +50,11 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         10
       )
     } else {
-      this.studentId = null
+      this.studentId = this.authService.loggedUser.value.userid
     }
 
     this.appraisalService.appraisalEntities.subscribe((appraisals) => {
-      if (appraisals) {
+      if (appraisals && this.situation) {
         appraisals.forEach((appraisal) => {
           if (appraisal.situationId === this.situation.id) {
             // TODO: find a way to refresh the page.
@@ -114,6 +114,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         component: ModalAskAppraisalComponent,
         componentProps: {
           situation: this.situation,
+          studentId: this.studentId,
         },
       })
       .then((modal) => {

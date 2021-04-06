@@ -11,6 +11,6 @@ export class Situation {
   comments: string
   status?: string // This is a calculated field for display.
   studentName?: string // This is a calculated field for display.
-  studentId: number
+  studentId: number // This should not be used ... (see situation evaluation)
   studentPictureUrl?: string
 }

@@ -72,43 +72,21 @@ export class EvaluatePage extends BaseComponent implements OnInit {
         this.loader = res
         this.loader.present()
 
-        this.criteriaService
-          .retrieveCriteria()
-          .subscribe((criteria: Criterion[]) => {
-            this.situationService.situations$.subscribe((situations) => {
-              const situation = situations.find(
-                (sit) => sit.id === this.situationId
-              )
-              const transformCriteriaIntoAppraisalCriteria = (
-                crit: Criterion
-              ) =>
-                new CriterionAppraisal({
-                  criterionId: crit.id,
-                  label: crit.label,
-                  comment: '',
-                  grade: 0,
-                  subcriteria: crit.subcriteria.map(
-                    transformCriteriaIntoAppraisalCriteria
-                  ),
-                })
-              const criterionAppraisal = criteria.map(
-                transformCriteriaIntoAppraisalCriteria
-              )
-              this.appraisal = new Appraisal({
-                situationId: this.situationId,
-                situationTitle: situation.title,
-                context: '',
-                comment: '',
-                appraiserId: this.authService.loggedUser.getValue().userid,
-                type: 1,
-                studentId: this.studentId,
-                timeModified: Date.now(),
-                criteria: criterionAppraisal,
-              })
-
+        this.situationService.situations$.subscribe((situations) => {
+          const situation = situations.find(
+            (sit) => sit.id === this.situationId
+          )
+          this.appraisalService
+            .createBlankAppraisal(
+              situation.id,
+              this.authService.loggedUser.getValue().userid,
+              this.studentId
+            )
+            .subscribe((appraisal: Appraisal) => {
+              this.appraisal = appraisal
               this.loader.dismiss()
             })
-          })
+        })
       })
     } else {
       this.router.navigate(['/situation-detail', this.situationId])
@@ -149,43 +127,39 @@ export class EvaluatePage extends BaseComponent implements OnInit {
 
   saveAndRedirect() {
     this.loader.present()
-    this.appraisalService
-      .submitAppraisal(
-        this.appraisal,
-        this.authService.loggedUser.getValue().userid,
-        this.studentId
-      )
-      .subscribe(
-        () => {
-          this.loader.dismiss()
-          this.toastController
-            .create({
-              message: 'Enregistré !',
-              duration: 2000,
-              color: 'success',
-            })
-            .then((toast) => {
-              toast.present()
-            })
-          this.router.navigate([
-            '/situation-detail',
-            this.situationId,
-            this.studentId,
-          ])
-        },
-        () => {
-          this.toastController
-            .create({
-              message: `Une erreur s'est produite !`,
-              duration: 2000,
-              color: 'danger',
-            })
-            .then((toast) => {
-              toast.present()
-            })
-          this.loader.dismiss()
-        }
-      )
+    this.appraisal.appraiserId = this.authService.loggedUser.getValue().userid
+    this.appraisal.studentId = this.studentId
+    this.appraisalService.submitAppraisal(this.appraisal).subscribe(
+      () => {
+        this.loader.dismiss()
+        this.toastController
+          .create({
+            message: 'Enregistré !',
+            duration: 2000,
+            color: 'success',
+          })
+          .then((toast) => {
+            toast.present()
+          })
+        this.router.navigate([
+          '/situation-detail',
+          this.situationId,
+          this.studentId,
+        ])
+      },
+      () => {
+        this.toastController
+          .create({
+            message: `Une erreur s'est produite !`,
+            duration: 2000,
+            color: 'danger',
+          })
+          .then((toast) => {
+            toast.present()
+          })
+        this.loader.dismiss()
+      }
+    )
   }
 
   getSubcriteriaGradedNumber(criterion: CriterionAppraisal) {

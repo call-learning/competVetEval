@@ -17,6 +17,8 @@ import { IonTextarea, ModalController } from '@ionic/angular'
 })
 export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
   @Input() situation: Situation
+  @Input() studentId: number // TODO: Check if there is no better way to do it (situation has got a student Id ?)
+
   qrCodeData: string
 
   askAppraisalForm: FormGroup
@@ -38,9 +40,7 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
     })
   }
 
-  ngOnInit() {
-    this.qrCodeData = `${this.situation.id}|${this.situation.studentId}`
-  }
+  ngOnInit() {}
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -60,6 +60,8 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
 
     if (this.askAppraisalForm.valid) {
       this.step = 'qr-code'
+      const encodedContext = encodeURIComponent(this.contextInput.value)
+      this.qrCodeData = `${this.situation.id}|${this.studentId}|${encodedContext}`
     } else {
       this.errorMsg = 'Le formulaire est invalide'
     }
