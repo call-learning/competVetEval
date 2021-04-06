@@ -144,7 +144,8 @@ export class MoodleApiService {
       }
       return apiCrit
     }
-    const args = {
+    let args = {
+      id: appraisal.id,
       situationid: appraisal.situationId,
       appraiserid: appraiserId,
       studentid: studentId,

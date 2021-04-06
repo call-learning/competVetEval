@@ -5,6 +5,7 @@ export class CriterionAppraisal {
   comment: string
   grade: number
   timeModified?: number
+  evaluating?: boolean
   subcriteria: CriterionAppraisal[]
 
   constructor(input: any) {

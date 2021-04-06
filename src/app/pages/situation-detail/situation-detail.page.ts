@@ -21,6 +21,7 @@ import { Appraisal } from './../../shared/models/appraisal.model'
 export class SituationDetailPage extends BaseComponent implements OnInit {
   situationId: number
   studentId: number
+  currentUserId: number
 
   situation: Situation
   appraisals: Appraisal[]
@@ -52,6 +53,17 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       this.studentId = null
     }
 
+    this.appraisalService.appraisalEntities.subscribe((appraisals) => {
+      if (appraisals) {
+        appraisals.forEach((appraisal) => {
+          if (appraisal.situationId === this.situation.id) {
+            // TODO: find a way to refresh the page.
+            //this.appraisals.push(appraisal)
+          }
+        })
+      }
+    })
+    this.currentUserId = this.authService.loggedUserValue.userid
     this.loadingController.create().then((res) => {
       this.loader = res
       this.loader.present()

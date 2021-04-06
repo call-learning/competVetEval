@@ -76,7 +76,8 @@
     <div class="ion-margin-vertical" *ngIf="appraisals.length">
       <a
         class="list-item"
-        [routerLink]="['/appraisal-detail', appraisal.id]"
+        [routerLink]="(appraisal.appraiserId === currentUserId) ? ['/appraisal-edit', appraisal.id]
+        : ['/appraisal-detail', appraisal.id]"
         routerDirection="forward"
         *ngFor="let appraisal of appraisals"
       >

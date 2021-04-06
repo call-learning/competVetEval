@@ -16,17 +16,15 @@ import { BaseComponent } from '../../shared/components/base/base.component'
 import { ModalAppraisalCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-appraisal-criterion.component'
 import { Appraisal } from '../../shared/models/appraisal.model'
 import { CriterionAppraisal } from '../../shared/models/criterion-appraisal.model'
-import { Criterion } from '../../shared/models/criterion.model'
 
 @Component({
-  selector: 'app-evaluate',
-  templateUrl: './evaluate.page.html',
-  styleUrls: ['./evaluate.page.scss'],
+  selector: 'app-appraisal-edit',
+  templateUrl: './appraisal-edit.page.html',
+  styleUrls: ['./appraisal-edit.page.scss'],
 })
-export class EvaluatePage extends BaseComponent implements OnInit {
+export class AppraisalEditPage extends BaseComponent implements OnInit {
   appraisal: Appraisal
-  situationId: number
-  studentId: number
+  appraisalId: number
 
   contextForm: FormGroup
   commentForm: FormGroup
@@ -59,59 +57,27 @@ export class EvaluatePage extends BaseComponent implements OnInit {
     // Create a new evaluation/appraisal.
     // TODO : add a workflow so to enable edition of an existing evaluation.
 
-    this.situationId = parseInt(
-      this.activatedRoute.snapshot.paramMap.get('situationId'),
+    this.appraisalId = parseInt(
+      this.activatedRoute.snapshot.paramMap.get('appraisalId'),
       10
     )
-    this.studentId = parseInt(
-      this.activatedRoute.snapshot.paramMap.get('studentId'),
-      10
-    )
+
     if (this.authService.isAppraiserMode) {
       this.loadingController.create().then((res) => {
         this.loader = res
         this.loader.present()
 
-        this.criteriaService
-          .retrieveCriteria()
-          .subscribe((criteria: Criterion[]) => {
-            this.situationService.situations$.subscribe((situations) => {
-              const situation = situations.find(
-                (sit) => sit.id === this.situationId
-              )
-              const transformCriteriaIntoAppraisalCriteria = (
-                crit: Criterion
-              ) =>
-                new CriterionAppraisal({
-                  criterionId: crit.id,
-                  label: crit.label,
-                  comment: '',
-                  grade: 0,
-                  subcriteria: crit.subcriteria.map(
-                    transformCriteriaIntoAppraisalCriteria
-                  ),
-                })
-              const criterionAppraisal = criteria.map(
-                transformCriteriaIntoAppraisalCriteria
-              )
-              this.appraisal = new Appraisal({
-                situationId: this.situationId,
-                situationTitle: situation.title,
-                context: '',
-                comment: '',
-                appraiserId: this.authService.loggedUser.getValue().userid,
-                type: 1,
-                studentId: this.studentId,
-                timeModified: Date.now(),
-                criteria: criterionAppraisal,
-              })
-
-              this.loader.dismiss()
-            })
+        this.appraisalService
+          .retrieveAppraisal(this.appraisalId)
+          .subscribe((appraisal) => {
+            this.appraisal = appraisal
+            this.contextForm.setValue({ context: appraisal.context })
+            this.commentForm.setValue({ comment: appraisal.comment })
+            this.loader.dismiss()
           })
       })
     } else {
-      this.router.navigate(['/situation-detail', this.situationId])
+      this.router.navigate(['/situation-list'])
     }
   }
 
@@ -153,7 +119,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       .submitAppraisal(
         this.appraisal,
         this.authService.loggedUser.getValue().userid,
-        this.studentId
+        this.appraisal.studentId
       )
       .subscribe(
         () => {
@@ -168,9 +134,9 @@ export class EvaluatePage extends BaseComponent implements OnInit {
               toast.present()
             })
           this.router.navigate([
-            '/situation-detail',
-            this.situationId,
-            this.studentId,
+            'situation-detail',
+            this.appraisal.situationId,
+            this.appraisal.studentId,
           ])
         },
         () => {
@@ -197,7 +163,8 @@ export class EvaluatePage extends BaseComponent implements OnInit {
   updateContext() {
     this.appraisal.context = this.contextForm.get('context').value
   }
+
   updateComment() {
-    this.appraisal.comment = this.commentForm.get('comment').value
+    this.appraisal.context = this.commentForm.get('comment').value
   }
 }

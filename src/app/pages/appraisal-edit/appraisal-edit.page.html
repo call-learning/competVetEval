@@ -1,0 +1,101 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button
+        [routerLink]="['/situation-detail', appraisal?.situationId, appraisal?.studentId]"
+        routerDirection="back"
+      >
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ appraisal?.situationTitle }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="page-title">Contexte</div>
+
+  <form [formGroup]="contextForm" class="form">
+    <ion-item class="form-input" lines="none">
+      <ion-textarea
+        formControlName="context"
+        (ionBlur)="updateContext()"
+        spellcheck="true"
+      ></ion-textarea>
+    </ion-item>
+  </form>
+
+  <div class="page-title">Observation</div>
+
+  <div class="ion-margin-vertical">
+    <div
+      class="list-item"
+      *ngFor="let criterion of appraisal?.criteria"
+      (click)="openModalEvaluateCriterion(criterion)"
+    >
+      <div class="list-item-content">
+        <div class="list-item-title -regular">{{ criterion.label }}</div>
+        <div class="list-item-infos">
+          <div class="list-item-info">
+            <svg-icon
+              src="assets/images/svg-icons/icon-smile.svg"
+              [svgStyle]="{ 'width.px':21 }"
+            ></svg-icon>
+            <span
+              >{{ getSubcriteriaGradedNumber(criterion) }} / {{
+              criterion.subcriteria.length }}</span
+            >
+          </div>
+          <div class="list-item-info">
+            <svg-icon
+              src="assets/images/svg-icons/icon-comment.svg"
+              [svgStyle]="{ 'width.px':23 }"
+            ></svg-icon>
+            <span>{{ criterion.comment ? 1 : 0 }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="list-item-icon">
+        <svg-icon
+          class="nnki-pointer"
+          src="assets/images/svg-icons/emojis/ranking-active-{{ criterion.grade ? criterion.grade : 'add' }}.svg"
+          [svgStyle]="{ 'width.px':36 }"
+          (click)="evaluateCriterion(criterion, $event)"
+        ></svg-icon>
+
+        <div class="evaluate-criterion" *ngIf="criterion.evaluating">
+          <div
+            class="mask"
+            (click)="dismissEvaluateCriterion(criterion, $event)"
+          ></div>
+          <div class="emojis-list">
+            <svg-icon
+              *ngFor="let grade of [5, 4, 3, 2, 1, -1]"
+              src="assets/images/svg-icons/emojis/ranking-active-{{ grade }}.svg"
+              [svgStyle]="{ 'width.px':36 }"
+              (click)="selectGrade(criterion, grade, $event)"
+              class="nnki-pointer"
+              [class.-selected]="criterion.grade == grade"
+            ></svg-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-title">Commentaire</div>
+
+  <form [formGroup]="commentForm" class="form">
+    <ion-item class="form-input" lines="none">
+      <ion-textarea
+        formControlName="comment"
+        (ionBlur)="updateComment()"
+        spellcheck="true"
+      ></ion-textarea>
+    </ion-item>
+  </form>
+
+  <button class="btn btn-primary btn-full nnki-mb4" (click)="saveAndRedirect()">
+    Enregistrer
+  </button>
+</ion-content>

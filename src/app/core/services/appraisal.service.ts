@@ -10,7 +10,7 @@ import { AuthService } from './auth.service'
   providedIn: 'root',
 })
 export class AppraisalService {
-  private appraisalEntities = new BehaviorSubject<Appraisal[]>(null)
+  public appraisalEntities = new BehaviorSubject<Appraisal[]>(null)
 
   constructor(
     private moodleApiService: MoodleApiService,
@@ -43,8 +43,21 @@ export class AppraisalService {
     return this.moodleApiService
       .submitUserAppraisal(appraisal, appraiserId, studentId)
       .pipe(
-        tap((appraisals: Appraisal[]) => {
-          this.appraisalEntities.next(appraisals)
+        tap((appraisal: Appraisal) => {
+          let allAppraisals = this.appraisalEntities.value
+          if (allAppraisals) {
+            let foundAppraisal = false
+            allAppraisals.forEach((app) => {
+              if (app.id == appraisal.id) {
+                Object.assign(app, appraisal)
+                foundAppraisal = true
+              }
+            })
+            if (!foundAppraisal) {
+              allAppraisals.push(appraisal)
+            }
+            this.appraisalEntities.next(allAppraisals)
+          }
         }),
         catchError((err) => {
           console.error(err)

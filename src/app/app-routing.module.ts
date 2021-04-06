@@ -56,6 +56,15 @@ const routes: Routes = [
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
+    path: 'appraisal-edit',
+    loadChildren: () =>
+      import('./pages/appraisal-edit/appraisal-edit.module').then(
+        (m) => m.AppraisalEditModule
+      ),
+    canLoad: [ApplicationIsLoadedGuard],
+    canActivate: [SchoolGuard, AuthenticatedGuard],
+  },
+  {
     path: 'evaluate',
     loadChildren: () =>
       import('./pages/evaluate/evaluate.module').then(
