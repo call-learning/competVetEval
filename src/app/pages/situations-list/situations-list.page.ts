@@ -39,6 +39,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       this.loader.present()
 
       this.situationService.retrieveSituations().subscribe((situations) => {
+        console.log('Situations: ' + JSON.stringify(situations))
         this.situations = situations
         this.filterSituations('all')
         this.loader.dismiss()

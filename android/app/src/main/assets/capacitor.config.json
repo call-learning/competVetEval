@@ -9,5 +9,8 @@
       "launchShowDuration": 0
     }
   },
+  "android": {
+    "allowMixedContent": true
+  },
   "cordova": {}
 }

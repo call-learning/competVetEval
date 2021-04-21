@@ -65,7 +65,7 @@ export class LoginPage implements OnInit {
               if (err.message === 'invalidlogin') {
                 this.errorMsg = 'Identifiants invalides'
               } else {
-                this.errorMsg = `Une erreur s'est produite`
+                this.errorMsg = `Une erreur s'est produite (${err.name})`
               }
 
               this.loader.dismiss()
