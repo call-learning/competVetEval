@@ -6,10 +6,10 @@
           <img src="https://via.placeholder.com/50x50" />
         </div>
         <div class="situations-list__title">
-          <ng-container *ngIf="authService.isStudentMode">
+          <ng-container *ngIf="authService.isStudent">
             Situations
           </ng-container>
-          <ng-container *ngIf="authService.isAppraiserMode">
+          <ng-container *ngIf="authService.isAppraiser">
             Observations
           </ng-container>
         </div>
@@ -20,14 +20,7 @@
           value="all"
           mode="ios"
         >
-          <ion-segment-button value="to_evaluate">
-            <ng-container *ngIf="authService.isStudentMode">
-              À évaluer
-            </ng-container>
-            <ng-container *ngIf="authService.isAppraiserMode">
-              En cours
-            </ng-container>
-          </ion-segment-button>
+          <ion-segment-button value="today">Aujourd'hui</ion-segment-button>
           <ion-segment-button value="all">Toutes</ion-segment-button>
         </ion-segment>
 
@@ -48,143 +41,30 @@
   <div class="ion-margin-vertical">
     <div
       class="list-item"
-      [routerLink]="authService.isStudentMode ? ['/situation-detail', situation.id] : ['/situation-detail', situation.id, situation.studentId ]"
+      [routerLink]="authService.isStudent ? ['/scheduled-situation-detail', situation.evalPlanId] :
+      ['/scheduled-situation-detail', situation.evalPlanId, situation.studentId ]"
       routerDirection="forward"
       *ngFor="let situation of situationsDisplayed"
     >
-      <!-- todo : implement -->
-      <!-- <div class="list-item-image" *ngIf="situation.type == 'appraiser'">
-        <img [src]="situation.image" />
-      </div> -->
-
-      <div class="list-item-content">
-        <div class="list-item-title">{{ situation.title }}</div>
-        <div class="list-item-dates">
-          {{ situation.startTime * 1000 | date:'d LLL yyyy' }} au {{
-          situation.endTime * 1000 | date:'d LLL yyyy' }}
-        </div>
-        <div class="list-item-infos">
-          <ng-container *ngIf="situation.type == 'student'">
-            <div class="list-item-info">
-              {{ situation.appraisalsCompleted }} observation(s) sur
-              {{situation.appraisalsRequired }} réalisée(s)
-            </div>
-          </ng-container>
-          <ng-container *ngIf="situation.type == 'appraiser'">
-            <div class="list-item-content">
-              <ion-item lines="none">
-                <ion-avatar slot="start"
-                  ><img src="{{situation.studentPictureUrl}}"
-                /></ion-avatar>
-                <ion-label>{{ situation.studentName }}</ion-label>
-              </ion-item>
-            </div>
-            <div class="list-item-info">
-              <ng-container
-                *ngIf="situation.status == 'in_progress' || situation.status == 'todo'"
-              >
-                <svg-icon
-                  src="assets/images/svg-icons/icon-times-light.svg"
-                  [svgStyle]="{ 'width.px':21 }"
-                ></svg-icon>
-              </ng-container>
-              <ng-container *ngIf="situation.status == 'done'">
-                <svg-icon
-                  src="assets/images/svg-icons/icon-check-light.svg"
-                  [svgStyle]="{ 'width.px':21 }"
-                ></svg-icon>
-              </ng-container>
-              <div class="list-item-info">
-                {{ situation.appraisalsCompleted }} /
-                {{situation.appraisalsRequired }}
-              </div>
-            </div>
-          </ng-container>
-        </div>
+      <div *ngIf="authService.isStudent" class="situations-list__card-item">
+        <app-student-situation-card
+          [scheduledSituation]="situation"
+        ></app-student-situation-card>
       </div>
-      <ng-container *ngIf="situation.type == 'student'">
-        <div class="list-item-info">
-          <span [ngSwitch]="situation.appraisalAverage">
-            <svg-icon
-              *ngSwitchCase="0"
-              src="assets/images/svg-icons/icon-smile.svg"
-              [svgStyle]="{ 'width.px':21 }"
-            >
-            </svg-icon>
-            <svg-icon
-              *ngSwitchCase="1"
-              src="assets/images/svg-icons/emojis/ranking-active-1.svg"
-              [svgStyle]="{ 'width.px':21 }"
-            >
-            </svg-icon>
-            <svg-icon
-              *ngSwitchCase="2"
-              src="assets/images/svg-icons/emojis/ranking-active-2.svg"
-              [svgStyle]="{ 'width.px':21 }"
-            >
-            </svg-icon>
-
-            <svg-icon
-              *ngSwitchCase="3"
-              src="assets/images/svg-icons/emojis/ranking-active-4.svg"
-              [svgStyle]="{ 'width.px':21 }"
-            >
-            </svg-icon>
-            <svg-icon
-              *ngSwitchCase="4"
-              src="assets/images/svg-icons/emojis/ranking-active-5.svg"
-              [svgStyle]="{ 'width.px':21 }"
-            ></svg-icon>
-            <svg-icon
-              *ngSwitchCase="5"
-              src="assets/images/svg-icons/emojis/ranking-active-5.svg"
-              [svgStyle]="{ 'width.px':21 }"
-            ></svg-icon>
-          </span>
-          <span class="situations-small_number_top"
-            >{{situation.appraisalAverage}}</span
-          >
-        </div>
-        <!-- todo : implement -->
-        <!-- <div class="list-item-info">
-          <svg-icon
-            src="assets/images/svg-icons/icon-comment.svg"
-            [svgStyle]="{ 'width.px':23 }"
-          ></svg-icon>
-          <span>{{ situation.comments }}</span>
-        </div> -->
-      </ng-container>
-      <div
-        class="list-item-icon"
-        [class.-done]="situation.status == 'done'"
-        [class.-todo]="situation.status == 'todo'"
-      >
-        <svg-icon
-          src="assets/images/svg-icons/icon-check.svg"
-          [svgStyle]="{ 'width.px':26 }"
-          *ngIf="situation.status == 'done'"
-        ></svg-icon>
-
-        <svg-icon
-          src="assets/images/svg-icons/icon-donut.svg"
-          [svgStyle]="{ 'width.px':24 }"
-          *ngIf="situation.status == 'in_progress'"
-        ></svg-icon>
-
-        <svg-icon
-          src="assets/images/svg-icons/icon-warning.svg"
-          [svgStyle]="{ 'width.px':26 }"
-          *ngIf="situation.status == 'todo'"
-        ></svg-icon>
+      <div *ngIf="authService.isAppraiser" class="situations-list__card-item">
+        <app-appraiser-situation-card
+          [scheduledSituation]="situation"
+          [studentId]="situation.studentId"
+        >
+        </app-appraiser-situation-card>
       </div>
     </div>
   </div>
-
   <ion-fab
     vertical="bottom"
     horizontal="end"
     slot="fixed"
-    *ngIf="authService.isAppraiserMode"
+    *ngIf="authService.isAppraiser"
     (click)="openModalScanAppraisal()"
   >
     <ion-fab-button>

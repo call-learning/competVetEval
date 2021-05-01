@@ -1,32 +1,50 @@
+/**
+ * Http Auth endpoint
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { throwError } from 'rxjs'
+import { Observable, throwError } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
-import { AuthEndpoints } from 'src/app/shared/endpoints/auth.endpoints'
-import { LoginResult } from 'src/app/shared/models/auth.model'
-import { CevUser } from 'src/app/shared/models/cev-user.model'
+import { LoginResult } from '../../shared/models/auth.model'
+import { CevUser } from '../../shared/models/cev-user.model'
 import { UserType } from '../../shared/models/user-type.model'
+import { EndpointsServices } from './endpoints.services'
 import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpAuthService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private endPointService: EndpointsServices
+  ) {}
 
-  login(username: string, password: string) {
+  /**
+   * Login user and get user role
+   *
+   * @param username
+   * @param password
+   * @return An Observable of the response and a LoginResult object.
+   */
+  login(username: string, password: string): Observable<LoginResult> {
     const formData: FormData = new FormData()
     formData.append('username', username)
     formData.append('password', password)
     formData.append('service', 'moodle_mobile_app')
 
-    return this.http.post(AuthEndpoints.login(), formData).pipe(
+    return this.http.post(this.endPointService.login(), formData).pipe(
       map((res: any) => {
         return new LoginResult(res)
       }),
       catchError((err) => {
-        const endpoint = AuthEndpoints.login()
+        const endpoint = this.endPointService.login()
         console.log(
           `Erreur de connexion: (${err.name}:${err.message}) - ${endpoint}`
         )
@@ -35,27 +53,28 @@ export class HttpAuthService {
     )
   }
 
-  getUserProfile() {
+  getUserProfile(): Observable<CevUser> {
     return MoodleApiUtils.apiCall(
       'core_webservice_get_site_info',
       {},
-      this.http
+      this.http,
+      this.endPointService.server()
     ).pipe(
       map((res) => {
         return new CevUser(res)
       }),
       catchError((err) => {
-        console.error(err)
         return throwError(err)
       })
     )
   }
 
-  getUserType(userid) {
+  getUserType(userid): Observable<'student' | 'appraiser'> {
     return MoodleApiUtils.apiCall(
       'local_cveteval_get_user_type',
       { userid },
-      this.http
+      this.http,
+      this.endPointService.server()
     ).pipe(
       map((res): 'student' | 'appraiser' => {
         const userType = new UserType(res)

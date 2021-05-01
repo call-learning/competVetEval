@@ -1,4 +1,12 @@
-import { Situation } from './../../models/situation.model'
+/**
+ * Ask appraisal components
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
+import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
 import {
   AfterViewInit,
   Component,
@@ -16,8 +24,8 @@ import { IonTextarea, ModalController } from '@ionic/angular'
   styleUrls: ['./modal-ask-appraisal.component.scss'],
 })
 export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
-  @Input() situation: Situation
-  @Input() studentId: number // TODO: Check if there is no better way to do it (situation has got a student Id ?)
+  @Input() scheduledSituation: ScheduledSituation
+  @Input() studentId: number // TODO: Check if there is no better way to do it (scheduledSituation has got a student Id ?)
 
   qrCodeData: string
 
@@ -60,8 +68,11 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
 
     if (this.askAppraisalForm.valid) {
       this.step = 'qr-code'
+
+      // TODO: Change this and create a blank appraisal. To do that we would need
+      // to add a status to the appraisal (to complete or sht like this)
       const encodedContext = encodeURIComponent(this.contextInput.value)
-      this.qrCodeData = `${this.situation.id}|${this.studentId}|${encodedContext}`
+      this.qrCodeData = `${this.scheduledSituation.evalPlanId}|${this.studentId}|${encodedContext}`
     } else {
       this.errorMsg = 'Le formulaire est invalide'
     }

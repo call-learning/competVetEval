@@ -38,7 +38,7 @@ const routes: Routes = [
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
-    path: 'situation-detail',
+    path: 'scheduled-situation-detail',
     loadChildren: () =>
       import('./pages/situation-detail/situation-detail.module').then(
         (m) => m.SituationDetailPageModule

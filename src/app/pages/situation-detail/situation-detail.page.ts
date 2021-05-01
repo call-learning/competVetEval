@@ -3,15 +3,18 @@ import { ActivatedRoute } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
 
-import { first } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
-import { Situation } from 'src/app/shared/models/situation.model'
-import { AppraisalService } from '../../core/services/appraisal.service'
-import { SituationService } from '../../core/services/situation.service'
+import { ScheduledSituation } from 'src/app/shared/models/ui/scheduled-situation.model'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
-import { Appraisal } from './../../shared/models/appraisal.model'
+import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
+import { BehaviorSubject, combineLatest, iif, of, zip } from 'rxjs'
+import { UserDataService } from '../../core/services/user-data.service'
+import { CevUser } from '../../shared/models/cev-user.model'
+import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
+import { combineAll, map, zipAll } from 'rxjs/operators'
 
 @Component({
   selector: 'app-situation-detail',
@@ -19,29 +22,31 @@ import { Appraisal } from './../../shared/models/appraisal.model'
   styleUrls: ['./situation-detail.page.scss'],
 })
 export class SituationDetailPage extends BaseComponent implements OnInit {
-  situationId: number
-  studentId: number
-  currentUserId: number
+  evalPlanId: number = null
+  studentId: number = null
+  currentUserId: number = null
+  studentInfo: CevUser = null
 
-  situation: Situation
-  appraisals: Appraisal[]
+  scheduledSituation: ScheduledSituation
+  appraisals = null
 
   loader: HTMLIonLoadingElement
 
   constructor(
     public authService: AuthService,
     private modalController: ModalController,
-    public appraisalService: AppraisalService,
-    public situationService: SituationService,
+    public appraisalUIService: AppraisalUiService,
+    public situationService: ScheduledSituationService,
     private activatedRoute: ActivatedRoute,
+    private userDataService: UserDataService,
     private loadingController: LoadingController
   ) {
     super()
   }
 
   ngOnInit() {
-    this.situationId = parseInt(
-      this.activatedRoute.snapshot.paramMap.get('situationId'),
+    this.evalPlanId = parseInt(
+      this.activatedRoute.snapshot.paramMap.get('evalPlanId'),
       10
     )
     if (this.activatedRoute.snapshot.paramMap.has('studentId')) {
@@ -50,44 +55,43 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         10
       )
     } else {
-      this.studentId = this.authService.loggedUser.value.userid
+      this.studentId = null
     }
 
-    this.appraisalService.appraisalEntities.subscribe((appraisals) => {
-      if (appraisals && this.situation) {
-        appraisals.forEach((appraisal) => {
-          if (appraisal.situationId === this.situation.id) {
-            // TODO: find a way to refresh the page.
-            //this.appraisals.push(appraisal)
-          }
-        })
-      }
-    })
-    this.currentUserId = this.authService.loggedUserValue.userid
+    this.currentUserId = this.authService.loggedUser.getValue().userid
+    // Refresh when we change the appraisals.
+    this.appraisalUIService
+      .fetchAppraisalsForEvalPlanStudentId(this.evalPlanId, this.studentId)
+      .subscribe((appraisals) => {
+        this.appraisals = appraisals
+      })
     this.loadingController.create().then((res) => {
       this.loader = res
       this.loader.present()
-
-      this.situationService.situations$
-        .pipe(first())
-        .subscribe((situations) => {
-          this.situation = situations.find((sit) => sit.id === this.situationId)
-
-          const userId = this.studentId
-            ? this.studentId
-            : this.authService.loggedUser.getValue().userid
-          this.appraisalService
-            .retrieveAppraisals(userId)
-            .subscribe((appraisals) => {
-              this.appraisals = []
-              appraisals.forEach((appraisal) => {
-                if (appraisal.situationId === this.situation.id) {
-                  this.appraisals.push(appraisal)
-                }
-              })
+      zip(
+        this.situationService.situations.asObservable(),
+        iif(
+          () => this.studentId != null,
+          this.userDataService.getUserProfileInfo(this.studentId),
+          of(null)
+        )
+      )
+        .pipe(
+          map(([situations, userProfile]) => {
+            this.scheduledSituation = situations.find(
+              (s) =>
+                s.evalPlanId == this.evalPlanId &&
+                (this.studentId == null || this.studentId == s.studentId)
+            )
+            if (userProfile) {
+              this.studentInfo = userProfile
+            }
+            if (this.loader.animated) {
               this.loader.dismiss()
-            })
-        })
+            }
+          })
+        )
+        .subscribe()
     })
   }
 
@@ -113,7 +117,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       .create({
         component: ModalAskAppraisalComponent,
         componentProps: {
-          situation: this.situation,
+          scheduledSituation: this.scheduledSituation,
           studentId: this.studentId,
         },
       })

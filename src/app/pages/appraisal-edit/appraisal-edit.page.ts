@@ -1,3 +1,11 @@
+/**
+ * Appraisal edit page
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -8,14 +16,14 @@ import {
   ToastController,
 } from '@ionic/angular'
 
-import { AppraisalService } from '../../core/services/appraisal.service'
 import { AuthService } from '../../core/services/auth.service'
-import { CriteriaService } from '../../core/services/criteria.service'
-import { SituationService } from '../../core/services/situation.service'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
 import { ModalAppraisalCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-appraisal-criterion.component'
-import { Appraisal } from '../../shared/models/appraisal.model'
-import { CriterionAppraisal } from '../../shared/models/criterion-appraisal.model'
+import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
+import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
+import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
+import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 
 @Component({
   selector: 'app-appraisal-edit',
@@ -23,9 +31,9 @@ import { CriterionAppraisal } from '../../shared/models/criterion-appraisal.mode
   styleUrls: ['./appraisal-edit.page.scss'],
 })
 export class AppraisalEditPage extends BaseComponent implements OnInit {
-  appraisal: Appraisal
+  appraisal: AppraisalUI
   appraisalId: number
-
+  scheduledSituation: ScheduledSituation
   contextForm: FormGroup
   commentForm: FormGroup
 
@@ -36,9 +44,8 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController,
     private router: Router,
-    private criteriaService: CriteriaService,
-    private situationService: SituationService,
-    private appraisalService: AppraisalService,
+    private scheduledSituationService: ScheduledSituationService,
+    private appraisalUIService: AppraisalUiService,
     public authService: AuthService,
     private activatedRoute: ActivatedRoute,
     private loadingController: LoadingController
@@ -62,13 +69,17 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
       10
     )
 
-    if (this.authService.isAppraiserMode) {
+    if (this.authService.isAppraiser) {
       this.loadingController.create().then((res) => {
         this.loader = res
         this.loader.present()
-
-        this.appraisalService
-          .retrieveAppraisal(this.appraisalId)
+        this.scheduledSituationService.situations.subscribe((situations) => {
+          this.scheduledSituation = situations.find(
+            (sit) => sit.evalPlanId == this.appraisal.evalPlan.id
+          )
+        })
+        this.appraisalUIService
+          .waitForAppraisalId(this.appraisalId)
           .subscribe((appraisal) => {
             this.appraisal = appraisal
             this.contextForm.setValue({ context: appraisal.context })
@@ -77,7 +88,7 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
           })
       })
     } else {
-      this.router.navigate(['/situation-list'])
+      this.router.navigate(['/scheduledSituation-list'])
     }
   }
 
@@ -115,8 +126,8 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
 
   saveAndRedirect() {
     this.loader.present()
-    this.appraisal.appraiserId = this.authService.loggedUser.getValue().userid
-    this.appraisalService.submitAppraisal(this.appraisal).subscribe(
+    this.appraisal.appraiser = this.authService.loggedUser.getValue()
+    this.appraisalUIService.submitAppraisal(this.appraisal).subscribe(
       () => {
         this.loader.dismiss()
         this.toastController
@@ -129,9 +140,9 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
             toast.present()
           })
         this.router.navigate([
-          'situation-detail',
-          this.appraisal.situationId,
-          this.appraisal.studentId,
+          'scheduled-situation-detail',
+          this.appraisal.evalPlan.clsituationid,
+          this.appraisal.student.userid,
         ])
       },
       () => {
@@ -149,7 +160,7 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
     )
   }
 
-  getSubcriteriaGradedNumber(criterion: CriterionAppraisal) {
+  getSubcriteriaGradedNumber(criterion: CriterionForAppraisalTreeModel) {
     return criterion.subcriteria.filter((sc) => {
       return sc.grade !== 0
     }).length

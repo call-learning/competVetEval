@@ -11,6 +11,9 @@ import { ModalAskAppraisalComponent } from './modals/modal-ask-appraisal/modal-a
 import { ModalCriterionDetailComponent } from './modals/modal-criterion-detail/modal-criterion-detail.component'
 import { ModalScanAppraisalComponent } from './modals/modal-scan-appraisal/modal-scan-appraisal.component'
 import { ModalSituationChartComponent } from './modals/modal-situation-chart/modal-situation-chart.component'
+import { SituationStatusIconComponent } from './components/situation-status-icon/situation-status-icon.component'
+import { StudentSituationCardComponent } from './components/student-situation-card/student-situation-card.component'
+import { AppraiserSituationCardComponent } from './components/appraiser-situation-card/appraiser-situation-card.component'
 
 @NgModule({
   declarations: [
@@ -19,6 +22,9 @@ import { ModalSituationChartComponent } from './modals/modal-situation-chart/mod
     ModalSituationChartComponent,
     ModalScanAppraisalComponent,
     ModalAppraisalCriterionComponent,
+    SituationStatusIconComponent,
+    StudentSituationCardComponent,
+    AppraiserSituationCardComponent,
   ],
   imports: [
     CommonModule,
@@ -28,6 +34,13 @@ import { ModalSituationChartComponent } from './modals/modal-situation-chart/mod
     ReactiveFormsModule,
     QRCodeModule,
   ],
-  exports: [AngularSvgIconModule, ReactiveFormsModule, QRCodeModule],
+  exports: [
+    AngularSvgIconModule,
+    ReactiveFormsModule,
+    QRCodeModule,
+    SituationStatusIconComponent,
+    StudentSituationCardComponent,
+    AppraiserSituationCardComponent,
+  ],
 })
 export class SharedModule {}

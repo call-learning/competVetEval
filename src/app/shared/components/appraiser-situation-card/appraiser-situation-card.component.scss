@@ -1,0 +1,21 @@
+.appraiser-situation-card {
+  display: flex;
+}
+
+.appraiser-situation-card_additional_info {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.appraiser-situation-card_additional_info_items {
+  display: flex;
+  flex-direction: row;
+}
+
+.appraiser-situation-card_number_top {
+  font-size: small;
+  margin-left: 1.5em;
+  margin-top: -2.5em;
+  color: red;
+}

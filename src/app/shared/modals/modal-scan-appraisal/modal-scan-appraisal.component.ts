@@ -1,11 +1,19 @@
+/**
+ * Modal for barcode scan
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { ModalController, ToastController } from '@ionic/angular'
-import { Appraisal } from '../../models/appraisal.model'
-import { AppraisalService } from '../../../core/services/appraisal.service'
+import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
 import { AuthService } from '../../../core/services/auth.service'
+import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
 
 @Component({
   selector: 'app-modal-scan-appraisal',
@@ -18,7 +26,7 @@ export class ModalScanAppraisalComponent implements OnInit {
     private modalController: ModalController,
     private toastController: ToastController,
     private barcodeScanner: BarcodeScanner,
-    private appraisalService: AppraisalService,
+    private appraisalUIService: AppraisalUiService,
     private authService: AuthService,
     private router: Router
   ) {}
@@ -55,18 +63,14 @@ export class ModalScanAppraisalComponent implements OnInit {
         this.dismissModal()
 
         const barcodeDataSplit = barcodeData.text.split('|')
-        this.appraisalService
-          .createBlankAppraisal(
-            barcodeDataSplit[0],
-            barcodeDataSplit[1],
-            this.authService.loggedUser.getValue().userid
-          )
-          .subscribe((appraisal: Appraisal) => {
+        this.appraisalUIService
+          .waitForAppraisalId(Number.parseInt(barcodeDataSplit[0]))
+          .subscribe((appraisal: AppraisalUI) => {
             appraisal.context = barcodeDataSplit[2]
-            this.appraisalService
+            this.appraisalUIService
               .submitAppraisal(appraisal)
-              .subscribe((appraisal) => {
-                this.router.navigate(['appraisal-edit', appraisal.id])
+              .subscribe((appraisalid) => {
+                this.router.navigate(['appraisal-edit', appraisalid])
               })
           })
       })

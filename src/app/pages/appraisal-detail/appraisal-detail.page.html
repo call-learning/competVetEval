@@ -3,13 +3,15 @@
     <ion-buttons slot="start">
       <ion-button
         *ngIf="appraisal"
-        [routerLink]="authService.isStudentMode ? ['/situation-detail', appraisal.situationId] : ['/situation-detail', appraisal.situationId, appraisal.studentId ]"
+        [routerLink]="authService.isStudent ?
+         ['/scheduled-situation-detail', appraisal?.evalPlan.id] :
+          ['/scheduled-situation-detail',appraisal?.evalPlan.id, appraisal?.student.userid ]"
         routerDirection="back"
       >
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ appraisal?.situationTitle }}</ion-title>
+    <ion-title>{{ scheduledSituation?.situation.title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

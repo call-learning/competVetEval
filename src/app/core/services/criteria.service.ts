@@ -1,38 +1,80 @@
+/**
+ * Criteria based services
+ *
+ * Used to manage criteria related routines
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
+
+import { BehaviorSubject, Observable } from 'rxjs'
+import { CriterionModel } from '../../shared/models/moodle/criterion.model'
+import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { Injectable } from '@angular/core'
+import { map, mergeMap } from 'rxjs/operators'
+import { CevUser } from '../../shared/models/cev-user.model'
+import { RoleModel } from '../../shared/models/moodle/role.model'
+import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
+import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
+import { BaseDataService } from './base-data.service'
+import { root } from 'rxjs/internal-compatibility'
 
-import { throwError, BehaviorSubject } from 'rxjs'
-import { catchError, map } from 'rxjs/operators'
-import { Criterion } from '../../shared/models/criterion.model'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-
+/**
+ * Manage criteria hierarchical view
+ * - criteria / evaluation grid
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class CriteriaService {
-  constructor(private moodleApiService: MoodleApiService) {
-    // Retrieve situations from localStorage if any ?
+  private criteriaTreeEntities = new BehaviorSubject<CriterionTreeModel[]>(null)
+
+  /**
+   * Build the base data service
+   *
+   * @param baseDataService
+   * @param authService
+   */
+  constructor(private baseDataService: BaseDataService) {
+    this.baseDataService.criteria.subscribe((newcriteria) => {
+      this.refreshCriteria(newcriteria)
+    })
   }
 
-  criteria = new BehaviorSubject<Criterion[]>([])
-
-  get getCriteria(): Criterion[] {
-    return this.criteria.getValue()
+  /**
+   * Get current criteria tree
+   */
+  public get criteriaTree(): BehaviorSubject<CriterionTreeModel[]> {
+    return this.criteriaTreeEntities
   }
 
-  retrieveCriteria() {
-    return this.moodleApiService.getCriteria().pipe(
-      map((criteria: Criterion[]) => {
-        this.criteria.next(criteria)
-        return criteria
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
-      })
-    )
+  /**
+   * Build a tree model of criteria from a flat list
+   *
+   * @param newcriteria
+   */
+  public refreshCriteria(newcriteria: CriterionModel[]): CriterionTreeModel[] {
+    if (newcriteria) {
+      const allHierarchicalCriteria =
+        CriterionTreeModel.convertToTree(newcriteria)
+      this.criteriaTreeEntities.next(allHierarchicalCriteria)
+      return allHierarchicalCriteria
+    }
   }
 
-  public getLabelForCriteria(critid) {
-    this.criteria.getValue()
+  /**
+   * Get criteria from eval Grid
+   * @param evalgridId
+   */
+  public getCriteriaFromEvalGrid(evalgridId: number): CriterionModel[] {
+    const allCriteria = this.baseDataService.criteria.getValue()
+    return this.baseDataService.criteriaEvalgrid
+      .getValue()
+      .filter((ce) => ce.evalgridid == evalgridId)
+      .map((evalgridcrit) =>
+        allCriteria.find((c) => c.id == evalgridcrit.criterionid)
+      )
   }
 }

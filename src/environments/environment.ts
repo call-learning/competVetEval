@@ -1,4 +1,14 @@
-export const environment = {
+import { IEnvironment } from './ienvironment'
+
+export const environment: IEnvironment = {
   production: false,
-  apiUrl: 'https://cveteval.call-learning.fr',
+  mockServer: false,
+  schools: [
+    {
+      id: 'dev-instance',
+      name: 'Local Development Instance',
+      logo: 'assets/images/schools/logo-calllearning.png',
+      moodleUrl: 'http://cveteval.call-learning.fr',
+    },
+  ],
 }

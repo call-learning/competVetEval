@@ -26,54 +26,38 @@
     <img src="assets/images/illustrations/illustration-surgeon.png" />
   </div>
 
-  <ng-container *ngIf="situation && appraisals">
+  <ng-container *ngIf="scheduledSituation">
     <div class="situation-detail__header">
       <div class="situation-detail__header-content">
-        <div class="page-title">{{ situation.title }}</div>
-        <div class="page-descr">{{ situation.description }}</div>
+        <div class="page-title">{{ scheduledSituation.situation.title }}</div>
+        <div class="page-descr">
+          {{ scheduledSituation.situation.description }}
+        </div>
         <div class="page-dates">
-          {{ situation.startTime * 1000 | date:'d LLL yy' }}/{{
-          situation.endTime * 1000 | date:'d LLL yy' }}
+          {{ scheduledSituation.evalPlan.starttime * 1000 | date:'d LLL yy'
+          }}/{{ scheduledSituation.evalPlan.endtime * 1000 | date:'d LLL yy' }}
         </div>
-        <div *ngIf="studentId != null">
-          <div class="situation-detail__student">Etudiant</div>
-          <div class="situation-detail__student_name">
-            <ion-item lines="none">
-              <ion-avatar slot="start"
-                ><img src="{{situation.studentPictureUrl}}"
-              /></ion-avatar>
-              <ion-label>{{ situation.studentName }}</ion-label>
-            </ion-item>
-          </div>
+        <div *ngIf="authService.isStudent" class="situations-list__card-item">
+          <app-student-situation-card
+            [scheduledSituation]="scheduledSituation"
+            [showHeader]="false"
+          ></app-student-situation-card>
         </div>
-      </div>
-      <div
-        class="list-item-icon"
-        [class.-done]="situation.status == 'done'"
-        [class.-todo]="situation.status == 'todo'"
-      >
-        <svg-icon
-          src="assets/images/svg-icons/icon-check.svg"
-          [svgStyle]="{ 'width.px':26 }"
-          *ngIf="situation.status == 'done'"
-        ></svg-icon>
-        <svg-icon
-          src="assets/images/svg-icons/icon-donut.svg"
-          [svgStyle]="{ 'width.px':24 }"
-          *ngIf="situation.status == 'in_progress'"
-        ></svg-icon>
-        <svg-icon
-          src="assets/images/svg-icons/icon-warning.svg"
-          [svgStyle]="{ 'width.px':26 }"
-          *ngIf="situation.status == 'todo'"
-        ></svg-icon>
+        <div *ngIf="authService.isAppraiser" class="situations-list__card-item">
+          <app-appraiser-situation-card
+            [scheduledSituation]="scheduledSituation"
+            [studentId]="scheduledSituation.studentId"
+            [showHeader]="false"
+          >
+          </app-appraiser-situation-card>
+        </div>
       </div>
     </div>
     <div class="page-subtitle">Observations</div>
-    <div class="situation-detail__no-appraisals" *ngIf="!appraisals.length">
+    <div class="situation-detail__no-appraisals" *ngIf="!appraisals?.length">
       Cette situation n’a pas encore été évaluée
     </div>
-    <div class="ion-margin-vertical" *ngIf="appraisals.length">
+    <div class="ion-margin-vertical" *ngIf="appraisals?.length">
       <a
         class="list-item"
         [routerLink]="(appraisal.appraiserId === currentUserId) ? ['/appraisal-edit', appraisal.id]
@@ -89,9 +73,9 @@
           <div class="list-item-title">
             <ion-item lines="none">
               <ion-avatar slot="start"
-                ><img src="{{appraisal.appraiserPictureUrl}}"
+                ><img src="{{appraisal.appraiser.userpictureurl}}"
               /></ion-avatar>
-              <ion-label>{{ appraisal.appraiserName }}</ion-label>
+              <ion-label>{{ appraisal.appraiser.fullname }}</ion-label>
             </ion-item>
           </div>
           <div class="list-item-subtitle">
@@ -117,10 +101,7 @@
         </div>
       </a>
     </div>
-    <div
-      class="situation-detail__ask-appraisal"
-      *ngIf="authService.isStudentMode"
-    >
+    <div class="situation-detail__ask-appraisal" *ngIf="authService.isStudent">
       <button
         class="btn btn-primary btn-full nnki-mb4"
         (click)="openModalAskAppraisal()"
@@ -130,8 +111,8 @@
     </div>
     <ion-button
       class="btn-full"
-      [routerLink]="['/evaluate', situationId, studentId]"
-      *ngIf="authService.isAppraiserMode"
+      [routerLink]="['/evaluate', evalPlanId, studentId]"
+      *ngIf="authService.isAppraiser"
     >
       <ion-icon name="chevron-forward"></ion-icon>
       Démarrer l'observation

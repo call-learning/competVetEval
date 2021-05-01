@@ -41,3 +41,10 @@ From Xcode >
 
 Modify version number + name
 Product > Archive
+
+# Build Test version
+
+With mock data and MSW handler:
+
+ionic build --configuration=test
+ionic serve --configuration=test

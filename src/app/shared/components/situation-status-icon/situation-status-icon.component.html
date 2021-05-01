@@ -1,0 +1,23 @@
+<div
+  class="list-item-icon"
+  [class.-done]="this.status == 'done'"
+  [class.-todo]="this.status == 'todo'"
+>
+  <svg-icon
+    src="assets/images/svg-icons/icon-check.svg"
+    [svgStyle]="{ 'width.px': 26 }"
+    *ngIf="this.status == 'done'"
+  ></svg-icon>
+
+  <svg-icon
+    src="assets/images/svg-icons/icon-donut.svg"
+    [svgStyle]="{ 'width.px': 24 }"
+    *ngIf="this.status == 'in_progress'"
+  ></svg-icon>
+
+  <svg-icon
+    src="assets/images/svg-icons/icon-warning.svg"
+    [svgStyle]="{ 'width.px': 26 }"
+    *ngIf="this.status == 'todo'"
+  ></svg-icon>
+</div>

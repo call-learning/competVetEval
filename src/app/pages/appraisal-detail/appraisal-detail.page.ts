@@ -1,3 +1,11 @@
+/**
+ * Appraisal details page
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
@@ -6,10 +14,12 @@ import { LoadingController, ModalController } from '@ionic/angular'
 
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
-import { AppraisalService } from '../../core/services/appraisal.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
-import { Appraisal } from '../../shared/models/appraisal.model'
-import { CriterionAppraisal } from './../../shared/models/criterion-appraisal.model'
+import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
+import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
+import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
+import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 
 @Component({
   selector: 'app-appraisal-detail',
@@ -22,7 +32,8 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
   formSubmitted = false
 
   appraisalId: number
-  appraisal: Appraisal
+  appraisal: AppraisalUI
+  scheduledSituation: ScheduledSituation
 
   loader: HTMLIonLoadingElement
 
@@ -30,9 +41,10 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
     private formBuilder: FormBuilder,
     public authService: AuthService,
     private modalController: ModalController,
-    private appraisalService: AppraisalService,
+    private appraisalUIService: AppraisalUiService,
     private activatedRoute: ActivatedRoute,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private scheduledSituationService: ScheduledSituationService
   ) {
     super()
     this.answerAppraisalForm = this.formBuilder.group({
@@ -50,16 +62,25 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
       this.loader = res
       this.loader.present()
 
-      this.appraisalService
-        .retrieveAppraisal(this.appraisalId)
+      this.appraisalUIService
+        .waitForAppraisalId(this.appraisalId)
         .subscribe((appraisal) => {
           this.appraisal = appraisal
-          this.loader.dismiss()
+          this.scheduledSituationService.situations.subscribe((situations) => {
+            if (situations) {
+              this.scheduledSituation = situations.find(
+                (sit) => sit.evalPlanId == this.appraisal.evalPlan.id
+              )
+            }
+          })
+          if (this.loader.present) {
+            this.loader.dismiss()
+          }
         })
     })
   }
 
-  getSubcriteriaGradedNumber(criterion: CriterionAppraisal) {
+  getSubcriteriaGradedNumber(criterion: CriterionForAppraisalTreeModel) {
     return criterion.subcriteria.filter((sc) => {
       return sc.grade !== 0
     }).length

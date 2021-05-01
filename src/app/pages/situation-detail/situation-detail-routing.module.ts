@@ -5,11 +5,11 @@ import { SituationDetailPage } from './situation-detail.page'
 
 const routes: Routes = [
   {
-    path: ':situationId/:studentId',
+    path: ':evalPlanId/:studentId',
     component: SituationDetailPage,
   },
   {
-    path: ':situationId',
+    path: ':evalPlanId',
     component: SituationDetailPage,
   },
 ]

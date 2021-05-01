@@ -1,0 +1,86 @@
+<div class="student-situation-card">
+  <div class="list-item-content">
+    <div *ngIf="showHeader">
+      <div class="list-item-title">
+        {{ scheduledSituation.situation.title }}
+      </div>
+      <div class="list-item-dates">
+        {{
+          scheduledSituation.evalPlan.starttime * 1000 | date: 'd LLL yyyy'
+        }}
+        au
+        {{ scheduledSituation.evalPlan.endtime * 1000 | date: 'd LLL yyyy' }}
+      </div>
+    </div>
+    <div class="list-item-infos">
+      <div class="list-item-info">
+        <div *ngIf="studentSituationStats">
+          {{ studentSituationStats.appraisalsCompleted }} observation(s) sur
+          {{ studentSituationStats.appraisalsRequired }} réalisée(s)
+        </div>
+        <div *ngIf="!studentSituationStats">
+          <ion-spinner name="dots"></ion-spinner>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="student-situation-card_additional_info">
+  <div
+    *ngIf="studentSituationStats"
+    class="student-situation-card_additional_info_items"
+  >
+    <div class="list-item-icon">
+      <div [ngSwitch]="studentSituationStats.appraisalAverage">
+        <svg-icon
+          *ngSwitchCase="0"
+          src="assets/images/svg-icons/icon-smile.svg"
+          [svgStyle]="{ 'width.px': 21 }"
+        >
+        </svg-icon>
+        <svg-icon
+          *ngSwitchCase="1"
+          src="assets/images/svg-icons/emojis/ranking-active-1.svg"
+          [svgStyle]="{ 'width.px': 21 }"
+        >
+        </svg-icon>
+        <svg-icon
+          *ngSwitchCase="2"
+          src="assets/images/svg-icons/emojis/ranking-active-2.svg"
+          [svgStyle]="{ 'width.px': 21 }"
+        >
+        </svg-icon>
+
+        <svg-icon
+          *ngSwitchCase="3"
+          src="assets/images/svg-icons/emojis/ranking-active-4.svg"
+          [svgStyle]="{ 'width.px': 21 }"
+        >
+        </svg-icon>
+        <svg-icon
+          *ngSwitchCase="4"
+          src="assets/images/svg-icons/emojis/ranking-active-5.svg"
+          [svgStyle]="{ 'width.px': 21 }"
+        ></svg-icon>
+        <svg-icon
+          *ngSwitchCase="5"
+          src="assets/images/svg-icons/emojis/ranking-active-5.svg"
+          [svgStyle]="{ 'width.px': 21 }"
+        ></svg-icon>
+      </div>
+      <div class="student-situation-card_number_top">
+        {{ studentSituationStats.appraisalAverage }}
+      </div>
+    </div>
+    <app-situation-status-icon
+      [status]="studentSituationStats.status"
+    ></app-situation-status-icon>
+    <div
+      *ngIf="!studentSituationStats"
+      class="student-situation-card_additional_info_items"
+    >
+      <ion-spinner name="lines"></ion-spinner>
+      <ion-spinner name="lines"></ion-spinner>
+    </div>
+  </div>
+</div>

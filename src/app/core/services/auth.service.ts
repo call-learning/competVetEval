@@ -1,16 +1,27 @@
+/**
+ * Auth service file
+ *
+ * Manage authentication and user role
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
+
+import { School } from 'src/app/shared/models/school.model'
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs'
+import { CevUser } from '../../shared/models/cev-user.model'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-
-import { of, throwError, BehaviorSubject } from 'rxjs'
-import { catchError, concatMap, map, tap } from 'rxjs/operators'
-import { LoginResult } from 'src/app/shared/models/auth.model'
-import { CevUser } from 'src/app/shared/models/cev-user.model'
-import { School } from 'src/app/shared/models/school.model'
-import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
 import { HttpAuthService } from '../http-services/http-auth.service'
 import { SchoolsProviderService } from '../providers/schools-provider.service'
+import { catchError, concatMap, map, tap } from 'rxjs/operators'
+import { LoginResult } from '../../shared/models/auth.model'
+import { LocaleKeys } from '../../shared/utils/locale-keys'
+import { UseComponentViewEncapsulationRule } from 'codelyzer'
 
-export let LOGIN_STATE = {
+export const LOGIN_STATE = {
   ATTEMPT_TO_RECOVER: 'ATTEMPT_TO_RECOVER',
   IDLE: 'IDLE',
   LOGGED: 'LOGGED',
@@ -21,24 +32,26 @@ export let LOGIN_STATE = {
 })
 export class AuthService {
   chosenSchool: School
-
   loggedUser = new BehaviorSubject<CevUser>(null)
   loginState = new BehaviorSubject<string>(LOGIN_STATE.ATTEMPT_TO_RECOVER)
-
   accessToken: string
-
   currentUserRole = new BehaviorSubject<'student' | 'appraiser'>(null)
 
   constructor(
     private router: Router,
-    private httpAuthService: HttpAuthService
+    private httpAuthService: HttpAuthService,
+    private schoolsProviderService: SchoolsProviderService
   ) {}
 
-  login(username: string, password: string) {
+  login(
+    username: string,
+    password: string
+  ): Observable<'student' | 'appraiser'> {
     this.cleanAuthLocalStorage()
     return this.httpAuthService.login(username, password).pipe(
-      tap((res) => {
+      tap((res: LoginResult) => {
         if (res.errorcode) {
+          console.log(`Erreur de connexion: (${res.errorcode})`)
           throw new Error(res.errorcode)
         }
       }),
@@ -68,18 +81,18 @@ export class AuthService {
 
   setChosenSchool(school: School) {
     if (school) {
-      localStorage.setItem(LocaleKeys.schoolChoiceId, school.id)
+      this.schoolsProviderService.setSelectedSchoolId(school.id)
     } else {
-      localStorage.setItem(LocaleKeys.schoolChoiceId, null)
+      this.schoolsProviderService.setSelectedSchoolId(null)
     }
 
     this.chosenSchool = school
   }
 
   recoverSession() {
-    if (localStorage.getItem(LocaleKeys.schoolChoiceId)) {
-      this.chosenSchool = SchoolsProviderService.getSchoolFromId(
-        localStorage.getItem(LocaleKeys.schoolChoiceId)
+    if (this.schoolsProviderService.getSelectedSchoolId()) {
+      this.chosenSchool = this.schoolsProviderService.getSchoolFromId(
+        this.schoolsProviderService.getSelectedSchoolId()
       )
     }
 
@@ -109,7 +122,7 @@ export class AuthService {
   }
 
   isStillLoggedIn() {
-    this.variablesInSessionExists()
+    return !!this.variablesInSessionExists()
   }
 
   private recoverStorageVariables() {
@@ -121,9 +134,9 @@ export class AuthService {
     )
   }
 
-  private loadUserProfile() {
+  private loadUserProfile(): Observable<'student' | 'appraiser'> {
     return this.httpAuthService.getUserProfile().pipe(
-      map((user) => {
+      map((user: CevUser) => {
         if (user) {
           this.setUserProfile(user)
           return user
@@ -134,8 +147,11 @@ export class AuthService {
       concatMap((user) => {
         return this.httpAuthService.getUserType(user.userid)
       }),
-      tap((role) => {
+      tap((role: 'student' | 'appraiser') => {
         this.setUserRole(role)
+      }),
+      catchError((err) => {
+        return throwError(err)
       })
     )
   }
@@ -160,11 +176,11 @@ export class AuthService {
     return this.loggedUser.getValue()
   }
 
-  get isStudentMode() {
+  get isStudent() {
     return this.currentUserRole.getValue() === 'student'
   }
 
-  get isAppraiserMode() {
-    return this.currentUserRole.getValue() === 'appraiser'
+  get isAppraiser() {
+    return this.currentUserRole.getValue() == 'appraiser'
   }
 }
