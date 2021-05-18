@@ -72,6 +72,13 @@ const entities = {
   appr_crit: apprcrit,
 }
 
+const queryEntity = (entityType, req, res, ctx) => {
+  const { query } = req.body as any
+  let returnedEntities = getEntities(entityType, query)
+
+  return res(ctx.json(returnedEntities))
+}
+
 const getEntities = (entitytype, queryJSON) => {
   let returnedEntities = []
   if (entities[entitytype]) {
@@ -133,11 +140,29 @@ const restServerCallback = {
       return res(ctx.json({}))
     }
   },
-  local_cveteval_get_entities: (req, res, ctx) => {
-    const { wstoken, entitytype, query } = req.body as any
-    let returnedEntities = getEntities(entitytype, query)
-
-    return res(ctx.json(returnedEntities))
+  local_cveteval_get_appraisal: (req, res, ctx) => {
+    return queryEntity('appraisal', req, res, ctx)
+  },
+  local_cveteval_get_appr_crit: (req, res, ctx) => {
+    return queryEntity('appr_crit', req, res, ctx)
+  },
+  local_cveteval_get_evalplan: (req, res, ctx) => {
+    return queryEntity('evalplan', req, res, ctx)
+  },
+  local_cveteval_get_clsituation: (req, res, ctx) => {
+    return queryEntity('clsituation', req, res, ctx)
+  },
+  local_cveteval_get_criterion: (req, res, ctx) => {
+    return queryEntity('criterion', req, res, ctx)
+  },
+  local_cveteval_get_cevalgrid: (req, res, ctx) => {
+    return queryEntity('cevalgrid', req, res, ctx)
+  },
+  local_cveteval_get_role: (req, res, ctx) => {
+    return queryEntity('role', req, res, ctx)
+  },
+  local_cveteval_get_group_assign: (req, res, ctx) => {
+    return queryEntity('group_assign', req, res, ctx)
   },
   local_cveteval_get_latest_modifications: (req, res, ctx) => {
     const { wstoken, entitytype, query } = req.body as any

@@ -40,8 +40,12 @@ export class MoodleApiService {
    */
   public getEntities(entityType, args): Observable<BaseMoodleModel[]> {
     return MoodleApiUtils.apiCall(
-      `local_cveteval_get_entities`,
-      this.getEntityQuery(entityType, args),
+      `local_cveteval_get_${entityType}`,
+      args
+        ? {
+            query: JSON.stringify(args),
+          }
+        : {},
       this.http,
       this.endPointService.server()
     ).pipe(
@@ -150,6 +154,7 @@ export class MoodleApiService {
       entitytype: entityType,
     }
   }
+
   /**
    * Get user profile information
    *
@@ -200,6 +205,7 @@ export class MoodleApiService {
       })
     )
   }
+
   /**
    * Submit a new appraisal remotely
    *
