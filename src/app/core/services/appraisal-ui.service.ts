@@ -234,7 +234,6 @@ export class AppraisalUiService {
       tap((appraisalsUI) =>
         mergeExistingBehaviourSubject(this.appraisalEntities, appraisalsUI, [
           'id',
-          'studentId',
         ])
       )
     )

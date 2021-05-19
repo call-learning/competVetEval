@@ -7,9 +7,11 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 import { Injectable } from '@angular/core'
-import { Observable, throwError } from 'rxjs'
+import { Observable, of, throwError } from 'rxjs'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
+import { AuthService } from './auth.service'
+import { find, tap } from 'rxjs/operators'
 
 /**
  * Load user profile info for a given user or all related users
@@ -24,12 +26,22 @@ import { MoodleApiService } from '../http-services/moodle-api.service'
   providedIn: 'root',
 })
 export class UserDataService {
+  protected userProfiles: CevUser[] = []
   /**
    * Build the user data service
    *
    * @param moodleApiService
    */
-  constructor(private moodleApiService: MoodleApiService) {}
+  constructor(
+    private moodleApiService: MoodleApiService,
+    private authService: AuthService
+  ) {
+    this.authService.loggedUser.subscribe((cveUser) => {
+      if (!this.authService.isStillLoggedIn()) {
+        this.userProfiles = []
+      }
+    })
+  }
 
   /**
    * Get user profile information
@@ -39,6 +51,15 @@ export class UserDataService {
    * @param userid
    */
   public getUserProfileInfo(userid: number): Observable<CevUser> {
-    return this.moodleApiService.getUserProfileInfo(userid)
+    const exitingProfile = this.userProfiles.find(
+      (user) => user.userid == userid
+    )
+    if (!exitingProfile) {
+      return this.moodleApiService
+        .getUserProfileInfo(userid)
+        .pipe(tap((user) => this.userProfiles.push(user)))
+    } else {
+      return of(exitingProfile)
+    }
   }
 }

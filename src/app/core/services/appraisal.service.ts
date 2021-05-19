@@ -140,7 +140,9 @@ export class AppraisalService {
         this.moodleApiService.fetchIfMoreRecent(
           'appraisal',
           { evalplanid: evalPlan.id },
-          this.appraisalModels.getValue()
+          this.appraisalModels
+            .getValue()
+            ?.filter((app) => app.evalplanid == evalPlan.id)
         )
       ),
       tap((newAppraisals: AppraisalModel[]) => {
@@ -165,7 +167,9 @@ export class AppraisalService {
       this.moodleApiService.fetchIfMoreRecent(
         'appraisal',
         { studentid: studentid },
-        this.appraisalModels.getValue()
+        this.appraisalModels
+          .getValue()
+          ?.filter((app) => app.studentid == studentid)
       ) as Observable<AppraisalModel[]>
     ).pipe(
       tap((newAppraisals) => {
@@ -183,25 +187,26 @@ export class AppraisalService {
    * @protected
    */
   public refresh(): Observable<AppraisalCriterionModel[]> {
+    let modelRetriever: Observable<AppraisalModel[]> = null
     // At login we refresh always.
-    return this.authService.currentUserRole.pipe(
-      concatMap((currentUserRole) => {
-        if (this.authService.isStudent) {
-          const userid = this.authService.loggedUser.getValue().userid
-          // Retrieve all appraisal marked with my id as studentid.
-          return this.getAppraisalsModelForStudent(userid)
-        } else {
-          // Retrieve all appraisals I am involved in.
-          return this.getAppraisalModelForAppraiser()
-        }
-      }),
+    if (this.authService.isStudent) {
+      const userid = this.authService.loggedUser.getValue().userid
+      // Retrieve all appraisal marked with my id as studentid.
+      modelRetriever = this.getAppraisalsModelForStudent(userid)
+    } else {
+      // Retrieve all appraisals I am involved in.
+      modelRetriever = this.getAppraisalModelForAppraiser()
+    }
+    return modelRetriever.pipe(
       concatMap((appraisalModels) => from(appraisalModels)),
       concatMap((appraisal: AppraisalModel) => {
         return this.moodleApiService
           .fetchIfMoreRecent(
             'appr_crit',
             { appraisalid: appraisal.id },
-            this.appraisalCriterionModels.getValue()
+            this.appraisalCriterionModels
+              .getValue()
+              ?.filter((appc) => appc.appraisalid == appraisal.id)
           )
           .pipe(
             map((appraisalCriteriaModels) =>
@@ -280,6 +285,7 @@ export class AppraisalService {
   ): Observable<AppraisalModel> {
     return this.moodleApiService.submitAppraisal(appraisalModel)
   }
+
   /**
    * Submit a set of appraisal criteria to server and retrieve it in memory
    *
@@ -288,17 +294,21 @@ export class AppraisalService {
   public submitAppraisalCriteria(
     appraisalCriterionModels: AppraisalCriterionModel[]
   ): Observable<AppraisalCriterionModel[]> {
-    return this.moodleApiService
-      .submitAppraisalCriteria(appraisalCriterionModels)
-      .pipe(
-        tap((newAppraisaCriterionlModel) => {
-          // Update internal cached data.
-          mergeExistingBehaviourSubject(
-            this.appraisalCriterionModels,
-            newAppraisaCriterionlModel,
-            ['id']
-          )
-        })
-      )
+    if (appraisalCriterionModels?.length) {
+      return this.moodleApiService
+        .submitAppraisalCriteria(appraisalCriterionModels)
+        .pipe(
+          tap((newAppraisaCriterionlModel) => {
+            // Update internal cached data.
+            mergeExistingBehaviourSubject(
+              this.appraisalCriterionModels,
+              newAppraisaCriterionlModel,
+              ['id']
+            )
+          })
+        )
+    } else {
+      return of([])
+    }
   }
 }

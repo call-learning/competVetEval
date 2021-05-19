@@ -175,14 +175,33 @@ const restServerCallback = {
   },
   local_cveteval_submit_appraisal: (req, res, ctx) => {
     // Eval is evil but really practical here :)
-    let { appraisalmodel } = Object.entries(req.body).reduce(
-      (acc, [key, val]) => {
-        parseFormDataVariable(acc, key, val)
-        return acc
-      },
-      {}
-    ) as any
+    let {
+      id,
+      studentid,
+      appraiserid,
+      evalplanid,
+      context,
+      contextformat,
+      comment,
+      commentformat,
+      usermodified,
+      timemodified,
+      timecreated,
+    } = req.body as any
 
+    let appraisalmodel = {
+      id,
+      studentid,
+      appraiserid,
+      evalplanid,
+      context,
+      contextformat,
+      comment,
+      commentformat,
+      usermodified,
+      timemodified,
+      timecreated,
+    }
     if (appraisalmodel.id) {
       const previousmodel = entities['appraisal'].find(
         (app) => (app.id = appraisalmodel.id)
@@ -204,7 +223,7 @@ const restServerCallback = {
   },
   local_cveteval_submit_appraisal_criteria: (req, res, ctx) => {
     // Eval is evil but really practical here :)
-    const { appraisalcriteriamodel } = Object.entries(req.body).reduce(
+    const { appraisalcriteriamodels } = Object.entries(req.body).reduce(
       (acc, [key, val]) => {
         parseFormDataVariable(acc, key, val)
         return acc
@@ -212,7 +231,7 @@ const restServerCallback = {
       {}
     ) as any
     let returnedEntities = []
-    appraisalcriteriamodel.forEach((apprcrit) => {
+    appraisalcriteriamodels.forEach((apprcrit) => {
       if (apprcrit.id) {
         const previousmodel = entities['appr_crit'].find(
           (app) => (app.id = apprcrit.id)

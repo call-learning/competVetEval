@@ -33,5 +33,11 @@ export const environment: IEnvironment = {
       moodleUrl: 'https://vetagro-sup.call-learning.io/',
       //moodleUrl: 'https://vetagrotice.vetagro-sup.fr/',
     },
+    {
+      id: 'test-server',
+      name: 'Test server',
+      logo: 'assets/images/schools/logo-calllearning.png',
+      moodleUrl: 'https://cveteval.call-learning.fr/',
+    },
   ],
 }

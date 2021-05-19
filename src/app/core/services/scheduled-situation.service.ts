@@ -177,7 +177,8 @@ export class ScheduledSituationService {
                 evalplans as EvalPlanModel[],
                 situations as SituationModel[],
                 roles as RoleModel[],
-                groupAssignments as GroupAssignmentModel[]
+                groupAssignments as GroupAssignmentModel[],
+                this.authService.loggedUser.getValue().userid
               )
             }
           }
@@ -227,14 +228,17 @@ export class ScheduledSituationService {
     evalPlans: EvalPlanModel[],
     situations: SituationModel[],
     roles: RoleModel[],
-    groupAssignment: GroupAssignmentModel[]
+    groupAssignment: GroupAssignmentModel[],
+    userid
   ): ScheduledSituation[] {
     let scheduledSituations = []
     evalPlans.forEach((eplan: EvalPlanModel) => {
       const scheduledSituation = this.buildScheduledSituation(eplan, situations)
 
       const hasSituation = roles.find(
-        (r) => r.clsituationid == scheduledSituation.situation.id
+        (r) =>
+          r.userid == userid &&
+          r.clsituationid == scheduledSituation.situation.id
       )
 
       if (hasSituation) {
@@ -308,31 +312,18 @@ export class ScheduledSituationService {
     evalplan
   ) {
     if (allsituations && appraisals) {
+      let appraiserStats = []
       allsituations.forEach((situation) => {
         const appraisalsRequired = situation.situation.expectedevalsnb
         const existingAppraisalAppraiser = appraisals.filter(
-          (appraisal) => appraisal.evalPlan.id == situation.evalPlan.id
+          (appraisal) => appraisal.evalPlan.id == situation.evalPlanId
         )
         // Now fetch all students involved
-        let allStudentId = []
-        const myEvalPlans = evalplan.filter(
-          (epl) => epl.clsituationid == situation.situation.id
-        )
-        myEvalPlans.forEach((epl) =>
-          groupAssignments
-            .filter((ga) => (ga.groupid = epl.groupid))
-            .map((ga) => ga.studentid)
-            .forEach(
-              (studentId) =>
-                allStudentId.indexOf(studentId) === -1 &&
-                allStudentId.push(studentId)
-            )
-        )
-        const appraiserStats = allStudentId.map((studentId) => {
-          const nbAppraisalAppraiserStudent = existingAppraisalAppraiser.filter(
-            (appraisal) => studentId == appraisal.student.userid
-          ).length
-          return new AppraiserSituationStatsModel({
+        const nbAppraisalAppraiserStudent = existingAppraisalAppraiser.filter(
+          (appraisal) => situation.studentId == appraisal.student.userid
+        ).length
+        appraiserStats.push(
+          new AppraiserSituationStatsModel({
             id: situation.evalPlanId,
             appraisalsCompleted: nbAppraisalAppraiserStudent,
             appraisalsRequired: situation.situation.expectedevalsnb,
@@ -342,15 +333,15 @@ export class ScheduledSituationService {
                 : nbAppraisalAppraiserStudent
                 ? 'in_progress'
                 : 'todo',
-            studentId: studentId,
+            studentId: situation.studentId,
           })
-        })
-        mergeExistingBehaviourSubject(
-          this.appraiserSituationStats,
-          appraiserStats,
-          ['id', 'studentId']
         )
       })
+      mergeExistingBehaviourSubject(
+        this.appraiserSituationStats,
+        appraiserStats,
+        ['id', 'studentId']
+      )
     }
   }
 }

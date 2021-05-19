@@ -48,7 +48,7 @@ export class MoodleApiUtils {
       })
     } else if (value instanceof Object) {
       for (const prop in value) {
-        if (value[prop]) {
+        if (typeof value[prop] !== 'undefined') {
           const propName = argumentName ? `${argumentName}[${prop}]` : prop
           MoodleApiUtils.convertArguments(formData, propName, value[prop])
         }

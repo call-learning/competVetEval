@@ -134,6 +134,11 @@ export class MoodleApiService {
       this.getEntityQuery(entityType, args),
       this.http,
       this.endPointService.server()
+    ).pipe(
+      map((latestmodifobject) => {
+        const { latestmodifications } = latestmodifobject
+        return latestmodifications
+      })
     )
   }
 
@@ -191,7 +196,7 @@ export class MoodleApiService {
     return MoodleApiUtils.apiCall(
       'local_cveteval_submit_appraisal',
       {
-        appraisalmodel: appraisalModel,
+        ...appraisalModel,
       },
       this.http,
       this.endPointService.server()
@@ -213,12 +218,12 @@ export class MoodleApiService {
    * @param appraisalCriteriaModel
    */
   public submitAppraisalCriteria(
-    appraisalCriteriaModel: AppraisalCriterionModel[]
+    appraisalCriteriaModels: AppraisalCriterionModel[]
   ): Observable<AppraisalCriterionModel[]> {
     return MoodleApiUtils.apiCall(
       'local_cveteval_submit_appraisal_criteria',
       {
-        appraisalcriteriamodel: appraisalCriteriaModel,
+        appraisalcriteriamodels: appraisalCriteriaModels,
       },
       this.http,
       this.endPointService.server()
