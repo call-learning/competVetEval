@@ -85,6 +85,14 @@
                 "src/mockServiceWorker.js"
               ]
             },
+            "localdev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.localdev.ts"
+                }
+              ]
+            },
             "ci": {
               "progress": false
             }
@@ -101,6 +109,9 @@
             },
             "test": {
               "browserTarget": "app:build:test"
+            },
+            "localdev": {
+              "browserTarget": "app:build:localdev"
             },
             "ci": {
               "progress": false
