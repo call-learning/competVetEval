@@ -276,33 +276,37 @@ export class ScheduledSituationService {
 
   private buildStudentStatistics(allsituations, appraisals, currentUserId) {
     let allStudentStats = []
-    allsituations.forEach((situation) => {
-      const appraisalsRequired = situation.situation.expectedevalsnb
-      const existingAppraisalAppraiser = appraisals.filter(
-        (appraisal) => appraisal.evalPlan.id == situation.evalPlan.id
-      )
+    if (allsituations && appraisals) {
+      allsituations.forEach((situation) => {
+        const appraisalsRequired = situation.situation.expectedevalsnb
+        const existingAppraisalAppraiser = appraisals.filter(
+          (appraisal) => appraisal.evalPlan.id == situation.evalPlan.id
+        )
 
-      const nbAppraisalStudent = appraisals.filter(
-        (appraisal) =>
-          appraisal.student.userid == currentUserId &&
-          appraisal.evalPlan.id == situation.evalPlanId
-      ).length
-      const studentStats = new StudentSituationStatsModel({
-        id: situation.evalPlanId,
-        appraisalsCompleted: nbAppraisalStudent,
-        appraisalsRequired: appraisalsRequired,
-        status:
-          nbAppraisalStudent > appraisalsRequired
-            ? 'done'
-            : nbAppraisalStudent
-            ? 'in_progress'
-            : 'todo',
+        const nbAppraisalStudent = appraisals.filter(
+          (appraisal) =>
+            appraisal.student.userid == currentUserId &&
+            appraisal.evalPlan.id == situation.evalPlanId
+        ).length
+        const studentStats = new StudentSituationStatsModel({
+          id: situation.evalPlanId,
+          appraisalsCompleted: nbAppraisalStudent,
+          appraisalsRequired: appraisalsRequired,
+          status:
+            nbAppraisalStudent > appraisalsRequired
+              ? 'done'
+              : nbAppraisalStudent
+              ? 'in_progress'
+              : 'todo',
+        })
+        allStudentStats.push(studentStats)
       })
-      allStudentStats.push(studentStats)
-    })
-    mergeExistingBehaviourSubject(this.studentSituationStats, allStudentStats, [
-      'id',
-    ])
+      mergeExistingBehaviourSubject(
+        this.studentSituationStats,
+        allStudentStats,
+        ['id']
+      )
+    }
   }
 
   private buildAppraiserStatistics(

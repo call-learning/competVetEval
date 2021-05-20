@@ -189,15 +189,18 @@ export class AppraisalService {
   public refresh(): Observable<AppraisalCriterionModel[]> {
     let modelRetriever: Observable<AppraisalModel[]> = null
     // At login we refresh always.
-    if (this.authService.isStudent) {
-      const userid = this.authService.loggedUser.getValue().userid
-      // Retrieve all appraisal marked with my id as studentid.
-      modelRetriever = this.getAppraisalsModelForStudent(userid)
-    } else {
-      // Retrieve all appraisals I am involved in.
-      modelRetriever = this.getAppraisalModelForAppraiser()
-    }
-    return modelRetriever.pipe(
+    return this.authService.currentUserRole.pipe(
+      filter((roletype) => roletype != null),
+      concatMap((userType) => {
+        if (this.authService.isStudent) {
+          const userid = this.authService.loggedUser.getValue().userid
+          // Retrieve all appraisal marked with my id as studentid.
+          return this.getAppraisalsModelForStudent(userid)
+        } else {
+          // Retrieve all appraisals I am involved in.
+          return this.getAppraisalModelForAppraiser()
+        }
+      }),
       concatMap((appraisalModels) => from(appraisalModels)),
       concatMap((appraisal: AppraisalModel) => {
         return this.moodleApiService

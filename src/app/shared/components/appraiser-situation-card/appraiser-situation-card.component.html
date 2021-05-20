@@ -5,9 +5,7 @@
         {{ scheduledSituation.situation.title }}
       </div>
       <div class="list-item-dates">
-        {{
-          scheduledSituation.evalPlan.starttime * 1000 | date: 'd LLL yyyy'
-        }}
+        {{ scheduledSituation.evalPlan.starttime * 1000 | date: 'd LLL yyyy' }}
         au
         {{ scheduledSituation.evalPlan.endtime * 1000 | date: 'd LLL yyyy' }}
       </div>
@@ -26,13 +24,17 @@
           <ion-spinner name="lines"></ion-spinner>
         </div>
       </div>
-      <div class="list-item-info">
-        <div *ngIf="appraiserSituationStats">
-          {{ appraiserSituationStats.appraisalsCompleted }} observation(s) sur
-          {{ appraiserSituationStats.appraisalsRequired }} réalisée(s)
-        </div>
-        <div *ngIf="!appraiserSituationStats">
-          <ion-spinner name="dots"></ion-spinner>
+    </div>
+    <div class="list-item-infos">
+      <div class="list-item-content">
+        <div class="list-item-content">
+          <div *ngIf="appraiserSituationStats">
+            {{ appraiserSituationStats.appraisalsCompleted }} observation(s) sur
+            {{ appraiserSituationStats.appraisalsRequired }} réalisée(s)
+          </div>
+          <div *ngIf="!appraiserSituationStats">
+            <ion-spinner name="dots"></ion-spinner>
+          </div>
         </div>
       </div>
     </div>
