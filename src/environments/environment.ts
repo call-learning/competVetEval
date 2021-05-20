@@ -5,6 +5,7 @@ import { IEnvironment } from './ienvironment'
 export const environment: IEnvironment = {
   production: true,
   mockServer: false,
+  helpUrl: 'http://pedagogie.vetagro-sup.fr/Pages/CompetVet/co/guide-ts.html',
   schools: [
     {
       id: 'enva',

@@ -3,6 +3,7 @@ import { IEnvironment } from './ienvironment'
 export const environment: IEnvironment = {
   production: true,
   mockServer: false,
+  helpUrl: 'http://pedagogie.vetagro-sup.fr/Pages/CompetVet/co/guide-ts.html',
   schools: [
     {
       id: 'enva',
@@ -32,12 +33,6 @@ export const environment: IEnvironment = {
       // Test site
       moodleUrl: 'https://vetagro-sup.call-learning.io/',
       //moodleUrl: 'https://vetagrotice.vetagro-sup.fr/',
-    },
-    {
-      id: 'test-server',
-      name: 'Test server',
-      logo: 'assets/images/schools/logo-calllearning.png',
-      moodleUrl: 'https://cveteval.call-learning.fr/',
     },
   ],
 }

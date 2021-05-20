@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 
 import { Platform } from '@ionic/angular'
 
-import { Capacitor, Plugins } from '@capacitor/core'
+import { Browser, Capacitor, Plugins } from '@capacitor/core'
 import { AuthService } from './core/services/auth.service'
 import { EnvironmentService } from './core/services/environment.service'
 import { worker } from '../mock/browser'
@@ -39,5 +39,9 @@ export class AppComponent {
         Plugins.SplashScreen.hide()
       }
     })
+  }
+  async openHelpPage() {
+    // Opening a URL and returning an InAppBrowserObject
+    await Browser.open({ url: this.environmentService.helpUrl })
   }
 }
