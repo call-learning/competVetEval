@@ -1,14 +1,39 @@
 import { IEnvironment } from './ienvironment'
 
+// It seems that the environment.prod.ts is not taken into account during
+// the buid so we have a duplicate here
 export const environment: IEnvironment = {
-  production: false,
+  production: true,
   mockServer: false,
   schools: [
     {
-      id: 'dev-instance',
-      name: 'Local Development Instance',
-      logo: 'assets/images/schools/logo-calllearning.png',
-      moodleUrl: 'http://cveteval.call-learning.fr',
+      id: 'enva',
+      name: 'EnvA',
+      logo: 'assets/images/schools/logo-enva.png',
+      moodleUrl: 'https://vet-alfort.call-learning.io/',
+      //moodleUrl: 'https://eve.vet-alfort.fr/',
+    },
+    {
+      id: 'oniris',
+      name: 'Oniris',
+      logo: 'assets/images/schools/logo-oniris.png',
+      moodleUrl: 'https://oniris-nantes.call-learning.io/',
+      //moodleUrl: 'https://connect.oniris-nantes.fr/',
+    },
+    {
+      id: 'envt',
+      name: 'envt',
+      logo: 'assets/images/schools/logo-envt.png',
+      moodleUrl: 'https://envt.call-learning.io/',
+      //moodleUrl: 'https://moodle.envt.fr/',
+    },
+    {
+      id: 'vet-agro-sup',
+      name: 'VetAgro Sup',
+      logo: 'assets/images/schools/logo-vetagro.png',
+      // Test site
+      moodleUrl: 'https://vetagro-sup.call-learning.io/',
+      //moodleUrl: 'https://vetagrotice.vetagro-sup.fr/',
     },
   ],
 }
