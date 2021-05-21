@@ -283,7 +283,7 @@ export class ScheduledSituationService {
           const nbAppraisalStudent = appraisals
             ? appraisals.filter(
                 (appraisal) =>
-                  appraisals.evalPlan &&
+                  appraisal.evalPlan &&
                   appraisal.student.userid == currentUserId &&
                   appraisal.evalPlan.id == situation.evalPlanId
               ).length
