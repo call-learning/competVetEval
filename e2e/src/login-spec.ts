@@ -1,6 +1,6 @@
-import { LoginPage } from './pages/login-page.po'
-import { AppPage } from './pages/app-page.po'
 import { server } from '../../src/mock/server'
+import { AppPage } from './pages/app-page.po'
+import { LoginPage } from './pages/login-page.po'
 
 describe('new App', () => {
   beforeEach(async () => {
@@ -13,7 +13,7 @@ describe('new App', () => {
   afterAll(() => {
     server.close()
   })
-  let page: LoginPage = new LoginPage()
+  const page: LoginPage = new LoginPage()
   const app = new AppPage()
   beforeEach(() => {
     app.load()

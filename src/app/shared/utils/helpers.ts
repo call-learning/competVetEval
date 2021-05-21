@@ -12,7 +12,6 @@
  * @param newAppraisals
  * @protected
  */
-import { AppraisalModel } from '../models/moodle/appraisal.model'
 import { BehaviorSubject } from 'rxjs'
 
 /**

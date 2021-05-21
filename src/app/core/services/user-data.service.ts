@@ -7,11 +7,12 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 import { Injectable } from '@angular/core'
-import { Observable, of, throwError } from 'rxjs'
+
+import { of, Observable } from 'rxjs'
+import { tap } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
-import { find, tap } from 'rxjs/operators'
 
 /**
  * Load user profile info for a given user or all related users

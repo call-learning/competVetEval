@@ -6,18 +6,18 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Observable, of, throwError } from 'rxjs'
+import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
+
+import { of, throwError, Observable } from 'rxjs'
+import { catchError, map, mergeMap } from 'rxjs/operators'
+import { CevUser } from '../../shared/models/cev-user.model'
+import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
+import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
-import { HttpClient } from '@angular/common/http'
-import { EndpointsServices } from './endpoints.services'
 import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
-import { catchError, map, mergeMap } from 'rxjs/operators'
-import { Injectable } from '@angular/core'
-import { UserType } from '../../shared/models/user-type.model'
-import { CevUser } from '../../shared/models/cev-user.model'
-import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
-import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
+import { EndpointsServices } from './endpoints.services'
 
 @Injectable({
   providedIn: 'root',
@@ -103,7 +103,7 @@ export class MoodleApiService {
       }
       return apiCrit
     }
-    let args = {
+    const args = {
       id: appraisal.id,
       // situationid: appraisal.evalPlanId,
       // appraiserid: appraisal.appraiserId,

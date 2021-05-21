@@ -9,20 +9,18 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { AuthService, LOGIN_STATE } from './auth.service'
-import { HttpAuthService } from '../http-services/http-auth.service'
+import { Component } from '@angular/core'
+import { inject, TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+
 import { Observable } from 'rxjs'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
-import { inject, TestBed } from '@angular/core/testing'
-import { RouterTestingModule } from '@angular/router/testing'
-import { Component } from '@angular/core'
+import { HttpAuthService } from '../http-services/http-auth.service'
 import SpyObj = jasmine.SpyObj
 import { ServicesModule } from '../services.module'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-import { EndpointsServices } from '../http-services/endpoints.services'
-import { HttpClient } from '@angular/common/http'
+import { AuthService, LOGIN_STATE } from './auth.service'
 
 // Dummy component for routes.
 @Component({ template: '' })

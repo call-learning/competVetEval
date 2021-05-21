@@ -9,13 +9,13 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { Observable, throwError } from 'rxjs'
+import { throwError, Observable } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { UserType } from '../../shared/models/user-type.model'
-import { EndpointsServices } from './endpoints.services'
 import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
+import { EndpointsServices } from './endpoints.services'
 
 @Injectable({
   providedIn: 'root',

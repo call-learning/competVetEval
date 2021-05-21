@@ -9,17 +9,12 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { BehaviorSubject, Observable } from 'rxjs'
-import { CriterionModel } from '../../shared/models/moodle/criterion.model'
-import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { Injectable } from '@angular/core'
-import { map, mergeMap } from 'rxjs/operators'
-import { CevUser } from '../../shared/models/cev-user.model'
-import { RoleModel } from '../../shared/models/moodle/role.model'
-import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
+
+import { BehaviorSubject } from 'rxjs'
+import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { BaseDataService } from './base-data.service'
-import { root } from 'rxjs/internal-compatibility'
 
 /**
  * Manage criteria hierarchical view

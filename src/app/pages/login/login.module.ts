@@ -13,9 +13,9 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 
 import { SharedModule } from 'src/app/shared/shared.module'
+import { ShowHidePasswordComponent } from '../../shared/components/show-hide-password/show-hide-password.component'
 import { LoginPageRoutingModule } from './login-routing.module'
 import { LoginPage } from './login.page'
-import { ShowHidePasswordComponent } from '../../shared/components/show-hide-password/show-hide-password.component'
 
 @NgModule({
   imports: [

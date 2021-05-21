@@ -10,6 +10,7 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 import { Injectable } from '@angular/core'
+
 import { SchoolsProviderService } from '../providers/schools-provider.service'
 
 @Injectable({

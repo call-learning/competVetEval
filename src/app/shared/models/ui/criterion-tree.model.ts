@@ -34,7 +34,7 @@ export class CriterionTreeModel {
         subcriteria: allSubcriteria.map((subcrit) => buildAllChildren(subcrit)),
       })
     }
-    let allHierarchicalCriteria = []
+    const allHierarchicalCriteria = []
     rootCriteria.forEach((rootc) => {
       allHierarchicalCriteria.push(buildAllChildren(rootc))
     })

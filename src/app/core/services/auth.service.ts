@@ -9,17 +9,17 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { School } from 'src/app/shared/models/school.model'
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs'
-import { CevUser } from '../../shared/models/cev-user.model'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
+
+import { of, throwError, BehaviorSubject, Observable } from 'rxjs'
+import { catchError, concatMap, map, tap } from 'rxjs/operators'
+import { School } from 'src/app/shared/models/school.model'
+import { LoginResult } from '../../shared/models/auth.model'
+import { CevUser } from '../../shared/models/cev-user.model'
+import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { HttpAuthService } from '../http-services/http-auth.service'
 import { SchoolsProviderService } from '../providers/schools-provider.service'
-import { catchError, concatMap, map, tap } from 'rxjs/operators'
-import { LoginResult } from '../../shared/models/auth.model'
-import { LocaleKeys } from '../../shared/utils/locale-keys'
-import { UseComponentViewEncapsulationRule } from 'codelyzer'
 
 export const LOGIN_STATE = {
   ATTEMPT_TO_RECOVER: 'ATTEMPT_TO_RECOVER',

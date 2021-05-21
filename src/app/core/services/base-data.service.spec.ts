@@ -9,23 +9,22 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { AuthService } from './auth.service'
-import { Router } from '@angular/router'
-import { inject, TestBed } from '@angular/core/testing'
-import { Component } from '@angular/core'
-import { BaseDataService } from './base-data.service'
-import { SchoolsProviderService } from '../providers/schools-provider.service'
-import { worker } from 'src/mock/browser'
-
-import { RouterTestingModule } from '@angular/router/testing'
-import { ServicesModule } from '../services.module'
 import { HttpClientModule } from '@angular/common/http'
-import { CoreModule } from '../core.module'
+import { Component } from '@angular/core'
+import { inject, TestBed } from '@angular/core/testing'
+import { Router } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+
+import { worker } from 'src/mock/browser'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
-import { CriteriaService } from './criteria.service'
-import { SituationModel } from '../../shared/models/moodle/situation.model'
-import { RoleModel } from '../../shared/models/moodle/role.model'
 import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
+import { RoleModel } from '../../shared/models/moodle/role.model'
+import { SituationModel } from '../../shared/models/moodle/situation.model'
+import { CoreModule } from '../core.module'
+import { SchoolsProviderService } from '../providers/schools-provider.service'
+import { ServicesModule } from '../services.module'
+import { AuthService } from './auth.service'
+import { BaseDataService } from './base-data.service'
 
 // Dummy component for routes.
 @Component({ template: '' })
@@ -194,7 +193,7 @@ describe('BaseDataService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      //await service.groupAssignment.toPromise()
+      // await service.groupAssignment.toPromise()
       await service.situations$.toPromise()
       await service.groupAssignment$.toPromise()
       expect(service.groupAssignment$.getValue()).toContain(

@@ -9,9 +9,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning
  */
-import { CriterionModel } from '../moodle/criterion.model'
 import { AppraisalCriterionModel } from '../moodle/appraisal-criterion.model'
-import { monitorEventLoopDelay } from 'perf_hooks'
+import { CriterionModel } from '../moodle/criterion.model'
 
 export class CriterionForAppraisalTreeModel {
   id?: number
@@ -41,13 +40,13 @@ export class CriterionForAppraisalTreeModel {
     criterion: CriterionModel,
     subcriteria: CriterionForAppraisalTreeModel[]
   ) {
-    let model = new CriterionForAppraisalTreeModel({
-      criterion: criterion, // Moodle internal model for criterion.
+    const model = new CriterionForAppraisalTreeModel({
+      criterion, // Moodle internal model for criterion.
       comment: appraisalCriterionModel.comment
         ? appraisalCriterionModel.comment
         : '',
       timeModified: appraisalCriterionModel.timemodified,
-      subcriteria: subcriteria,
+      subcriteria,
     })
     if (appraisalCriterionModel.id) {
       model.id = appraisalCriterionModel.id

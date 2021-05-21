@@ -11,37 +11,21 @@
  */
 import { Injectable } from '@angular/core'
 
-import {
-  BehaviorSubject,
-  combineLatest,
-  forkJoin,
-  from,
-  iif,
-  Observable,
-  of,
-  zip,
-} from 'rxjs'
-import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService } from './auth.service'
-import {
-  concatMap,
-  concatMapTo,
-  filter,
-  map,
-  tap,
-  toArray,
-} from 'rxjs/operators'
-import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
-import { BaseDataService } from './base-data.service'
-import { EvalPlanService } from './eval-plan.service'
-import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
-import { CriteriaService } from './criteria.service'
-import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
+import { combineLatest, from, of, zip, BehaviorSubject, Observable } from 'rxjs'
+import { concatMap, filter, map, tap, toArray } from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
-import { UserDataService } from './user-data.service'
-import { AppraisalService } from './appraisal.service'
+import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
+import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
+import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
+import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
+import { MoodleApiService } from '../http-services/moodle-api.service'
+import { AppraisalService } from './appraisal.service'
+import { AuthService } from './auth.service'
+import { BaseDataService } from './base-data.service'
+import { CriteriaService } from './criteria.service'
+import { EvalPlanService } from './eval-plan.service'
+import { UserDataService } from './user-data.service'
 
 @Injectable({
   providedIn: 'root',
@@ -60,10 +44,10 @@ export class AppraisalUiService {
   ) {
     this.authService.loggedUser.subscribe((cveUser) => {
       // Make sure that all data from this layer is fetch from the basic appraisalService layer
-      combineLatest(
+      combineLatest([
         this.appraisalServices.appraisals$,
-        this.appraisalServices.appraisalsCriteria$
-      )
+        this.appraisalServices.appraisalsCriteria$,
+      ])
         .pipe(
           tap(([appraisalModels, appraisalCriteria]) => {
             if (appraisalModels && appraisalCriteria) {
@@ -131,7 +115,7 @@ export class AppraisalUiService {
    *
    */
   public submitAppraisal(appraisal: AppraisalUI): Observable<number> {
-    let appraisalModel = AppraisalModel.createBlank(
+    const appraisalModel = AppraisalModel.createBlank(
       appraisal.student.userid,
       appraisal.appraiser.userid,
       appraisal.evalPlan.id
@@ -143,9 +127,9 @@ export class AppraisalUiService {
     const flatternAppraisalCriteria = (
       appraisalCriteria: CriterionForAppraisalTreeModel[]
     ) => {
-      let transformedCriteria: AppraisalCriterionModel[] = []
+      const transformedCriteria: AppraisalCriterionModel[] = []
       appraisalCriteria.forEach((acriteria) => {
-        let appraisalCriteriaModel =
+        const appraisalCriteriaModel =
           AppraisalCriterionModel.createFromCriterionModel(acriteria.criterion)
         appraisalCriteriaModel.id = acriteria.id
         appraisalCriteriaModel.grade = acriteria.grade
@@ -200,8 +184,8 @@ export class AppraisalUiService {
     appraisalModels: AppraisalModel[],
     appraisalCriteriaModels: AppraisalCriterionModel[]
   ): Observable<AppraisalUI[]> {
-    let currentAppraisalEntities = this.appraisalEntities$.getValue()
-    let changed = false
+    const currentAppraisalEntities = this.appraisalEntities$.getValue()
+    const changed = false
 
     return from(appraisalModels).pipe(
       // Retrieve relevant appraisal models.

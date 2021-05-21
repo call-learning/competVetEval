@@ -9,18 +9,19 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { SituationModel } from '../../shared/models/moodle/situation.model'
-import { BehaviorSubject, Observable, of } from 'rxjs'
-import { CriterionModel } from '../../shared/models/moodle/criterion.model'
-import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { Injectable } from '@angular/core'
+
+import { of, BehaviorSubject, Observable } from 'rxjs'
+import { mergeMap, tap } from 'rxjs/operators'
+import { CevUser } from '../../shared/models/cev-user.model'
+import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
+import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
+import { CriterionModel } from '../../shared/models/moodle/criterion.model'
+import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
+import { RoleModel } from '../../shared/models/moodle/role.model'
+import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
-import { map, mergeMap, tap } from 'rxjs/operators'
-import { CevUser } from '../../shared/models/cev-user.model'
-import { RoleModel } from '../../shared/models/moodle/role.model'
-import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
-import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
 
 const EntityClass: any = {
   clsituation: SituationModel,

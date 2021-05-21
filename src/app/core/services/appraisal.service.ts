@@ -10,27 +10,17 @@
 
 import { Injectable } from '@angular/core'
 
-import { BehaviorSubject, combineLatest, from, Observable, of, zip } from 'rxjs'
+import { combineLatest, from, of, BehaviorSubject, Observable } from 'rxjs'
+import { concatMap, filter, map, mapTo, tap } from 'rxjs/operators'
+import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
+import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
+import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
-import {
-  concatAll,
-  concatMap,
-  filter,
-  map,
-  mapTo,
-  tap,
-  toArray,
-} from 'rxjs/operators'
-import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { BaseDataService } from './base-data.service'
-import { EvalPlanService } from './eval-plan.service'
 import { CriteriaService } from './criteria.service'
-import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
+import { EvalPlanService } from './eval-plan.service'
 import { UserDataService } from './user-data.service'
-import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
-import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
-import appr from '../../../mock/fixtures/appr'
 
 @Injectable({
   providedIn: 'root',
@@ -115,11 +105,11 @@ export class AppraisalService {
    * @protected
    */
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
-    return combineLatest(
+    return combineLatest([
       this.evalPlanService.plans$.pipe(filter((obj) => obj != null)),
       this.baseDataService.situations$.pipe(filter((obj) => obj != null)),
-      this.baseDataService.roles$.pipe(filter((obj) => obj != null))
-    ).pipe(
+      this.baseDataService.roles$.pipe(filter((obj) => obj != null)),
+    ]).pipe(
       concatMap(([evalplans, situations, roles]) => {
         // First check all situations involved.
         const mySituations = situations.filter((sit) => {

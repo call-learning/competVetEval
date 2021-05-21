@@ -1,4 +1,4 @@
-import { browser, by, element, ExpectedConditions } from 'protractor'
+import { by, element } from 'protractor'
 import { PageObjectBase } from './base.po'
 
 export class LoginPage extends PageObjectBase {

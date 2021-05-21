@@ -14,12 +14,12 @@ import { LoadingController, ModalController } from '@ionic/angular'
 
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
+import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
-import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
-import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 
 @Component({
   selector: 'app-appraisal-detail',

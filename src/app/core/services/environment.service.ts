@@ -8,10 +8,11 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Injectable, Type } from '@angular/core'
+import { Injectable } from '@angular/core'
+
+import { environment } from 'src/environments/environment'
 import { IEnvironment } from '../../../environments/ienvironment'
 import { School } from '../../shared/models/school.model'
-import { environment } from 'src/environments/environment'
 
 @Injectable({
   providedIn: 'root',

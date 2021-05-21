@@ -8,10 +8,11 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core'
-import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
+
+import { first } from 'rxjs/operators'
 import { AuthService } from '../../../core/services/auth.service'
 import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
-import { first } from 'rxjs/operators'
+import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
 import { StudentSituationStatsModel } from '../../models/ui/student-situation-stats.model'
 
 @Component({
@@ -21,7 +22,7 @@ import { StudentSituationStatsModel } from '../../models/ui/student-situation-st
 })
 export class StudentSituationCardComponent implements OnInit {
   @Input() scheduledSituation?: ScheduledSituation
-  @Input() showHeader?: boolean = true
+  @Input() showHeader = true
   public studentSituationStats: StudentSituationStatsModel = null
 
   constructor(

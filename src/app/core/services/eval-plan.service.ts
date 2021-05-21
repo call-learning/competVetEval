@@ -8,11 +8,12 @@
  */
 
 import { Injectable } from '@angular/core'
+
 import { BehaviorSubject, Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
-import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
-import { map, tap } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root',
@@ -73,7 +74,7 @@ export class EvalPlanService {
           )
           this.planningEntities$.next(evalplanmodels)
           return evalplanmodels
-          //this.planningEntities.complete()
+          // this.planningEntities.complete()
         })
       )
   }

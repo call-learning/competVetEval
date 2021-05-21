@@ -7,13 +7,10 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Component, Input, OnInit } from '@angular/core'
-import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
+import { Component, Input } from '@angular/core'
+
 import { AuthService } from '../../../core/services/auth.service'
-import { AppraiserSituationStatsModel } from '../../models/ui/appraiser-situation-stats.model'
-import { CevUser } from '../../models/cev-user.model'
 import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
-import { first } from 'rxjs/operators'
 
 @Component({
   selector: 'app-situation-status-icon',

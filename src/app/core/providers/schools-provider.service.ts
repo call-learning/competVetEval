@@ -9,10 +9,11 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { School } from 'src/app/shared/models/school.model'
 import { Injectable } from '@angular/core'
-import { EnvironmentService } from '../services/environment.service'
+
+import { School } from 'src/app/shared/models/school.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
+import { EnvironmentService } from '../services/environment.service'
 
 @Injectable({
   providedIn: 'root',

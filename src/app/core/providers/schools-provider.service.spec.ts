@@ -10,8 +10,9 @@
  */
 
 import { Component } from '@angular/core'
-import { SchoolsProviderService } from './schools-provider.service'
 import { inject } from '@angular/core/testing'
+
+import { SchoolsProviderService } from './schools-provider.service'
 
 // Dummy component for routes.
 @Component({ template: '' })
