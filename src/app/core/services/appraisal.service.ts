@@ -156,7 +156,7 @@ export class AppraisalService {
     return (
       this.moodleApiService.fetchIfMoreRecent(
         'appraisal',
-        { studentid: studentid },
+        { studentid },
         this.appraisalModels$
           .getValue()
           ?.filter((app) => app.studentid == studentid)
@@ -177,7 +177,6 @@ export class AppraisalService {
    * @protected
    */
   public refresh(): Observable<AppraisalCriterionModel[]> {
-    let modelRetriever: Observable<AppraisalModel[]> = null
     // At login we refresh always.
     return this.authService.currentUserRole.pipe(
       filter((roletype) => roletype != null),

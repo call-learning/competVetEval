@@ -97,7 +97,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
   }
 
   openModalSituationChart() {
-    let criteriaLabels = this.appraisals
+    const criteriaLabels = this.appraisals
       ? this.appraisals[0].criteria.map((c) => c.label)
       : []
     this.modalController

@@ -301,8 +301,7 @@ export default [
   },
   {
     id: '69',
-    label:
-      "Capacité à synthétiser un bilan clinique en intégrant les données de l’anamnèse et de l'examen clinique",
+    label: `Capacité à synthétiser un bilan clinique en intégrant les données de l'anamnèse et de l'examen clinique`,
     idnumber: 'Q029',
     parentid: '67',
     sort: '2',
