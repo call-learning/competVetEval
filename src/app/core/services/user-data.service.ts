@@ -7,11 +7,12 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 import { Injectable } from '@angular/core'
-import { Observable, of, throwError } from 'rxjs'
+
+import { of, Observable } from 'rxjs'
+import { tap } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
-import { find, tap } from 'rxjs/operators'
 
 /**
  * Load user profile info for a given user or all related users
@@ -51,15 +52,15 @@ export class UserDataService {
    * @param userid
    */
   public getUserProfileInfo(userid: number): Observable<CevUser> {
-    const exitingProfile = this.userProfiles.find(
+    const existingProfile = this.userProfiles.find(
       (user) => user.userid == userid
     )
-    if (!exitingProfile) {
+    if (!existingProfile) {
       return this.moodleApiService
         .getUserProfileInfo(userid)
         .pipe(tap((user) => this.userProfiles.push(user)))
     } else {
-      return of(exitingProfile)
+      return of(existingProfile)
     }
   }
 }

@@ -7,7 +7,7 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Component, HostListener, OnInit } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 
 import {
   LoadingController,
@@ -17,9 +17,9 @@ import {
 
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appraisal/modal-scan-appraisal.component'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
-import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 
 const DAY_SECONDS = 3600 * 24
 const MAX_INTERVAL = 8
@@ -52,9 +52,9 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     this.loadingController.create().then((res) => {
       this.loader = res
       this.loader.present().then(() =>
-        this.scheduledSituationsService.situations.subscribe(() => {
+        this.scheduledSituationsService.situations$.subscribe(() => {
           const scheduledSituations =
-            this.scheduledSituationsService.situations.getValue()
+            this.scheduledSituationsService.situations$.getValue()
           if (scheduledSituations) {
             console.log('Situations: ' + JSON.stringify(scheduledSituations))
             this.situations = scheduledSituations

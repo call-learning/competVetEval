@@ -9,10 +9,9 @@
  * @copyright  2021 SAS CALL Learning
  */
 
-import { CriterionForAppraisalTreeModel } from './criterion-for-appraisal-tree.model'
 import { CevUser } from '../cev-user.model'
 import { EvalPlanModel } from '../moodle/eval-plan.model'
-import { ScheduledSituation } from './scheduled-situation.model'
+import { CriterionForAppraisalTreeModel } from './criterion-for-appraisal-tree.model'
 
 // This entity is deduced from several API calls to Moodle and compiled in the App
 // We use lowerCamelCase in entities that are directly retrieved via API (like this one which

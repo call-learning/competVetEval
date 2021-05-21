@@ -16,13 +16,13 @@ import {
   ToastController,
 } from '@ionic/angular'
 
+import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { AuthService } from '../../core/services/auth.service'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
 import { ModalAppraisalCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-appraisal-criterion.component'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
-import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 
 @Component({
@@ -78,7 +78,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       this.loadingController.create().then((res) => {
         this.loader = res
         this.loader.present()
-        this.situationService.situations.subscribe((situations) => {
+        this.situationService.situations$.subscribe((situations) => {
           // TODO: beware of triple === as sometimes the data is not correctly typed
           // due to Object assign.
           this.scheduledSituation = situations.find(

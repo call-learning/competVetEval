@@ -8,13 +8,13 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core'
-import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
-import { AuthService } from '../../../core/services/auth.service'
-import { AppraiserSituationStatsModel } from '../../models/ui/appraiser-situation-stats.model'
-import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
+
 import { first } from 'rxjs/operators'
+import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
 import { UserDataService } from '../../../core/services/user-data.service'
 import { CevUser } from '../../models/cev-user.model'
+import { AppraiserSituationStatsModel } from '../../models/ui/appraiser-situation-stats.model'
+import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
 
 @Component({
   selector: 'app-appraiser-situation-card',
@@ -24,7 +24,7 @@ import { CevUser } from '../../models/cev-user.model'
 export class AppraiserSituationCardComponent implements OnInit {
   @Input() scheduledSituation?: ScheduledSituation
   @Input() studentId?: number
-  @Input() showHeader?: boolean = true
+  @Input() showHeader = true
   public appraiserSituationStats: AppraiserSituationStatsModel = null
   public studentInfo: CevUser = null
 
@@ -37,7 +37,7 @@ export class AppraiserSituationCardComponent implements OnInit {
     const evalPlanId = this.scheduledSituation.evalPlan.id
     this.scheduledSituationService
       .getAppraiserScheduledSituationStats(evalPlanId, this.studentId)
-      //.pipe(first())
+      // .pipe(first())
       .subscribe((stats) => (this.appraiserSituationStats = stats))
     this.userDataService
       .getUserProfileInfo(this.studentId)

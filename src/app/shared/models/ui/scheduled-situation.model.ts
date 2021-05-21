@@ -1,8 +1,7 @@
 // This is an entity managed essentially by the app and display and transferred partially
 // when needed to the server.
-import { SituationModel } from '../moodle/situation.model'
 import { EvalPlanModel } from '../moodle/eval-plan.model'
-import { CevUser } from '../cev-user.model'
+import { SituationModel } from '../moodle/situation.model'
 
 // This entity is deduced from several API calls to Moodle and compiled in the App
 

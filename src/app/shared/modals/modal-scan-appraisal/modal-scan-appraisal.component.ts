@@ -11,9 +11,10 @@ import { Router } from '@angular/router'
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { ModalController, ToastController } from '@ionic/angular'
-import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
-import { AuthService } from '../../../core/services/auth.service'
+
 import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
+import { AuthService } from '../../../core/services/auth.service'
+import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
 
 @Component({
   selector: 'app-modal-scan-appraisal',

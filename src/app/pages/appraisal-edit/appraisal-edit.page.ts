@@ -16,13 +16,13 @@ import {
   ToastController,
 } from '@ionic/angular'
 
+import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { AuthService } from '../../core/services/auth.service'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
 import { ModalAppraisalCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-appraisal-criterion.component'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
-import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 
 @Component({
@@ -77,7 +77,7 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
           .waitForAppraisalId(this.appraisalId)
           .subscribe((appraisal) => {
             this.appraisal = appraisal
-            this.scheduledSituationService.situations.subscribe(
+            this.scheduledSituationService.situations$.subscribe(
               (situations) => {
                 this.scheduledSituation = situations.find(
                   (sit) => sit.evalPlanId == this.appraisal.evalPlan.id

@@ -8,24 +8,25 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Injectable, Type } from '@angular/core'
+import { Injectable } from '@angular/core'
+
+import { environment } from 'src/environments/environment'
 import { IEnvironment } from '../../../environments/ienvironment'
 import { School } from '../../shared/models/school.model'
-import { environment } from 'src/environments/environment'
 
 @Injectable({
   providedIn: 'root',
 })
 export class EnvironmentService implements IEnvironment {
+  mockServer: boolean
+  schools: Array<School>
+  production: boolean
+  helpUrl: string
+
   constructor() {
     this.schools = environment.schools
     this.production = environment.production
     this.mockServer = environment.mockServer
     this.helpUrl = environment.helpUrl
   }
-
-  mockServer: boolean
-  schools: Array<School>
-  production: boolean
-  helpUrl: string
 }

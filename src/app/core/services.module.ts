@@ -10,13 +10,13 @@
  */
 
 import { NgModule } from '@angular/core'
-import { BaseDataService } from './services/base-data.service'
-import { AuthService } from './services/auth.service'
-import { MoodleApiService } from './http-services/moodle-api.service'
+
 import { HttpAuthService } from './http-services/http-auth.service'
+import { MoodleApiService } from './http-services/moodle-api.service'
 import { SchoolsProviderService } from './providers/schools-provider.service'
+import { AuthService } from './services/auth.service'
+import { BaseDataService } from './services/base-data.service'
 import { EnvironmentService } from './services/environment.service'
-import { worker } from '../../mock/browser'
 
 @NgModule({
   declarations: [],

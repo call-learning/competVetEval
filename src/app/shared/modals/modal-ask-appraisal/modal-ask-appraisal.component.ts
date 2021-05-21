@@ -6,7 +6,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
 import {
   AfterViewInit,
   Component,
@@ -17,6 +16,8 @@ import {
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 import { IonTextarea, ModalController } from '@ionic/angular'
+
+import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
 
 @Component({
   selector: 'app-modal-ask-appraisal',

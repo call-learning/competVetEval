@@ -1,25 +1,25 @@
 import { rest } from 'msw'
-import allUsers from './fixtures/users'
+import appr from './fixtures/appr'
+import apprcrit from './fixtures/apprcrit'
+import cevalgrid from './fixtures/cevalgrid'
 import criterion from './fixtures/criterion'
-import situations from './fixtures/situations'
-import groups from './fixtures/groups'
 import evalplan from './fixtures/evalplan'
 import groupassign from './fixtures/groupassign'
+import groups from './fixtures/groups'
 import role from './fixtures/role'
-import cevalgrid from './fixtures/cevalgrid'
-import apprcrit from './fixtures/apprcrit'
-import appr from './fixtures/appr'
+import situations from './fixtures/situations'
+import allUsers from './fixtures/users'
 
 export const handlers = [
   rest.post('https://moodle.local/login/token.php', (req, res, ctx) => {
     const { username, password } = req.body as any
-    let returnValue = {}
+    const returnValue: any = {}
 
     const foundUser = allUsers.find((u) => u.username == username)
     if (username && password && foundUser && foundUser.password === password) {
-      returnValue['token'] = foundUser.token
+      returnValue.token = foundUser.token
     } else {
-      returnValue['errorcode'] = 'wronguser'
+      returnValue.errorcode = 'wronguser'
     }
     return res(ctx.json(returnValue))
   }),
@@ -61,20 +61,20 @@ const parseFormDataVariable = (currentObj, key, val) => {
 }
 
 const entities = {
-  criterion: criterion,
+  criterion,
   clsituation: situations,
   group_assign: groupassign,
   group: groups,
-  role: role,
-  evalplan: evalplan,
-  cevalgrid: cevalgrid,
+  role,
+  evalplan,
+  cevalgrid,
   appraisal: appr,
   appr_crit: apprcrit,
 }
 
 const queryEntity = (entityType, req, res, ctx) => {
   const { query } = req.body as any
-  let returnedEntities = getEntities(entityType, query)
+  const returnedEntities = getEntities(entityType, query)
 
   return res(ctx.json(returnedEntities))
 }
@@ -87,7 +87,7 @@ const getEntities = (entitytype, queryJSON) => {
       const query = JSON.parse(queryJSON)
       returnedEntities = returnedEntities.filter((e) => {
         let isMacthing = true
-        for (let property in query) {
+        for (const property in query) {
           if (e[property] != query[property]) {
             isMacthing = false
           }
@@ -175,7 +175,7 @@ const restServerCallback = {
   },
   local_cveteval_submit_appraisal: (req, res, ctx) => {
     // Eval is evil but really practical here :)
-    let {
+    const {
       id,
       studentid,
       appraiserid,
@@ -189,7 +189,7 @@ const restServerCallback = {
       timecreated,
     } = req.body as any
 
-    let appraisalmodel = {
+    const appraisalmodel = {
       id,
       studentid,
       appraiserid,
@@ -203,17 +203,17 @@ const restServerCallback = {
       timecreated,
     }
     if (appraisalmodel.id) {
-      const previousmodel = entities['appraisal'].find(
+      const previousmodel = entities.appraisal.find(
         (app) => (app.id = appraisalmodel.id)
       )
       appraisalmodel.timemodified = Math.ceil(Date.now() / 1000)
       Object.assign(previousmodel, appraisalmodel)
     } else {
-      appraisalmodel.id = entities['appraisal'].length
+      appraisalmodel.id = entities.appraisal.length
       appraisalmodel.timecreated = Math.ceil(Date.now() / 1000)
       appraisalmodel.timemodified = Math.ceil(Date.now() / 1000)
       appraisalmodel.usermodified = 1
-      entities['appraisal'].push(appraisalmodel)
+      entities.appraisal.push(appraisalmodel)
     }
     return res(
       ctx.json({
@@ -230,10 +230,10 @@ const restServerCallback = {
       },
       {}
     ) as any
-    let returnedEntities = []
+    const returnedEntities = []
     appraisalcriteriamodels.forEach((apprcrit) => {
       if (apprcrit.id) {
-        const previousmodel = entities['appr_crit'].find(
+        const previousmodel = entities.appr_crit.find(
           (app) => (app.id = apprcrit.id)
         )
         apprcrit.timemodified = Math.ceil(Date.now() / 1000)
@@ -242,12 +242,12 @@ const restServerCallback = {
         apprcrit.timecreated = Math.ceil(Date.now() / 1000)
         apprcrit.timemodified = Math.ceil(Date.now() / 1000)
         apprcrit.usermodified = 1
-        apprcrit.id = entities['appr_crit'].length
-        entities['appr_crit'].push(apprcrit)
+        apprcrit.id = entities.appr_crit.length
+        entities.appr_crit.push(apprcrit)
       }
       returnedEntities.push(apprcrit)
     })
-    entities['appr_crit'].concat(returnedEntities)
+    entities.appr_crit.concat(returnedEntities)
     return res(ctx.json([...returnedEntities]))
   },
 }

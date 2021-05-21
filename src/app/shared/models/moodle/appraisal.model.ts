@@ -30,9 +30,9 @@ export class AppraisalModel extends BaseMoodleModel {
     evalplanid: number
   ) {
     return new AppraisalModel({
-      studentid: studentid,
-      appraiserid: appraiserid,
-      evalplanid: evalplanid,
+      studentid,
+      appraiserid,
+      evalplanid,
       context: '',
       contextformat: 1,
       comment: '',

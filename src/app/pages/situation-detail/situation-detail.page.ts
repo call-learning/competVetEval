@@ -3,18 +3,17 @@ import { ActivatedRoute } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
 
+import { iif, of, zip } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
 import { ScheduledSituation } from 'src/app/shared/models/ui/scheduled-situation.model'
-import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
-import { BaseComponent } from '../../shared/components/base/base.component'
-import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
-import { BehaviorSubject, combineLatest, iif, of, zip } from 'rxjs'
-import { UserDataService } from '../../core/services/user-data.service'
-import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
-import { combineAll, map, zipAll } from 'rxjs/operators'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
+import { UserDataService } from '../../core/services/user-data.service'
+import { BaseComponent } from '../../shared/components/base/base.component'
+import { CevUser } from '../../shared/models/cev-user.model'
 
 @Component({
   selector: 'app-situation-detail',
@@ -69,7 +68,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       this.loader = res
       this.loader.present()
       zip(
-        this.situationService.situations.asObservable(),
+        this.situationService.situations$.asObservable(),
         iif(
           () => this.studentId != null,
           this.userDataService.getUserProfileInfo(this.studentId),

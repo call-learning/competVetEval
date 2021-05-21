@@ -9,36 +9,36 @@
 
 import { Injectable } from '@angular/core'
 
-import { BehaviorSubject, combineLatest, from, Observable, of, zip } from 'rxjs'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService } from './auth.service'
-import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
-import { BaseDataService } from './base-data.service'
-import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
+import { combineLatest, from, of, zip, BehaviorSubject, Observable } from 'rxjs'
 import { concatMap, filter, map, tap } from 'rxjs/operators'
-import { SituationModel } from '../../shared/models/moodle/situation.model'
-import { StudentSituationStatsModel } from '../../shared/models/ui/student-situation-stats.model'
-import { EvalPlanService } from './eval-plan.service'
+import evalplan from '../../../mock/fixtures/evalplan'
+import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
 import { RoleModel } from '../../shared/models/moodle/role.model'
+import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { AppraiserSituationStatsModel } from '../../shared/models/ui/appraiser-situation-stats.model'
-import { AppraisalUiService } from './appraisal-ui.service'
+import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
+import { StudentSituationStatsModel } from '../../shared/models/ui/student-situation-stats.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
-import evalplan from '../../../mock/fixtures/evalplan'
+import { MoodleApiService } from '../http-services/moodle-api.service'
+import { AppraisalUiService } from './appraisal-ui.service'
+import { AuthService } from './auth.service'
+import { BaseDataService } from './base-data.service'
+import { EvalPlanService } from './eval-plan.service'
 
 @Injectable({
   providedIn: 'any',
 })
 export class ScheduledSituationService {
-  private scheduledSituationsEntities = new BehaviorSubject<
+  private scheduledSituationsEntities$ = new BehaviorSubject<
     ScheduledSituation[]
   >(null)
 
-  private studentSituationStats = new BehaviorSubject<
+  private studentSituationStats$ = new BehaviorSubject<
     StudentSituationStatsModel[]
   >(null)
 
-  private appraiserSituationStats = new BehaviorSubject<
+  private appraiserSituationStats$ = new BehaviorSubject<
     AppraiserSituationStatsModel[]
   >(null)
 
@@ -51,18 +51,18 @@ export class ScheduledSituationService {
   ) {
     this.authService.loggedUser.subscribe((res) => {
       if (!res) {
-        this.scheduledSituationsEntities.next(null)
-        this.studentSituationStats.next(null)
-        this.appraiserSituationStats.next(null)
+        this.scheduledSituationsEntities$.next(null)
+        this.studentSituationStats$.next(null)
+        this.appraiserSituationStats$.next(null)
       } else {
         this.refresh().subscribe()
-        combineLatest(
-          this.appraisalUIService.appraisals,
-          this.scheduledSituationsEntities,
+        combineLatest([
+          this.appraisalUIService.appraisals$,
+          this.scheduledSituationsEntities$,
           this.authService.loggedUser,
-          this.baseDataService.groupAssignment,
-          this.evalPlanService.plans
-        )
+          this.baseDataService.groupAssignment$,
+          this.evalPlanService.plans$,
+        ])
           .pipe(
             filter(
               ([appraisals, allsituations, currentUser]) =>
@@ -111,8 +111,8 @@ export class ScheduledSituationService {
     })
   }
 
-  public get situations(): BehaviorSubject<ScheduledSituation[]> {
-    return this.scheduledSituationsEntities
+  public get situations$(): BehaviorSubject<ScheduledSituation[]> {
+    return this.scheduledSituationsEntities$
   }
 
   /**
@@ -126,7 +126,7 @@ export class ScheduledSituationService {
   public getMyScheduledSituationStats(
     evalPlanId
   ): Observable<StudentSituationStatsModel> {
-    return this.studentSituationStats.pipe(
+    return this.studentSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
       filter((stat) => stat.id == evalPlanId)
@@ -146,7 +146,7 @@ export class ScheduledSituationService {
     evalPlanId,
     studentId
   ): Observable<AppraiserSituationStatsModel> {
-    return this.appraiserSituationStats.pipe(
+    return this.appraiserSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
       filter((stat) => stat.id == evalPlanId && stat.studentId == studentId)
@@ -159,10 +159,12 @@ export class ScheduledSituationService {
   public refresh(): Observable<ScheduledSituation[]> {
     if (this.authService.isStillLoggedIn()) {
       return zip(
-        this.evalPlanService.plans.pipe(filter((obj) => obj != null)),
-        this.baseDataService.situations.pipe(filter((obj) => obj != null)),
-        this.baseDataService.groupAssignment.pipe(filter((obj) => obj != null)),
-        this.baseDataService.roles.pipe(filter((obj) => obj != null))
+        this.evalPlanService.plans$.pipe(filter((obj) => obj != null)),
+        this.baseDataService.situations$.pipe(filter((obj) => obj != null)),
+        this.baseDataService.groupAssignment$.pipe(
+          filter((obj) => obj != null)
+        ),
+        this.baseDataService.roles$.pipe(filter((obj) => obj != null))
       ).pipe(
         map(([evalplans, situations, groupAssignments, roles]) => {
           if (this.authService.isStillLoggedIn()) {
@@ -202,17 +204,20 @@ export class ScheduledSituationService {
     situations: SituationModel[],
     groupAssignments: GroupAssignmentModel[]
   ): ScheduledSituation[] {
-    let scheduledSituations = []
+    const scheduledSituations = []
     evalPlans.forEach((eplan: EvalPlanModel) => {
       const evalPlanInGroup = groupAssignments.find(
         (ga) => ga.groupid == eplan.groupid
       )
       if (evalPlanInGroup) {
-        let scheduledSituation = this.buildScheduledSituation(eplan, situations)
+        const scheduledSituation = this.buildScheduledSituation(
+          eplan,
+          situations
+        )
         scheduledSituations.push(scheduledSituation)
       }
     })
-    this.scheduledSituationsEntities.next(scheduledSituations)
+    this.scheduledSituationsEntities$.next(scheduledSituations)
     return scheduledSituations
   }
 
@@ -231,7 +236,7 @@ export class ScheduledSituationService {
     groupAssignment: GroupAssignmentModel[],
     userid
   ): ScheduledSituation[] {
-    let scheduledSituations = []
+    const scheduledSituations = []
     evalPlans.forEach((eplan: EvalPlanModel) => {
       const scheduledSituation = this.buildScheduledSituation(eplan, situations)
 
@@ -256,7 +261,7 @@ export class ScheduledSituationService {
         }
       }
     })
-    this.scheduledSituationsEntities.next(scheduledSituations)
+    this.scheduledSituationsEntities$.next(scheduledSituations)
     return scheduledSituations
   }
 
@@ -304,7 +309,7 @@ export class ScheduledSituationService {
         }
       })
       mergeExistingBehaviourSubject(
-        this.studentSituationStats,
+        this.studentSituationStats$,
         allStudentStats,
         ['id']
       )
@@ -346,7 +351,7 @@ export class ScheduledSituationService {
         )
       })
       mergeExistingBehaviourSubject(
-        this.appraiserSituationStats,
+        this.appraiserSituationStats$,
         appraiserStats,
         ['id', 'studentId']
       )

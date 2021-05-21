@@ -8,7 +8,7 @@
  */
 import { HttpClient } from '@angular/common/http'
 
-import { Observable, throwError } from 'rxjs'
+import { throwError, Observable } from 'rxjs'
 import { catchError } from 'rxjs/operators'
 
 export class MoodleApiUtils {
