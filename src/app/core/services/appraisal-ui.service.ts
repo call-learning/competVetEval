@@ -135,7 +135,7 @@ export class AppraisalUiService {
     const flatternAppraisalCriteria = (
       appraisalCriteria: CriterionForAppraisalTreeModel[]
     ) => {
-      const transformedCriteria: AppraisalCriterionModel[] = []
+      let transformedCriteria: AppraisalCriterionModel[] = []
       appraisalCriteria.forEach((acriteria) => {
         const appraisalCriteriaModel =
           AppraisalCriterionModel.createFromCriterionModel(acriteria.criterion)
@@ -144,7 +144,7 @@ export class AppraisalUiService {
         appraisalCriteriaModel.comment = acriteria.comment
         transformedCriteria.push(appraisalCriteriaModel)
         if (acriteria.subcriteria) {
-          transformedCriteria.concat(
+          transformedCriteria = transformedCriteria.concat(
             flatternAppraisalCriteria(acriteria.subcriteria)
           )
         }
