@@ -63,7 +63,7 @@ export class BaseDataService {
       if (cveUser) {
         for (const entityName in this.entities$) {
           this.refresh(entityName).subscribe()
-          // Subscribe for the the whole service lifetime
+          // Subscribe for the whole service lifetime
         }
       } else {
         for (const entityName in this.entities$) {
@@ -132,17 +132,7 @@ export class BaseDataService {
       if (entityType == 'role') {
         query = { userid: this.authService.loggedUser.getValue().userid }
       }
-      if (this.authService.isStillLoggedIn()) {
-        return this.doRefreshData(entityType, query)
-      }
-      return this.authService.loggedUser.pipe(
-        mergeMap((user: CevUser) => {
-          if (user) {
-            return this.doRefreshData(entityType, query)
-          }
-          return null
-        })
-      )
+      return this.doRefreshData(entityType, query)
     } else {
       return of([])
     }

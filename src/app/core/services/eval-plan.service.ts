@@ -44,15 +44,15 @@ export class EvalPlanService {
   /**
    * Retrieve appraisals for currently logged in user
    */
-  public get plans$(): BehaviorSubject<EvalPlanModel[]> {
-    return this.planningEntities$
+  public get plans$(): Observable<EvalPlanModel[]> {
+    return this.planningEntities$.asObservable()
   }
 
   /**
    * Retrieve appraisal from its Id
    */
   public planFromId(evalplanId): Observable<EvalPlanModel> {
-    return this.planningEntities$.pipe(
+    return this.plans$.pipe(
       map((evalplans) => evalplans.find((plan) => plan.id == evalplanId))
     )
   }
@@ -74,7 +74,6 @@ export class EvalPlanService {
           )
           this.planningEntities$.next(evalplanmodels)
           return evalplanmodels
-          // this.planningEntities.complete()
         })
       )
   }

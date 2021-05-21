@@ -9,9 +9,17 @@
 
 import { Injectable } from '@angular/core'
 
-import { combineLatest, from, of, zip, BehaviorSubject, Observable } from 'rxjs'
-import { concatMap, filter, map, tap } from 'rxjs/operators'
-import evalplan from '../../../mock/fixtures/evalplan'
+import {
+  combineLatest,
+  from,
+  of,
+  zip,
+  BehaviorSubject,
+  Observable,
+  Subscription,
+} from 'rxjs'
+import { concatMap, filter, first, map, tap } from 'rxjs/operators'
+// import evalplan from '../../../mock/fixtures/evalplan'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
 import { RoleModel } from '../../shared/models/moodle/role.model'
@@ -42,35 +50,40 @@ export class ScheduledSituationService {
     AppraiserSituationStatsModel[]
   >(null)
 
+  subscription: Subscription
+
   constructor(
     private baseDataService: BaseDataService,
     private authService: AuthService,
     private appraisalUIService: AppraisalUiService,
     private evalPlanService: EvalPlanService
   ) {
-    this.authService.loggedUser.subscribe((res) => {
-      if (!res) {
+    this.authService.loggedUser.subscribe((loggedUser) => {
+      if (!loggedUser) {
         this.scheduledSituationsEntities$.next(null)
         this.studentSituationStats$.next(null)
         this.appraiserSituationStats$.next(null)
+
+        if (this.subscription) {
+          this.subscription.unsubscribe()
+        }
       } else {
         this.refresh().subscribe()
-        combineLatest([
+        this.subscription = combineLatest([
           this.appraisalUIService.appraisals$,
           this.scheduledSituationsEntities$,
-          this.authService.loggedUser,
           this.baseDataService.groupAssignment$,
           this.evalPlanService.plans$,
         ])
           .pipe(
             filter(
-              ([appraisals, allsituations, currentUser]) =>
+              ([appraisals, allsituations, groupAssignments, evalplan]) =>
                 appraisals != null &&
                 allsituations != null &&
-                currentUser != null &&
+                loggedUser != null &&
                 evalplan != null
             ),
-            tap(([appraisals, allsituations, currentUser]) => {
+            tap(([appraisals, allsituations, groupAssignments, evalplan]) => {
               if (
                 this.authService.isStillLoggedIn() &&
                 this.authService.isStudent
@@ -78,32 +91,24 @@ export class ScheduledSituationService {
                 this.buildStudentStatistics(
                   allsituations,
                   appraisals,
-                  currentUser.userid
+                  loggedUser.userid
                 )
               }
             }),
-            tap(
-              ([
-                appraisals,
-                situations,
-                currentUser,
-                groupAssignments,
-                evalplan,
-              ]) => {
-                if (
-                  this.authService.isStillLoggedIn() &&
-                  this.authService.isAppraiser &&
-                  groupAssignments
-                ) {
-                  this.buildAppraiserStatistics(
-                    appraisals,
-                    situations,
-                    groupAssignments,
-                    evalplan
-                  )
-                }
+            tap(([appraisals, allsituations, groupAssignments, evalplan]) => {
+              if (
+                this.authService.isStillLoggedIn() &&
+                this.authService.isAppraiser &&
+                groupAssignments
+              ) {
+                this.buildAppraiserStatistics(
+                  appraisals,
+                  allsituations,
+                  groupAssignments,
+                  evalplan
+                )
               }
-            )
+            })
           )
           .subscribe()
       }
@@ -165,6 +170,7 @@ export class ScheduledSituationService {
         ),
         this.baseDataService.roles$.pipe(filter((obj) => obj != null))
       ).pipe(
+        first(),
         map(([evalplans, situations, groupAssignments, roles]) => {
           if (this.authService.isStillLoggedIn()) {
             if (this.authService.isStudent) {

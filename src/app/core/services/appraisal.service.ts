@@ -9,9 +9,10 @@
  */
 
 import { Injectable } from '@angular/core'
+import { cpuUsage } from 'process'
 
 import { combineLatest, from, of, BehaviorSubject, Observable } from 'rxjs'
-import { concatMap, filter, map, mapTo, tap } from 'rxjs/operators'
+import { concatMap, filter, first, map, mapTo, tap } from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
@@ -53,7 +54,6 @@ export class AppraisalService {
     private moodleApiService: MoodleApiService,
     private authService: AuthService,
     private criteriaService: CriteriaService,
-    private userDataService: UserDataService,
     private baseDataService: BaseDataService,
     private evalPlanService: EvalPlanService
   ) {
@@ -180,6 +180,7 @@ export class AppraisalService {
     // At login we refresh always.
     return this.authService.currentUserRole.pipe(
       filter((roletype) => roletype != null),
+      first(),
       concatMap((userType) => {
         if (this.authService.isStudent) {
           const userid = this.authService.loggedUser.getValue().userid

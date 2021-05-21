@@ -25,10 +25,7 @@ export class StudentSituationCardComponent implements OnInit {
   @Input() showHeader = true
   public studentSituationStats: StudentSituationStatsModel = null
 
-  constructor(
-    private scheduledSituationService: ScheduledSituationService,
-    private authService: AuthService
-  ) {}
+  constructor(private scheduledSituationService: ScheduledSituationService) {}
 
   ngOnInit() {
     const evalPlanId = this.scheduledSituation.evalPlan.id

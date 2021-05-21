@@ -12,7 +12,14 @@
 import { Injectable } from '@angular/core'
 
 import { combineLatest, from, of, zip, BehaviorSubject, Observable } from 'rxjs'
-import { concatMap, filter, map, tap, toArray } from 'rxjs/operators'
+import {
+  concatMap,
+  debounceTime,
+  filter,
+  map,
+  tap,
+  toArray,
+} from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
@@ -34,22 +41,23 @@ export class AppraisalUiService {
   protected appraisalEntities$ = new BehaviorSubject<AppraisalUI[]>(null)
 
   constructor(
-    private moodleApiService: MoodleApiService,
     private authService: AuthService,
     private criteriaService: CriteriaService,
     private userDataService: UserDataService,
-    private baseDataService: BaseDataService,
     private evalPlanService: EvalPlanService,
     private appraisalServices: AppraisalService
   ) {
-    this.authService.loggedUser.subscribe((cveUser) => {
-      // Make sure that all data from this layer is fetch from the basic appraisalService layer
-      combineLatest([
-        this.appraisalServices.appraisals$,
-        this.appraisalServices.appraisalsCriteria$,
-      ])
-        .pipe(
-          tap(([appraisalModels, appraisalCriteria]) => {
+    combineLatest([
+      this.authService.loggedUser,
+      this.appraisalServices.appraisals$,
+      this.appraisalServices.appraisalsCriteria$,
+    ])
+      .pipe(
+        debounceTime(500),
+        tap(([cveUser, appraisalModels, appraisalCriteria]) => {
+          if (!cveUser) {
+            this.appraisalEntities$.next(null)
+          } else {
             if (appraisalModels) {
               if (!appraisalCriteria) {
                 appraisalCriteria = [] // If there are no appraisalCriteria, then still convert the appraisal.
@@ -59,13 +67,10 @@ export class AppraisalUiService {
                 appraisalCriteria
               ).subscribe()
             }
-          })
-        )
-        .subscribe()
-      if (!cveUser) {
-        this.appraisalEntities$.next(null)
-      }
-    })
+          }
+        })
+      )
+      .subscribe()
   }
 
   /**
