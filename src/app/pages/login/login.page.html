@@ -47,7 +47,13 @@
 
     <label class="form-label">Mot de passe</label>
     <ion-item class="form-input -backgroundIcon" lines="none">
-      <ion-input formControlName="password" type="password"></ion-input>
+      <app-show-hide-password>
+        <ion-input
+          type="password"
+          placeholder="Password"
+          formControlName="password"
+        ></ion-input>
+      </app-show-hide-password>
       <svg-icon
         src="assets/images/svg-icons/icon-password.svg"
         [svgStyle]="{ 'width.px':17 }"

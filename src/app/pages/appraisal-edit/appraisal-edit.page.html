@@ -2,13 +2,13 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button
-        [routerLink]="['/scheduled-situation-detail', scheduledSituation.evalPlanId, scheduledSituation.studentId]"
+        [routerLink]="['/scheduled-situation-detail', scheduledSituation?.evalPlanId, scheduledSituation?.studentId]"
         routerDirection="back"
       >
         <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ scheduledSituation.situation.title }}</ion-title>
+    <ion-title>{{ scheduledSituation?.situation.title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

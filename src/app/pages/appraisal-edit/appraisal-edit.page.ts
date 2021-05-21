@@ -33,7 +33,7 @@ import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.m
 export class AppraisalEditPage extends BaseComponent implements OnInit {
   appraisal: AppraisalUI
   appraisalId: number
-  scheduledSituation: ScheduledSituation
+  scheduledSituation: ScheduledSituation = null
   contextForm: FormGroup
   commentForm: FormGroup
 
@@ -73,15 +73,17 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
       this.loadingController.create().then((res) => {
         this.loader = res
         this.loader.present()
-        this.scheduledSituationService.situations.subscribe((situations) => {
-          this.scheduledSituation = situations.find(
-            (sit) => sit.evalPlanId == this.appraisal.evalPlan.id
-          )
-        })
         this.appraisalUIService
           .waitForAppraisalId(this.appraisalId)
           .subscribe((appraisal) => {
             this.appraisal = appraisal
+            this.scheduledSituationService.situations.subscribe(
+              (situations) => {
+                this.scheduledSituation = situations.find(
+                  (sit) => sit.evalPlanId == this.appraisal.evalPlan.id
+                )
+              }
+            )
             this.contextForm.setValue({ context: appraisal.context })
             this.commentForm.setValue({ comment: appraisal.comment })
             this.loader.dismiss()
@@ -141,7 +143,7 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
           })
         this.router.navigate([
           'scheduled-situation-detail',
-          this.appraisal.evalPlan.clsituationid,
+          this.scheduledSituation.evalPlanId,
           this.appraisal.student.userid,
         ])
       },
@@ -171,6 +173,6 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
   }
 
   updateComment() {
-    this.appraisal.context = this.commentForm.get('comment').value
+    this.appraisal.comment = this.commentForm.get('comment').value
   }
 }

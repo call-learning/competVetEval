@@ -47,7 +47,7 @@ export class AuthService {
     username: string,
     password: string
   ): Observable<'student' | 'appraiser'> {
-    this.cleanAuthLocalStorage()
+    this.cleanUp()
     return this.httpAuthService.login(username, password).pipe(
       tap((res: LoginResult) => {
         if (res.errorcode) {
@@ -70,7 +70,7 @@ export class AuthService {
   logout() {
     this.router.navigate(['login'])
 
-    this.cleanAuthLocalStorage()
+    this.cleanUp()
 
     this.loginState.next(LOGIN_STATE.IDLE)
     this.loggedUser.next(null)
@@ -165,11 +165,9 @@ export class AuthService {
     this.currentUserRole.next(role)
   }
 
-  private cleanAuthLocalStorage() {
+  private cleanUp() {
     this.accessToken = null
-
-    localStorage.removeItem(LocaleKeys.tokenId)
-    localStorage.removeItem(LocaleKeys.authProfile)
+    LocaleKeys.cleanupAuthStorage()
   }
 
   get loggedUserValue() {

@@ -78,16 +78,18 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       )
         .pipe(
           map(([situations, userProfile]) => {
-            this.scheduledSituation = situations.find(
-              (s) =>
-                s.evalPlanId == this.evalPlanId &&
-                (this.studentId == null || this.studentId == s.studentId)
-            )
-            if (userProfile) {
-              this.studentInfo = userProfile
-            }
-            if (this.loader.animated) {
-              this.loader.dismiss()
+            if (situations) {
+              this.scheduledSituation = situations.find(
+                (s) =>
+                  s.evalPlanId == this.evalPlanId &&
+                  (this.studentId == null || this.studentId == s.studentId)
+              )
+              if (userProfile) {
+                this.studentInfo = userProfile
+              }
+              if (this.loader.animated) {
+                this.loader.dismiss()
+              }
             }
           })
         )

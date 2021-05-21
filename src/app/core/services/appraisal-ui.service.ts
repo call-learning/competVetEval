@@ -113,11 +113,13 @@ export class AppraisalUiService {
     return this.appraisalEntities.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
-        appraisals.filter(
-          (appraisal: AppraisalUI) =>
-            appraisal.evalPlan.id == evalPlanId &&
-            (studentId == null || appraisal.student.userid == studentId)
-        )
+        appraisals
+          .filter(
+            (appraisal: AppraisalUI) =>
+              appraisal.evalPlan.id == evalPlanId &&
+              (studentId == null || appraisal.student.userid == studentId)
+          )
+          .sort((app1, app2) => app2.timeModified - app1.timeModified)
       )
     )
   }
@@ -168,7 +170,7 @@ export class AppraisalUiService {
             (appraisalCriteria.appraisalid = appraisalModel.id)
         )
 
-        this.appraisalServices.submitAppraisalCriteria(allcriteria)
+        this.appraisalServices.submitAppraisalCriteria(allcriteria).subscribe()
         return appraisalModel
       }),
       map((appraisalModel) => appraisalModel.id)

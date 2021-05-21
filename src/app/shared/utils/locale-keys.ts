@@ -12,4 +12,13 @@ export class LocaleKeys {
   static tokenId = 'CVE_AUTH-access-token'
   static authProfile = 'CVE_AUTH-user-profile'
   static criteria = 'CVE_DATA-criteria'
+
+  static cleanupAllLocalStorage() {
+    LocaleKeys.cleanupAuthStorage()
+    localStorage.removeItem(LocaleKeys.schoolChoiceId)
+  }
+  static cleanupAuthStorage() {
+    localStorage.removeItem(LocaleKeys.tokenId)
+    localStorage.removeItem(LocaleKeys.authProfile)
+  }
 }
