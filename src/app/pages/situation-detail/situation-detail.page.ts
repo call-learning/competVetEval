@@ -29,6 +29,8 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
   scheduledSituation: ScheduledSituation
   appraisals = null
 
+  appraisalsloaded = false
+
   loader: HTMLIonLoadingElement
 
   constructor(
@@ -63,6 +65,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       .fetchAppraisalsForEvalPlanStudentId(this.evalPlanId, this.studentId)
       .subscribe((appraisals) => {
         this.appraisals = appraisals
+        this.appraisalsloaded = true
       })
     this.loadingController.create().then((res) => {
       this.loader = res
