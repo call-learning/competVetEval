@@ -78,7 +78,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       this.loadingController.create().then((res) => {
         this.loader = res
         this.loader.present()
-        this.situationService.situations.subscribe((situations) => {
+        this.situationService.situations$.subscribe((situations) => {
           // TODO: beware of triple === as sometimes the data is not correctly typed
           // due to Object assign.
           this.scheduledSituation = situations.find(

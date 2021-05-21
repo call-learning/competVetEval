@@ -17,15 +17,15 @@ import { environment } from 'src/environments/environment'
   providedIn: 'root',
 })
 export class EnvironmentService implements IEnvironment {
+  mockServer: boolean
+  schools: Array<School>
+  production: boolean
+  helpUrl: string
+
   constructor() {
     this.schools = environment.schools
     this.production = environment.production
     this.mockServer = environment.mockServer
     this.helpUrl = environment.helpUrl
   }
-
-  mockServer: boolean
-  schools: Array<School>
-  production: boolean
-  helpUrl: string
 }

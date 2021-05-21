@@ -51,15 +51,15 @@ export class UserDataService {
    * @param userid
    */
   public getUserProfileInfo(userid: number): Observable<CevUser> {
-    const exitingProfile = this.userProfiles.find(
+    const existingProfile = this.userProfiles.find(
       (user) => user.userid == userid
     )
-    if (!exitingProfile) {
+    if (!existingProfile) {
       return this.moodleApiService
         .getUserProfileInfo(userid)
         .pipe(tap((user) => this.userProfiles.push(user)))
     } else {
-      return of(exitingProfile)
+      return of(existingProfile)
     }
   }
 }

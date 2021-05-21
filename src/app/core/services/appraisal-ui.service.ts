@@ -47,7 +47,7 @@ import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
   providedIn: 'root',
 })
 export class AppraisalUiService {
-  protected appraisalEntities = new BehaviorSubject<AppraisalUI[]>(null)
+  protected appraisalEntities$ = new BehaviorSubject<AppraisalUI[]>(null)
 
   constructor(
     private moodleApiService: MoodleApiService,
@@ -61,8 +61,8 @@ export class AppraisalUiService {
     this.authService.loggedUser.subscribe((cveUser) => {
       // Make sure that all data from this layer is fetch from the basic appraisalService layer
       combineLatest(
-        this.appraisalServices.appraisals,
-        this.appraisalServices.appraisalsCriteria
+        this.appraisalServices.appraisals$,
+        this.appraisalServices.appraisalsCriteria$
       )
         .pipe(
           tap(([appraisalModels, appraisalCriteria]) => {
@@ -76,7 +76,7 @@ export class AppraisalUiService {
         )
         .subscribe()
       if (!cveUser) {
-        this.appraisalEntities.next(null)
+        this.appraisalEntities$.next(null)
       }
     })
   }
@@ -84,8 +84,8 @@ export class AppraisalUiService {
   /**
    * Retrieve appraisals for currently logged in user
    */
-  public get appraisals(): BehaviorSubject<AppraisalUI[]> {
-    return this.appraisalEntities
+  public get appraisals$(): BehaviorSubject<AppraisalUI[]> {
+    return this.appraisalEntities$
   }
 
   /**
@@ -93,7 +93,7 @@ export class AppraisalUiService {
    * Wait for it until is is retrieved
    */
   public waitForAppraisalId(appraisalId: number): Observable<AppraisalUI> {
-    return this.appraisalEntities.pipe(
+    return this.appraisalEntities$.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
         appraisals.find((appraisal) => appraisal.id == appraisalId)
@@ -110,7 +110,7 @@ export class AppraisalUiService {
     evalPlanId,
     studentId
   ): Observable<AppraisalUI[]> {
-    return this.appraisalEntities.pipe(
+    return this.appraisalEntities$.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
         appraisals
@@ -200,7 +200,7 @@ export class AppraisalUiService {
     appraisalModels: AppraisalModel[],
     appraisalCriteriaModels: AppraisalCriterionModel[]
   ): Observable<AppraisalUI[]> {
-    let currentAppraisalEntities = this.appraisalEntities.getValue()
+    let currentAppraisalEntities = this.appraisalEntities$.getValue()
     let changed = false
 
     return from(appraisalModels).pipe(
@@ -208,9 +208,9 @@ export class AppraisalUiService {
       concatMap((appraisalModel: AppraisalModel) => {
         let appraisalExistSameTime = false
         // First check that the appraisal does not exist currently.
-        if (this.appraisalEntities.getValue()) {
+        if (this.appraisalEntities$.getValue()) {
           appraisalExistSameTime =
-            this.appraisalEntities
+            this.appraisalEntities$
               .getValue()
               .findIndex(
                 (appr) => appr.timeModified == appraisalModel.timemodified
@@ -234,7 +234,7 @@ export class AppraisalUiService {
       // Back to array.
       toArray(),
       tap((appraisalsUI) =>
-        mergeExistingBehaviourSubject(this.appraisalEntities, appraisalsUI, [
+        mergeExistingBehaviourSubject(this.appraisalEntities$, appraisalsUI, [
           'id',
         ])
       )
@@ -266,7 +266,7 @@ export class AppraisalUiService {
         return null
       }
     }
-    const criteriaForAppraisalTree = this.criteriaService.criteriaTree
+    const criteriaForAppraisalTree = this.criteriaService.criteriaTree$
       .getValue()
       .map((criteriontree) => recurseThroughCriteriaTree(criteriontree))
       .filter((c) => c != null) // Remove null value.

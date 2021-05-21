@@ -29,7 +29,9 @@ import { root } from 'rxjs/internal-compatibility'
   providedIn: 'root',
 })
 export class CriteriaService {
-  private criteriaTreeEntities = new BehaviorSubject<CriterionTreeModel[]>(null)
+  private criteriaTreeEntities$ = new BehaviorSubject<CriterionTreeModel[]>(
+    null
+  )
 
   /**
    * Build the base data service
@@ -38,7 +40,7 @@ export class CriteriaService {
    * @param authService
    */
   constructor(private baseDataService: BaseDataService) {
-    this.baseDataService.criteria.subscribe((newcriteria) => {
+    this.baseDataService.criteria$.subscribe((newcriteria) => {
       this.refreshCriteria(newcriteria)
     })
   }
@@ -46,8 +48,8 @@ export class CriteriaService {
   /**
    * Get current criteria tree
    */
-  public get criteriaTree(): BehaviorSubject<CriterionTreeModel[]> {
-    return this.criteriaTreeEntities
+  public get criteriaTree$(): BehaviorSubject<CriterionTreeModel[]> {
+    return this.criteriaTreeEntities$
   }
 
   /**
@@ -59,7 +61,7 @@ export class CriteriaService {
     if (newcriteria) {
       const allHierarchicalCriteria =
         CriterionTreeModel.convertToTree(newcriteria)
-      this.criteriaTreeEntities.next(allHierarchicalCriteria)
+      this.criteriaTreeEntities$.next(allHierarchicalCriteria)
       return allHierarchicalCriteria
     }
   }
@@ -69,8 +71,8 @@ export class CriteriaService {
    * @param evalgridId
    */
   public getCriteriaFromEvalGrid(evalgridId: number): CriterionModel[] {
-    const allCriteria = this.baseDataService.criteria.getValue()
-    return this.baseDataService.criteriaEvalgrid
+    const allCriteria = this.baseDataService.criteria$.getValue()
+    return this.baseDataService.criteriaEvalgrid$
       .getValue()
       .filter((ce) => ce.evalgridid == evalgridId)
       .map((evalgridcrit) =>

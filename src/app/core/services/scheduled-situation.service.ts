@@ -30,15 +30,15 @@ import evalplan from '../../../mock/fixtures/evalplan'
   providedIn: 'any',
 })
 export class ScheduledSituationService {
-  private scheduledSituationsEntities = new BehaviorSubject<
+  private scheduledSituationsEntities$ = new BehaviorSubject<
     ScheduledSituation[]
   >(null)
 
-  private studentSituationStats = new BehaviorSubject<
+  private studentSituationStats$ = new BehaviorSubject<
     StudentSituationStatsModel[]
   >(null)
 
-  private appraiserSituationStats = new BehaviorSubject<
+  private appraiserSituationStats$ = new BehaviorSubject<
     AppraiserSituationStatsModel[]
   >(null)
 
@@ -51,17 +51,17 @@ export class ScheduledSituationService {
   ) {
     this.authService.loggedUser.subscribe((res) => {
       if (!res) {
-        this.scheduledSituationsEntities.next(null)
-        this.studentSituationStats.next(null)
-        this.appraiserSituationStats.next(null)
+        this.scheduledSituationsEntities$.next(null)
+        this.studentSituationStats$.next(null)
+        this.appraiserSituationStats$.next(null)
       } else {
         this.refresh().subscribe()
         combineLatest(
-          this.appraisalUIService.appraisals,
-          this.scheduledSituationsEntities,
+          this.appraisalUIService.appraisals$,
+          this.scheduledSituationsEntities$,
           this.authService.loggedUser,
-          this.baseDataService.groupAssignment,
-          this.evalPlanService.plans
+          this.baseDataService.groupAssignment$,
+          this.evalPlanService.plans$
         )
           .pipe(
             filter(
@@ -111,8 +111,8 @@ export class ScheduledSituationService {
     })
   }
 
-  public get situations(): BehaviorSubject<ScheduledSituation[]> {
-    return this.scheduledSituationsEntities
+  public get situations$(): BehaviorSubject<ScheduledSituation[]> {
+    return this.scheduledSituationsEntities$
   }
 
   /**
@@ -126,7 +126,7 @@ export class ScheduledSituationService {
   public getMyScheduledSituationStats(
     evalPlanId
   ): Observable<StudentSituationStatsModel> {
-    return this.studentSituationStats.pipe(
+    return this.studentSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
       filter((stat) => stat.id == evalPlanId)
@@ -146,7 +146,7 @@ export class ScheduledSituationService {
     evalPlanId,
     studentId
   ): Observable<AppraiserSituationStatsModel> {
-    return this.appraiserSituationStats.pipe(
+    return this.appraiserSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
       filter((stat) => stat.id == evalPlanId && stat.studentId == studentId)
@@ -159,10 +159,12 @@ export class ScheduledSituationService {
   public refresh(): Observable<ScheduledSituation[]> {
     if (this.authService.isStillLoggedIn()) {
       return zip(
-        this.evalPlanService.plans.pipe(filter((obj) => obj != null)),
-        this.baseDataService.situations.pipe(filter((obj) => obj != null)),
-        this.baseDataService.groupAssignment.pipe(filter((obj) => obj != null)),
-        this.baseDataService.roles.pipe(filter((obj) => obj != null))
+        this.evalPlanService.plans$.pipe(filter((obj) => obj != null)),
+        this.baseDataService.situations$.pipe(filter((obj) => obj != null)),
+        this.baseDataService.groupAssignment$.pipe(
+          filter((obj) => obj != null)
+        ),
+        this.baseDataService.roles$.pipe(filter((obj) => obj != null))
       ).pipe(
         map(([evalplans, situations, groupAssignments, roles]) => {
           if (this.authService.isStillLoggedIn()) {
@@ -212,7 +214,7 @@ export class ScheduledSituationService {
         scheduledSituations.push(scheduledSituation)
       }
     })
-    this.scheduledSituationsEntities.next(scheduledSituations)
+    this.scheduledSituationsEntities$.next(scheduledSituations)
     return scheduledSituations
   }
 
@@ -256,7 +258,7 @@ export class ScheduledSituationService {
         }
       }
     })
-    this.scheduledSituationsEntities.next(scheduledSituations)
+    this.scheduledSituationsEntities$.next(scheduledSituations)
     return scheduledSituations
   }
 
@@ -307,7 +309,7 @@ export class ScheduledSituationService {
         }
       })
       mergeExistingBehaviourSubject(
-        this.studentSituationStats,
+        this.studentSituationStats$,
         allStudentStats,
         ['id']
       )
@@ -347,7 +349,7 @@ export class ScheduledSituationService {
         )
       })
       mergeExistingBehaviourSubject(
-        this.appraiserSituationStats,
+        this.appraiserSituationStats$,
         appraiserStats,
         ['id', 'studentId']
       )

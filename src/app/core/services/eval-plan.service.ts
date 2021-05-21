@@ -18,7 +18,7 @@ import { map, tap } from 'rxjs/operators'
   providedIn: 'root',
 })
 export class EvalPlanService {
-  protected planningEntities = new BehaviorSubject<EvalPlanModel[]>(null)
+  protected planningEntities$ = new BehaviorSubject<EvalPlanModel[]>(null)
 
   /**
    * Constructor
@@ -35,7 +35,7 @@ export class EvalPlanService {
       if (cveUser) {
         this.refresh().subscribe()
       } else {
-        this.planningEntities.next(null)
+        this.planningEntities$.next(null)
       }
     })
   }
@@ -43,15 +43,15 @@ export class EvalPlanService {
   /**
    * Retrieve appraisals for currently logged in user
    */
-  public get plans(): BehaviorSubject<EvalPlanModel[]> {
-    return this.planningEntities
+  public get plans$(): BehaviorSubject<EvalPlanModel[]> {
+    return this.planningEntities$
   }
 
   /**
    * Retrieve appraisal from its Id
    */
   public planFromId(evalplanId): Observable<EvalPlanModel> {
-    return this.planningEntities.pipe(
+    return this.planningEntities$.pipe(
       map((evalplans) => evalplans.find((plan) => plan.id == evalplanId))
     )
   }
@@ -65,13 +65,13 @@ export class EvalPlanService {
    */
   public refresh(): Observable<EvalPlanModel[]> {
     return this.moodleApiService
-      .fetchIfMoreRecent('evalplan', {}, this.planningEntities.getValue())
+      .fetchIfMoreRecent('evalplan', {}, this.planningEntities$.getValue())
       .pipe(
         map((evalplans) => {
           const evalplanmodels = evalplans.map(
             (plan) => new EvalPlanModel(plan)
           )
-          this.planningEntities.next(evalplanmodels)
+          this.planningEntities$.next(evalplanmodels)
           return evalplanmodels
           //this.planningEntities.complete()
         })

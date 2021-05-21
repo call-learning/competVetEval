@@ -41,11 +41,11 @@ const EntityClass: any = {
 })
 export class BaseDataService {
   private entities = {
-    clsituation: new BehaviorSubject<SituationModel[]>(null),
-    criterion: new BehaviorSubject<CriterionModel[]>(null),
-    cevalgrid: new BehaviorSubject<CriterionEvalgridModel[]>(null),
-    role: new BehaviorSubject<RoleModel[]>(null),
-    group_assign: new BehaviorSubject<GroupAssignmentModel[]>(null),
+    clsituation$: new BehaviorSubject<SituationModel[]>(null),
+    criterion$: new BehaviorSubject<CriterionModel[]>(null),
+    cevalgrid$: new BehaviorSubject<CriterionEvalgridModel[]>(null),
+    role$: new BehaviorSubject<RoleModel[]>(null),
+    group_assign$: new BehaviorSubject<GroupAssignmentModel[]>(null),
   }
 
   /**
@@ -75,35 +75,35 @@ export class BaseDataService {
   /**
    * Get current situations
    */
-  public get situations(): BehaviorSubject<SituationModel[]> {
-    return this.entities.clsituation
+  public get situations$(): BehaviorSubject<SituationModel[]> {
+    return this.entities.clsituation$
   }
 
   /**
    * Get current criteria
    */
-  public get criteria(): BehaviorSubject<CriterionModel[]> {
-    return this.entities.criterion
+  public get criteria$(): BehaviorSubject<CriterionModel[]> {
+    return this.entities.criterion$
   }
 
   /**
    * Get current criteria evaluation grid
    */
-  public get criteriaEvalgrid(): BehaviorSubject<CriterionEvalgridModel[]> {
-    return this.entities.cevalgrid
+  public get criteriaEvalgrid$(): BehaviorSubject<CriterionEvalgridModel[]> {
+    return this.entities.cevalgrid$
   }
   /**
    * Get role for current logged in user
    */
-  public get roles(): BehaviorSubject<RoleModel[]> {
-    return this.entities.role
+  public get roles$(): BehaviorSubject<RoleModel[]> {
+    return this.entities.role$
   }
 
   /**
    * Get group assignment model
    */
-  public get groupAssignment(): BehaviorSubject<GroupAssignmentModel[]> {
-    return this.entities.group_assign
+  public get groupAssignment$(): BehaviorSubject<GroupAssignmentModel[]> {
+    return this.entities.group_assign$
   }
 
   /**

@@ -66,7 +66,7 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
         .waitForAppraisalId(this.appraisalId)
         .subscribe((appraisal) => {
           this.appraisal = appraisal
-          this.scheduledSituationService.situations.subscribe((situations) => {
+          this.scheduledSituationService.situations$.subscribe((situations) => {
             if (situations) {
               this.scheduledSituation = situations.find(
                 (sit) => sit.evalPlanId == this.appraisal.evalPlan.id
