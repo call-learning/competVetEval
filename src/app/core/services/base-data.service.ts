@@ -41,12 +41,12 @@ const EntityClass: any = {
   providedIn: 'root',
 })
 export class BaseDataService {
-  private entities = {
-    clsituation$: new BehaviorSubject<SituationModel[]>(null),
-    criterion$: new BehaviorSubject<CriterionModel[]>(null),
-    cevalgrid$: new BehaviorSubject<CriterionEvalgridModel[]>(null),
-    role$: new BehaviorSubject<RoleModel[]>(null),
-    group_assign$: new BehaviorSubject<GroupAssignmentModel[]>(null),
+  private entities$ = {
+    clsituation: new BehaviorSubject<SituationModel[]>(null),
+    criterion: new BehaviorSubject<CriterionModel[]>(null),
+    cevalgrid: new BehaviorSubject<CriterionEvalgridModel[]>(null),
+    role: new BehaviorSubject<RoleModel[]>(null),
+    group_assign: new BehaviorSubject<GroupAssignmentModel[]>(null),
   }
 
   /**
@@ -61,13 +61,13 @@ export class BaseDataService {
   ) {
     this.authService.loggedUser.subscribe((cveUser) => {
       if (cveUser) {
-        for (const entityName in this.entities) {
+        for (const entityName in this.entities$) {
           this.refresh(entityName).subscribe()
           // Subscribe for the the whole service lifetime
         }
       } else {
-        for (const entityName in this.entities) {
-          this.entities[entityName].next(null)
+        for (const entityName in this.entities$) {
+          this.entities$[entityName].next(null)
         }
       }
     })
@@ -77,34 +77,34 @@ export class BaseDataService {
    * Get current situations
    */
   public get situations$(): BehaviorSubject<SituationModel[]> {
-    return this.entities.clsituation$
+    return this.entities$.clsituation
   }
 
   /**
    * Get current criteria
    */
   public get criteria$(): BehaviorSubject<CriterionModel[]> {
-    return this.entities.criterion$
+    return this.entities$.criterion
   }
 
   /**
    * Get current criteria evaluation grid
    */
   public get criteriaEvalgrid$(): BehaviorSubject<CriterionEvalgridModel[]> {
-    return this.entities.cevalgrid$
+    return this.entities$.cevalgrid
   }
   /**
    * Get role for current logged in user
    */
   public get roles$(): BehaviorSubject<RoleModel[]> {
-    return this.entities.role$
+    return this.entities$.role
   }
 
   /**
    * Get group assignment model
    */
   public get groupAssignment$(): BehaviorSubject<GroupAssignmentModel[]> {
-    return this.entities.group_assign$
+    return this.entities$.group_assign
   }
 
   /**
@@ -114,7 +114,7 @@ export class BaseDataService {
    * @param id
    */
   public getEntityById(entityType, id): BaseMoodleModel | null {
-    const entities = this.entities[entityType].getValue()
+    const entities = this.entities$[entityType].getValue()
     if (entities) {
       return entities.find((entity) => entity.id == id)
     }
@@ -161,11 +161,11 @@ export class BaseDataService {
       .fetchIfMoreRecent(
         entityType,
         query,
-        this.entities[entityType].getValue()
+        this.entities$[entityType].getValue()
       )
       .pipe(
         tap((entities: BaseMoodleModel[]) => {
-          this.entities[entityType].next(
+          this.entities$[entityType].next(
             entities.map((e) => new EntityClass[entityType](e))
           )
         })
