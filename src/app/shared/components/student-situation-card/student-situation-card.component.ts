@@ -32,6 +32,8 @@ export class StudentSituationCardComponent implements OnInit {
     this.scheduledSituationService
       .getMyScheduledSituationStats(evalPlanId)
       .pipe(first())
-      .subscribe((stats) => (this.studentSituationStats = stats))
+      .subscribe((stats) => {
+        this.studentSituationStats = stats
+      })
   }
 }

@@ -304,7 +304,7 @@ export class ScheduledSituationService {
             appraisalsCompleted: nbAppraisalStudent,
             appraisalsRequired: appraisalsRequired,
             status:
-              nbAppraisalStudent > appraisalsRequired
+              nbAppraisalStudent >= appraisalsRequired
                 ? 'done'
                 : nbAppraisalStudent
                 ? 'in_progress'
@@ -346,7 +346,7 @@ export class ScheduledSituationService {
             appraisalsCompleted: nbAppraisalAppraiserStudent,
             appraisalsRequired: situation.situation.expectedevalsnb,
             status:
-              nbAppraisalAppraiserStudent > appraisalsRequired
+              nbAppraisalAppraiserStudent >= appraisalsRequired
                 ? 'done'
                 : nbAppraisalAppraiserStudent
                 ? 'in_progress'
