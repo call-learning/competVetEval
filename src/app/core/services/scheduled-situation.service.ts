@@ -44,7 +44,6 @@ export class ScheduledSituationService {
 
   constructor(
     private baseDataService: BaseDataService,
-    private moodleApiService: MoodleApiService,
     private authService: AuthService,
     private appraisalUIService: AppraisalUiService,
     private evalPlanService: EvalPlanService
@@ -111,8 +110,8 @@ export class ScheduledSituationService {
     })
   }
 
-  public get situations$(): BehaviorSubject<ScheduledSituation[]> {
-    return this.scheduledSituationsEntities$
+  public get situations$(): Observable<ScheduledSituation[]> {
+    return this.scheduledSituationsEntities$.asObservable()
   }
 
   /**

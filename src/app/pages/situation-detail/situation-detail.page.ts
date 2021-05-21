@@ -68,7 +68,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       this.loader = res
       this.loader.present()
       zip(
-        this.situationService.situations$.asObservable(),
+        this.situationService.situations$,
         iif(
           () => this.studentId != null,
           this.userDataService.getUserProfileInfo(this.studentId),

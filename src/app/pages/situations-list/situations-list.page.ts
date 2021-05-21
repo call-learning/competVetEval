@@ -52,9 +52,8 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     this.loadingController.create().then((res) => {
       this.loader = res
       this.loader.present().then(() =>
-        this.scheduledSituationsService.situations$.subscribe(() => {
-          const scheduledSituations =
-            this.scheduledSituationsService.situations$.getValue()
+        this.scheduledSituationsService.situations$.subscribe((res) => {
+          const scheduledSituations = res
           if (scheduledSituations) {
             console.log('Situations: ' + JSON.stringify(scheduledSituations))
             this.situations = scheduledSituations
