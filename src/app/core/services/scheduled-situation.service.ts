@@ -276,22 +276,19 @@ export class ScheduledSituationService {
 
   private buildStudentStatistics(allsituations, appraisals, currentUserId) {
     let allStudentStats = []
-    if (allsituations && appraisals) {
+    if (allsituations) {
       allsituations.forEach((situation) => {
         if (situation.evalPlan) {
           const appraisalsRequired = situation.situation.expectedevalsnb
-          const existingAppraisalAppraiser = appraisals.filter(
-            (appraisal) =>
-              appraisals.evalPlan &&
-              appraisal.evalPlan.id == situation.evalPlan.id
-          )
+          const nbAppraisalStudent = appraisals
+            ? appraisals.filter(
+                (appraisal) =>
+                  appraisals.evalPlan &&
+                  appraisal.student.userid == currentUserId &&
+                  appraisal.evalPlan.id == situation.evalPlanId
+              ).length
+            : 0
 
-          const nbAppraisalStudent = appraisals.filter(
-            (appraisal) =>
-              appraisals.evalPlan &&
-              appraisal.student.userid == currentUserId &&
-              appraisal.evalPlan.id == situation.evalPlanId
-          ).length
           const studentStats = new StudentSituationStatsModel({
             id: situation.evalPlanId,
             appraisalsCompleted: nbAppraisalStudent,
@@ -320,13 +317,15 @@ export class ScheduledSituationService {
     groupAssignments,
     evalplan
   ) {
-    if (allsituations && appraisals) {
+    if (allsituations) {
       let appraiserStats = []
       allsituations.forEach((situation) => {
         const appraisalsRequired = situation.situation.expectedevalsnb
-        const existingAppraisalAppraiser = appraisals.filter(
-          (appraisal) => appraisal.evalPlan.id == situation.evalPlanId
-        )
+        const existingAppraisalAppraiser = appraisals
+          ? appraisals.filter(
+              (appraisal) => appraisal.evalPlan.id == situation.evalPlanId
+            )
+          : []
         // Now fetch all students involved
         const nbAppraisalAppraiserStudent = existingAppraisalAppraiser.filter(
           (appraisal) => situation.studentId == appraisal.student.userid

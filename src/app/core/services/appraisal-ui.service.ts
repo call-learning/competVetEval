@@ -66,7 +66,10 @@ export class AppraisalUiService {
       )
         .pipe(
           tap(([appraisalModels, appraisalCriteria]) => {
-            if (appraisalModels && appraisalCriteria) {
+            if (appraisalModels) {
+              if (!appraisalCriteria) {
+                appraisalCriteria = [] // If there are no appraisalCriteria, then still convert the appraisal.
+              }
               this.lazyConvertAppraisalModelToUI(
                 appraisalModels,
                 appraisalCriteria
@@ -208,26 +211,32 @@ export class AppraisalUiService {
       concatMap((appraisalModel: AppraisalModel) => {
         let appraisalExistSameTime = false
         // First check that the appraisal does not exist currently.
-        if (this.appraisalEntities.getValue()) {
-          appraisalExistSameTime =
-            this.appraisalEntities
-              .getValue()
-              .findIndex(
-                (appr) => appr.timeModified == appraisalModel.timemodified
-              ) !== -1
-        }
-        if (appraisalExistSameTime) {
-          return of(null)
-        } else {
-          // Then we convert.
-          const appraisalCriteriaUI =
-            this.convertAppraisalCriterionModelsToTree(
-              appraisalCriteriaModels.filter(
-                (apc) => apc.appraisalid == appraisalModel.id
-              )
-            )
-          return this.convertAppraisalModel(appraisalModel, appraisalCriteriaUI)
-        }
+        const appraisalCriteriaUI = this.convertAppraisalCriterionModelsToTree(
+          appraisalCriteriaModels.filter(
+            (apc) => apc.appraisalid == appraisalModel.id
+          )
+        )
+        return this.convertAppraisalModel(appraisalModel, appraisalCriteriaUI)
+        // if (this.appraisalEntities.getValue()) {
+        //   appraisalExistSameTime =
+        //     this.appraisalEntities
+        //       .getValue()
+        //       .findIndex(
+        //         (appr) => appr.timeModified == appraisalModel.timemodified
+        //       ) !== -1
+        // }
+        // if (appraisalExistSameTime) {
+        //   return of(null)
+        // } else {
+        //   // Then we convert.
+        //   const appraisalCriteriaUI =
+        //     this.convertAppraisalCriterionModelsToTree(
+        //       appraisalCriteriaModels.filter(
+        //         (apc) => apc.appraisalid == appraisalModel.id
+        //       )
+        //     )
+        //   return this.convertAppraisalModel(appraisalModel, appraisalCriteriaUI)
+        // }
       }),
       // Filter out unwanted appraisals.
       filter((appraisalui) => appraisalui !== null),
