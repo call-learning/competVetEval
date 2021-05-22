@@ -12,10 +12,12 @@ export const environment: IEnvironment = {
       moodleUrl: 'http://competveteval.local/',
     },
     {
-      id: 'remote-server',
-      name: 'Remote server',
-      logo: 'assets/images/schools/logo-calllearning.png',
-      moodleUrl: 'https://cveteval.call-learning.fr/',
+      id: 'vet-agro-sup',
+      name: 'VetAgro Sup',
+      logo: 'assets/images/schools/logo-vetagro.png',
+      // Test site
+      moodleUrl: 'https://vetagro-sup.call-learning.io/',
+      // moodleUrl: 'https://vetagrotice.vetagro-sup.fr/',
     },
   ],
 }

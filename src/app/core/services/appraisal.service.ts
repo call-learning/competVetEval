@@ -232,12 +232,16 @@ export class AppraisalService {
     evalPlanId: number,
     evalGridId: number,
     studentId: number,
-    appraiserId: number
+    appraiserId: number,
+    comment?: string,
+    context?: string
   ): Observable<AppraisalModel> {
     const appraisalModel = AppraisalModel.createBlank(
       studentId,
       appraiserId,
-      evalPlanId
+      evalPlanId,
+      comment,
+      context
     )
     const appraisalCriteriaModel = this.criteriaService
       .getCriteriaFromEvalGrid(evalGridId)

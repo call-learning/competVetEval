@@ -158,6 +158,14 @@ export class ScheduledSituationService {
   }
 
   /**
+   * Refresh stats data for currently logged in user
+   */
+  public refreshStats(): Observable<any> {
+    // Pull all appraisals.
+    return this.appraisalUIService.refreshAppraisals()
+  }
+
+  /**
    * Refresh data for currently logged in user
    */
   public refresh(): Observable<ScheduledSituation[]> {
@@ -295,7 +303,8 @@ export class ScheduledSituationService {
                 (appraisal) =>
                   appraisal.evalPlan &&
                   appraisal.student.userid == currentUserId &&
-                  appraisal.evalPlan.id == situation.evalPlanId
+                  appraisal.evalPlan.id == situation.evalPlanId &&
+                  appraisal.appraiser // Make sure we only count appraisal assigned to an appraiser
               ).length
             : 0
 
@@ -333,7 +342,9 @@ export class ScheduledSituationService {
         const appraisalsRequired = situation.situation.expectedevalsnb
         const existingAppraisalAppraiser = appraisals
           ? appraisals.filter(
-              (appraisal) => appraisal.evalPlan.id == situation.evalPlanId
+              (appraisal) =>
+                appraisal.evalPlan.id == situation.evalPlanId &&
+                appraisal.appraiser // Make sure we only count appraisal assigned to an appraiser
             )
           : []
         // Now fetch all students involved

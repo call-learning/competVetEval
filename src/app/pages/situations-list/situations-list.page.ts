@@ -132,4 +132,12 @@ export class SituationsListPage extends BaseComponent implements OnInit {
         modal.present()
       })
   }
+
+  doRefresh(event) {
+    this.scheduledSituationsService
+      .refreshStats()
+      .subscribe((allsituations) => {
+        event.target.complete()
+      })
+  }
 }

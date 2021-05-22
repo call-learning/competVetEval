@@ -18,6 +18,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { IonTextarea, ModalController } from '@ionic/angular'
 
 import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
+import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
+import { AuthService } from '../../../core/services/auth.service'
 
 @Component({
   selector: 'app-modal-ask-appraisal',
@@ -42,7 +44,9 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
 
   constructor(
     private modalController: ModalController,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private appraisalService: AppraisalUiService,
+    private authService: AuthService
   ) {
     this.askAppraisalForm = this.formBuilder.group({
       context: ['', [Validators.required]],
@@ -67,13 +71,20 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
     this.errorMsg = ''
     this.formSubmitted = true
 
-    if (this.askAppraisalForm.valid) {
-      this.step = 'qr-code'
-
-      // TODO: Change this and create a blank appraisal. To do that we would need
-      // to add a status to the appraisal (to complete or sht like this)
-      const encodedContext = encodeURIComponent(this.contextInput.value)
-      this.qrCodeData = `${this.scheduledSituation.evalPlanId}|${this.studentId}|${encodedContext}`
+    if (this.askAppraisalForm.valid && this.step != 'qr-code') {
+      this.appraisalService
+        .createBlankAppraisal(
+          this.scheduledSituation.evalPlanId,
+          this.scheduledSituation.situation.evalgridid,
+          this.authService.loggedUser.getValue().userid,
+          0, // For now we don't know the appraiser.
+          '',
+          this.contextInput.value
+        )
+        .subscribe((appraisaluiId) => {
+          this.step = 'qr-code'
+          this.qrCodeData = `${appraisaluiId}`
+        })
     } else {
       this.errorMsg = 'Le formulaire est invalide'
     }

@@ -94,6 +94,11 @@ export class AuthService {
       this.chosenSchool = this.schoolsProviderService.getSchoolFromId(
         this.schoolsProviderService.getSelectedSchoolId()
       )
+      if (!this.chosenSchool) {
+        LocaleKeys.cleanupAllLocalStorage()
+        this.loginState.next(LOGIN_STATE.IDLE)
+        return of(true)
+      }
     }
 
     if (this.variablesInSessionExists()) {

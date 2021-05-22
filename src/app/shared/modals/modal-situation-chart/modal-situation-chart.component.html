@@ -25,7 +25,7 @@
             <!-- <div class="list-item-image">
               <img [src]="appraisal.image" />
             </div> -->
-            {{ appraisal.appraiser.fullname }}
+            {{ appraisal.appraiser?.fullname }}
           </div>
         </td>
         <td *ngFor="let criterion of appraisal.criteria">

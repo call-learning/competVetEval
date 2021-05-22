@@ -21,21 +21,21 @@ the application version.
 
 # Build android
 
-ionic build --prod
-npx cap copy android && npx cap sync android
-npx cap open android
+    ionic build --prod
+    npx cap copy android && npx cap sync android
+    npx cap open android
 
-From Android studio Build >
+From Android studio Build : Modify version number + name
 
-android/app/build.gradle -> Modify version number + name
+    android/app/build.gradle
 
 Build bundle or APK using Android Studio.
 
 # Build ios
 
-ionic build --prod
-npx cap copy ios | npx cap sync ios
-npx cap open ios
+    ionic build --prod
+    npx cap copy ios && npx cap sync ios
+    npx cap open ios
 
 From Xcode >
 
@@ -46,5 +46,5 @@ Product > Archive
 
 With mock data and MSW handler:
 
-ionic build --configuration=test
-ionic serve --configuration=test
+    ionic build --configuration=test
+    ionic serve --configuration=test

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
 
 import { iif, of, zip } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { filter, first, map } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
@@ -14,6 +14,8 @@ import { ScheduledSituationService } from '../../core/services/scheduled-situati
 import { UserDataService } from '../../core/services/user-data.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
 import { CevUser } from '../../shared/models/cev-user.model'
+import { ShowAppraisalBarcodeComponent } from '../../shared/modals/show-appraisal-barcode/show-appraisal-barcode.component'
+import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 
 @Component({
   selector: 'app-situation-detail',
@@ -40,7 +42,8 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
     public situationService: ScheduledSituationService,
     private activatedRoute: ActivatedRoute,
     private userDataService: UserDataService,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private router: Router
   ) {
     super()
   }
@@ -72,11 +75,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       this.loader.present()
       zip(
         this.situationService.situations$,
-        iif(
-          () => this.studentId != null,
-          this.userDataService.getUserProfileInfo(this.studentId),
-          of(null)
-        )
+        this.userDataService.getUserProfileInfo(this.studentId)
       )
         .pipe(
           map(([situations, userProfile]) => {
@@ -128,5 +127,38 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       .then((modal) => {
         modal.present()
       })
+  }
+
+  showPendingAppraisal(appraisalId) {
+    if (this.authService.isStudent) {
+      this.modalController
+        .create({
+          component: ShowAppraisalBarcodeComponent,
+          componentProps: {
+            appraisalId: appraisalId,
+          },
+        })
+        .then((modal) => {
+          modal.present()
+        })
+    } else {
+      this.appraisalUIService
+        .waitForAppraisalId(appraisalId)
+        .pipe(
+          filter((appraisal) => appraisal !== null),
+          first()
+        )
+        .subscribe((appraisal: AppraisalUI) => {
+          appraisal.appraiser = this.authService.loggedUser.getValue()
+          if (this.loader.animated) {
+            this.loader.dismiss()
+          }
+          this.appraisalUIService
+            .submitAppraisal(appraisal)
+            .subscribe((thisAppraisalId) => {
+              this.router.navigate(['appraisal-edit', thisAppraisalId])
+            })
+        })
+    }
   }
 }

@@ -105,9 +105,6 @@ export class MoodleApiService {
     }
     const args = {
       id: appraisal.id,
-      // situationid: appraisal.evalPlanId,
-      // appraiserid: appraisal.appraiserId,
-      // studentid: appraisal.studentId,
       context: appraisal.context,
       comment: appraisal.comment,
       criteria: appraisal.criteria.map(formatCriterionForApi),

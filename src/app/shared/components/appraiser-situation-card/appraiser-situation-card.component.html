@@ -5,9 +5,9 @@
         {{ scheduledSituation.situation.title }}
       </div>
       <div class="list-item-dates">
-        {{ scheduledSituation.evalPlan.starttime * 1000 | date: 'd LLL yyyy' }}
+        {{ scheduledSituation.evalPlan.starttime * 1000 | date: 'd/MM/yyyy' }}
         au
-        {{ scheduledSituation.evalPlan.endtime * 1000 | date: 'd LLL yyyy' }}
+        {{ scheduledSituation.evalPlan.endtime * 1000 | date: 'd/MM/yyyy' }}
       </div>
     </div>
     <div class="list-item-infos">

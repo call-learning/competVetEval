@@ -10,11 +10,17 @@ import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
-import { ModalController, ToastController } from '@ionic/angular'
+import {
+  LoadingController,
+  ModalController,
+  ToastController,
+} from '@ionic/angular'
 
 import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
 import { AuthService } from '../../../core/services/auth.service'
 import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
+import appr from '../../../../mock/fixtures/appr'
+import { filter, first } from 'rxjs/operators'
 
 @Component({
   selector: 'app-modal-scan-appraisal',
@@ -23,13 +29,16 @@ import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
   providers: [BarcodeScanner],
 })
 export class ModalScanAppraisalComponent implements OnInit {
+  loader: HTMLIonLoadingElement
+
   constructor(
     private modalController: ModalController,
     private toastController: ToastController,
     private barcodeScanner: BarcodeScanner,
     private appraisalUIService: AppraisalUiService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private loadingController: LoadingController
   ) {}
 
   ngOnInit() {}
@@ -62,18 +71,43 @@ export class ModalScanAppraisalComponent implements OnInit {
             toast.present()
           })
         this.dismissModal()
+        const appraisalId = Number.parseInt(barcodeData.text)
 
-        const barcodeDataSplit = barcodeData.text.split('|')
-        this.appraisalUIService
-          .waitForAppraisalId(Number.parseInt(barcodeDataSplit[0]))
-          .subscribe((appraisal: AppraisalUI) => {
-            appraisal.context = barcodeDataSplit[2]
-            this.appraisalUIService
-              .submitAppraisal(appraisal)
-              .subscribe((appraisalid) => {
-                this.router.navigate(['appraisal-edit', appraisalid])
-              })
-          })
+        this.loadingController.create().then((res) => {
+          this.loader = res
+          this.loader.present()
+          this.appraisalUIService
+            .waitForAppraisalId(appraisalId, true)
+            .pipe(
+              filter((appraisal) => appraisal !== null),
+              first()
+            )
+            .subscribe((appraisal: AppraisalUI) => {
+              if (this.loader.animated) {
+                this.loader.dismiss()
+              }
+              if (appraisal.appraiser !== null) {
+                this.toastController
+                  .create({
+                    message:
+                      'Cette observation a déjà été assignée à un autre évaluateur',
+                    duration: 2000,
+                    color: 'danger',
+                  })
+                  .then((toast) => {
+                    toast.present()
+                  })
+              } else {
+                appraisal.appraiser = this.authService.loggedUser.getValue()
+
+                this.appraisalUIService
+                  .submitAppraisal(appraisal)
+                  .subscribe((appraisalid) => {
+                    this.router.navigate(['appraisal-edit', appraisalid])
+                  })
+              }
+            })
+        })
       })
       .catch((err) => {
         console.error('Error', err)

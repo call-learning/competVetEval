@@ -55,6 +55,9 @@ export class UserDataService {
     const existingProfile = this.userProfiles.find(
       (user) => user.userid == userid
     )
+    if (!userid) {
+      return of(null)
+    }
     if (!existingProfile) {
       return this.moodleApiService
         .getUserProfileInfo(userid)

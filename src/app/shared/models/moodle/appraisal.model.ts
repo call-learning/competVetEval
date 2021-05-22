@@ -27,15 +27,17 @@ export class AppraisalModel extends BaseMoodleModel {
   public static createBlank(
     studentid: number,
     appraiserid: number,
-    evalplanid: number
+    evalplanid: number,
+    comment?: string,
+    context?: string
   ) {
     return new AppraisalModel({
       studentid,
       appraiserid,
       evalplanid,
-      context: '',
       contextformat: 1,
-      comment: '',
+      context: context ? context : '',
+      comment: comment ? comment : '',
       commentformat: 1,
     })
   }

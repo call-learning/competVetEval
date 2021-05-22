@@ -34,8 +34,8 @@
           {{ scheduledSituation.situation.description }}
         </div>
         <div class="page-dates">
-          {{ scheduledSituation.evalPlan.starttime * 1000 | date:'d LLL yy'
-          }}/{{ scheduledSituation.evalPlan.endtime * 1000 | date:'d LLL yy' }}
+          {{ scheduledSituation.evalPlan.starttime * 1000 | date:'d/MM/yy' }}/{{
+          scheduledSituation.evalPlan.endtime * 1000 | date:'d/MM/yy' }}
         </div>
         <div *ngIf="authService.isStudent" class="situations-list__card-item">
           <app-student-situation-card
@@ -63,48 +63,67 @@
         Cette situation n’a pas encore été évaluée
       </div>
       <div class="ion-margin-vertical" *ngIf="appraisals?.length">
-        <a
-          class="list-item"
-          [routerLink]="(appraisal.appraiser.userid === currentUserId) ? ['/appraisal-edit', appraisal.id]
+        <ion-list *ngFor="let appraisal of appraisals">
+          <a
+            class="list-item"
+            [routerLink]="(appraisal.appraiser?.userid === currentUserId) ? ['/appraisal-edit', appraisal.id]
         : ['/appraisal-detail', appraisal.id]"
-          routerDirection="forward"
-          *ngFor="let appraisal of appraisals"
-        >
-          <!-- todo : implement -->
-          <!-- <div class="list-item-image">
-            <img [src]="appraisal.image" />
-          </div> -->
-          <div class="list-item-content">
-            <div class="list-item-title">
-              <ion-item lines="none">
-                <ion-avatar slot="start"
-                  ><img src="{{appraisal.appraiser.userpictureurl}}"
-                /></ion-avatar>
-                <ion-label>{{ appraisal.appraiser.fullname }}</ion-label>
-              </ion-item>
+            routerDirection="forward"
+            *ngIf="appraisal.appraiser"
+          >
+            <div class="list-item-content">
+              <div class="list-item-title">
+                <ion-item lines="none">
+                  <ion-avatar slot="start"
+                    ><img src="{{appraisal.appraiser?.userpictureurl}}"
+                  /></ion-avatar>
+                  <ion-label>{{ appraisal.appraiser?.fullname }}</ion-label>
+                </ion-item>
+              </div>
+              <div class="list-item-subtitle">
+                <ng-container *ngIf="appraisal.type == 1">
+                  <span>Observateur</span>
+                </ng-container>
+                <!-- todo : implement -->
+                <ng-container *ngIf="appraisal.type == 2">
+                  <span>Responsable</span>
+                  <svg-icon
+                    src="assets/images/svg-icons/icon-star.svg"
+                    [svgStyle]="{ 'width.px':18 }"
+                  ></svg-icon>
+                </ng-container>
+              </div>
             </div>
-            <div class="list-item-subtitle">
-              <ng-container *ngIf="appraisal.type == 1">
-                <span>Observateur</span>
-              </ng-container>
-              <!-- todo : implement -->
-              <ng-container *ngIf="appraisal.type == 2">
-                <span>Responsable</span>
-                <svg-icon
-                  src="assets/images/svg-icons/icon-star.svg"
-                  [svgStyle]="{ 'width.px':18 }"
-                ></svg-icon>
-              </ng-container>
+            <div class="list-item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-calendar.svg"
+                [svgStyle]="{ 'width.px':16 }"
+              ></svg-icon>
+              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (hh:mm)' }}
             </div>
-          </div>
-          <div class="list-item-info">
-            <svg-icon
-              src="assets/images/svg-icons/icon-calendar.svg"
-              [svgStyle]="{ 'width.px':16 }"
-            ></svg-icon>
-            {{ appraisal.timeModified * 1000 | date:'d LLL yy' }}
-          </div>
-        </a>
+          </a>
+          <a
+            class="list-item"
+            (click)="showPendingAppraisal(appraisal.id)"
+            *ngIf="!appraisal.appraiser"
+          >
+            <div class="list-item-content">
+              <div class="list-item-title">
+                <ion-item lines="none" *ngIf="!appraisal.appraiser">
+                  <ion-icon name="help-circle-outline"></ion-icon>
+                  <ion-label>En attente...</ion-label>
+                </ion-item>
+              </div>
+            </div>
+            <div class="list-item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-calendar.svg"
+                [svgStyle]="{ 'width.px':16 }"
+              ></svg-icon>
+              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (hh:mm)' }}
+            </div>
+          </a>
+        </ion-list>
       </div>
     </div>
     <div class="situation-detail__ask-appraisal" *ngIf="authService.isStudent">

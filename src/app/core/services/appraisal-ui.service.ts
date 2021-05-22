@@ -84,7 +84,13 @@ export class AppraisalUiService {
    * Retrieve an appraisal from its id.
    * Wait for it until is is retrieved
    */
-  public waitForAppraisalId(appraisalId: number): Observable<AppraisalUI> {
+  public waitForAppraisalId(
+    appraisalId: number,
+    forceRefresh?: boolean
+  ): Observable<AppraisalUI> {
+    if (forceRefresh) {
+      this.refreshAppraisals()
+    }
     return this.appraisalEntities$.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
@@ -93,6 +99,12 @@ export class AppraisalUiService {
     )
   }
 
+  /**
+   * Refresh appraisals and feed up the list
+   */
+  public refreshAppraisals(): Observable<any> {
+    return this.appraisalServices.refresh()
+  }
   /**
    * Retrieve appraisals for given evaluation plan and given student id
    * @param evalPlanId
@@ -181,10 +193,19 @@ export class AppraisalUiService {
     evalPlanId: number,
     evalGridId: number,
     studentId: number,
-    appraiserId: number
+    appraiserId: number,
+    comment?: string,
+    context?: string
   ): Observable<number> {
     return this.appraisalServices
-      .createBlankAppraisal(evalPlanId, evalGridId, studentId, appraiserId)
+      .createBlankAppraisal(
+        evalPlanId,
+        evalGridId,
+        studentId,
+        appraiserId,
+        comment,
+        context
+      )
       .pipe(map((newModel) => newModel.id))
   }
 
@@ -297,6 +318,7 @@ export class AppraisalUiService {
     // This means also we recurse through this appraisal to see the grades/comment for each appraisal.
     return zip(
       this.userDataService.getUserProfileInfo(app.studentid),
+      // If the appraiserid is null, then this is because it has not yet been assigned.
       this.userDataService.getUserProfileInfo(app.appraiserid),
       this.evalPlanService.planFromId(app.evalplanid)
     ).pipe(

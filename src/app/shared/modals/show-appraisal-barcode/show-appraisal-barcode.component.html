@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ng-container>
+      <ion-buttons slot="start">
+        <ion-button (click)="dismissModal()">Annuler</ion-button>
+      </ion-buttons>
+    </ng-container>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ng-container>
+    <p class="ion-text-center page-text">
+      Présentez ce QR Code à votre observateur pour qu’il puisse démarrer
+      l’observation
+    </p>
+
+    <div class="modal-show-barcode__qr-code ion-text-center" *ngIf="qrCodeData">
+      <qrcode
+        [qrdata]="qrCodeData"
+        [width]="256"
+        [errorCorrectionLevel]="'M'"
+      ></qrcode>
+    </div>
+  </ng-container>
+</ion-content>
