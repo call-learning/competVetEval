@@ -261,7 +261,7 @@ export class ScheduledSituationService {
 
       if (hasSituation) {
         const assignedStudents = groupAssignment.filter(
-          (ga) => (ga.groupid = eplan.groupid)
+          (ga) => ga.groupid == eplan.groupid
         )
         if (assignedStudents) {
           assignedStudents.forEach((ga) => {
