@@ -89,7 +89,7 @@ export class AppraisalUiService {
     forceRefresh?: boolean
   ): Observable<AppraisalUI> {
     if (forceRefresh) {
-      this.refreshAppraisals()
+      this.refreshAppraisals().subscribe()
     }
     return this.appraisalEntities$.pipe(
       filter((obj) => obj != null),

@@ -79,7 +79,9 @@ export class ModalScanAppraisalComponent implements OnInit {
           this.appraisalUIService
             .waitForAppraisalId(appraisalId, true)
             .pipe(
-              filter((appraisal) => appraisal !== null),
+              filter(
+                (appraisal) => appraisal !== null && appraisal !== undefined
+              ),
               first()
             )
             .subscribe((appraisal: AppraisalUI) => {
