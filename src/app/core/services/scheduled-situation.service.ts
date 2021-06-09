@@ -49,8 +49,6 @@ export class ScheduledSituationService {
     AppraiserSituationStatsModel[]
   >(null)
 
-  subscription: Subscription
-
   constructor(
     private baseDataService: BaseDataService,
     private authService: AuthService,
@@ -62,56 +60,76 @@ export class ScheduledSituationService {
         this.scheduledSituationsEntities$.next(null)
         this.studentSituationStats$.next(null)
         this.appraiserSituationStats$.next(null)
-
-        if (this.subscription) {
-          this.subscription.unsubscribe()
-        }
       } else {
         this.refresh().subscribe()
-        this.subscription = combineLatest([
-          this.appraisalUIService.appraisals$,
-          this.scheduledSituationsEntities$,
-          this.baseDataService.groupAssignment$,
-          this.evalPlanService.plans$,
-        ])
-          .pipe(
-            filter(
-              ([appraisals, allsituations, groupAssignments, evalplan]) =>
-                appraisals != null &&
-                allsituations != null &&
-                loggedUser != null &&
-                evalplan != null
-            ),
-            tap(([appraisals, allsituations, groupAssignments, evalplan]) => {
-              if (
-                this.authService.isStillLoggedIn() &&
-                this.authService.isStudent
-              ) {
-                this.buildStudentStatistics(
-                  allsituations,
-                  appraisals,
-                  loggedUser.userid
-                )
-              }
-            }),
-            tap(([appraisals, allsituations, groupAssignments, evalplan]) => {
-              if (
-                this.authService.isStillLoggedIn() &&
-                this.authService.isAppraiser &&
-                groupAssignments
-              ) {
-                this.buildAppraiserStatistics(
-                  appraisals,
-                  allsituations,
-                  groupAssignments,
-                  evalplan
-                )
-              }
-            })
-          )
-          .subscribe()
       }
     })
+
+    combineLatest([
+      this.authService.loggedUser,
+      this.appraisalUIService.appraisals$,
+      this.scheduledSituationsEntities$,
+      this.baseDataService.groupAssignment$,
+      this.evalPlanService.plans$,
+    ])
+      .pipe(
+        filter(
+          ([
+            loggedUser,
+            appraisals,
+            allsituations,
+            groupAssignments,
+            evalplan,
+          ]) =>
+            appraisals != null &&
+            allsituations != null &&
+            loggedUser != null &&
+            evalplan != null
+        ),
+        tap(
+          ([
+            loggedUser,
+            appraisals,
+            allsituations,
+            groupAssignments,
+            evalplan,
+          ]) => {
+            if (
+              this.authService.isStillLoggedIn() &&
+              this.authService.isStudent
+            ) {
+              this.buildStudentStatistics(
+                allsituations,
+                appraisals,
+                loggedUser.userid
+              )
+            }
+          }
+        ),
+        tap(
+          ([
+            loggedUser,
+            appraisals,
+            allsituations,
+            groupAssignments,
+            evalplan,
+          ]) => {
+            if (
+              this.authService.isStillLoggedIn() &&
+              this.authService.isAppraiser &&
+              groupAssignments
+            ) {
+              this.buildAppraiserStatistics(
+                appraisals,
+                allsituations,
+                groupAssignments,
+                evalplan
+              )
+            }
+          }
+        )
+      )
+      .subscribe()
   }
 
   public get situations$(): Observable<ScheduledSituation[]> {

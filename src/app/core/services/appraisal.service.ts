@@ -10,7 +10,7 @@
 
 import { Injectable } from '@angular/core'
 
-import { combineLatest, from, of, BehaviorSubject, Observable } from 'rxjs'
+import { combineLatest, from, of, BehaviorSubject, Observable, iif } from 'rxjs'
 import { concatMap, filter, first, map, mapTo, tap } from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
@@ -69,15 +69,15 @@ export class AppraisalService {
   /**
    * Retrieve appraisals for currently logged in user
    */
-  public get appraisals$(): BehaviorSubject<AppraisalModel[]> {
-    return this.appraisalModels$
+  public get appraisals$(): Observable<AppraisalModel[]> {
+    return this.appraisalModels$.asObservable()
   }
 
   /**
    * Retrieve appraisals criteria for currently logged in user
    */
-  public get appraisalsCriteria$(): BehaviorSubject<AppraisalCriterionModel[]> {
-    return this.appraisalCriterionModels$
+  public get appraisalsCriteria$(): Observable<AppraisalCriterionModel[]> {
+    return this.appraisalCriterionModels$.asObservable()
   }
 
   /**
@@ -175,20 +175,13 @@ export class AppraisalService {
    * @protected
    */
   public refresh(): Observable<AppraisalCriterionModel[]> {
-    // At login we refresh always.
-    return this.authService.currentUserRole.pipe(
-      filter((roletype) => roletype != null),
-      first(),
-      concatMap((userType) => {
-        if (this.authService.isStudent) {
-          const userid = this.authService.loggedUser.getValue().userid
-          // Retrieve all appraisal marked with my id as studentid.
-          return this.getAppraisalsModelForStudent(userid)
-        } else {
-          // Retrieve all appraisals I am involved in.
-          return this.getAppraisalModelForAppraiser()
-        }
-      }),
+    return iif(
+      () => this.authService.isStudent,
+      this.getAppraisalsModelForStudent(
+        this.authService.loggedUser.getValue().userid
+      ),
+      this.getAppraisalModelForAppraiser()
+    ).pipe(
       concatMap((appraisalModels) => from(appraisalModels)),
       concatMap((appraisal: AppraisalModel) => {
         return this.moodleApiService
@@ -244,7 +237,6 @@ export class AppraisalService {
 
     return this.criteriaService.getCriteriaFromEvalGrid(evalGridId).pipe(
       concatMap((criteria) => {
-        console.log(criteria)
         const appraisalCriteriaModel = criteria.map((criterionmodel) =>
           AppraisalCriterionModel.createFromCriterionModel(criterionmodel)
         )

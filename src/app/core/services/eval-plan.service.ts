@@ -10,7 +10,7 @@
 import { Injectable } from '@angular/core'
 
 import { BehaviorSubject, Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { filter, map } from 'rxjs/operators'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
@@ -53,6 +53,7 @@ export class EvalPlanService {
    */
   public planFromId(evalplanId): Observable<EvalPlanModel> {
     return this.plans$.pipe(
+      filter((res) => !!res),
       map((evalplans) => evalplans.find((plan) => plan.id === evalplanId))
     )
   }

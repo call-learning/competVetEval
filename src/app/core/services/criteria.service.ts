@@ -37,16 +37,18 @@ export class CriteriaService {
    * @param authService
    */
   constructor(private baseDataService: BaseDataService) {
-    this.baseDataService.criteria$.subscribe((newcriteria) => {
-      this.refreshCriteria(newcriteria)
-    })
+    this.baseDataService.criteria$
+      .pipe(filter((res) => !!res))
+      .subscribe((newcriteria) => {
+        this.refreshCriteria(newcriteria)
+      })
   }
 
   /**
    * Get current criteria tree
    */
-  public get criteriaTree$(): BehaviorSubject<CriterionTreeModel[]> {
-    return this.criteriaTreeEntities$
+  public get criteriaTree$(): Observable<CriterionTreeModel[]> {
+    return this.criteriaTreeEntities$.asObservable()
   }
 
   /**
@@ -55,12 +57,10 @@ export class CriteriaService {
    * @param newcriteria
    */
   public refreshCriteria(newcriteria: CriterionModel[]): CriterionTreeModel[] {
-    if (newcriteria) {
-      const allHierarchicalCriteria =
-        CriterionTreeModel.convertToTree(newcriteria)
-      this.criteriaTreeEntities$.next(allHierarchicalCriteria)
-      return allHierarchicalCriteria
-    }
+    const allHierarchicalCriteria =
+      CriterionTreeModel.convertToTree(newcriteria)
+    this.criteriaTreeEntities$.next(allHierarchicalCriteria)
+    return allHierarchicalCriteria
   }
 
   /**

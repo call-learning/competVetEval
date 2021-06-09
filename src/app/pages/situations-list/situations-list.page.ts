@@ -58,7 +58,6 @@ export class SituationsListPage extends BaseComponent implements OnInit {
           .subscribe((situations) => {
             const scheduledSituations = situations
             if (scheduledSituations) {
-              // console.log('Situations: ' + JSON.stringify(scheduledSituations))
               this.situations = scheduledSituations
               this.filterSituations('all')
             }
