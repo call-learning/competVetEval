@@ -1,3 +1,4 @@
+import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
 
 /**
@@ -19,4 +20,12 @@ export class GroupAssignmentModel extends BaseMoodleModel {
   id: number
   studentid: number
   groupid: number
+
+  constructor(input) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'studentid')
+    parseIntMember(input, 'groupid')
+
+    super(input)
+  }
 }

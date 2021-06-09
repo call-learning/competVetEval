@@ -12,8 +12,7 @@
 import { Injectable } from '@angular/core'
 
 import { of, BehaviorSubject, Observable } from 'rxjs'
-import { mergeMap, tap } from 'rxjs/operators'
-import { CevUser } from '../../shared/models/cev-user.model'
+import { tap } from 'rxjs/operators'
 import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'

@@ -1,3 +1,4 @@
+import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
 
 /**
@@ -20,4 +21,12 @@ export class RoleModel extends BaseMoodleModel {
   userid: number
   clsituationid: number
   type: string
+
+  constructor(input) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'userid')
+    parseIntMember(input, 'clsituationid')
+
+    super(input)
+  }
 }

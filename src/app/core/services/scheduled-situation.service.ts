@@ -28,7 +28,6 @@ import { AppraiserSituationStatsModel } from '../../shared/models/ui/appraiser-s
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 import { StudentSituationStatsModel } from '../../shared/models/ui/student-situation-stats.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
-import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AppraisalUiService } from './appraisal-ui.service'
 import { AuthService } from './auth.service'
 import { BaseDataService } from './base-data.service'
@@ -293,7 +292,7 @@ export class ScheduledSituationService {
   }
 
   private buildStudentStatistics(allsituations, appraisals, currentUserId) {
-    let allStudentStats = []
+    const allStudentStats = []
     if (allsituations) {
       allsituations.forEach((situation) => {
         if (situation.evalPlan) {
@@ -337,7 +336,7 @@ export class ScheduledSituationService {
     evalplan
   ) {
     if (allsituations) {
-      let appraiserStats = []
+      const appraiserStats = []
       allsituations.forEach((situation) => {
         const appraisalsRequired = situation.situation.expectedevalsnb
         const existingAppraisalAppraiser = appraisals

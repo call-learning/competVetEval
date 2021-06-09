@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
 
-import { iif, of, zip } from 'rxjs'
+import { zip } from 'rxjs'
 import { filter, first, map } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
@@ -13,8 +13,8 @@ import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { UserDataService } from '../../core/services/user-data.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
-import { CevUser } from '../../shared/models/cev-user.model'
 import { ShowAppraisalBarcodeComponent } from '../../shared/modals/show-appraisal-barcode/show-appraisal-barcode.component'
+import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 
 @Component({

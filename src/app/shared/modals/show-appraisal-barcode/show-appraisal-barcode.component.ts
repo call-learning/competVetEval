@@ -13,13 +13,8 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 import { IonTextarea, ModalController } from '@ionic/angular'
-
-import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
-import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
-import { AuthService } from '../../../core/services/auth.service'
 
 @Component({
   selector: 'app-show-appraisal-barcode',

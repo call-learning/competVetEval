@@ -1,3 +1,4 @@
+import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
 
 /**
@@ -22,4 +23,12 @@ export class SituationModel extends BaseMoodleModel {
   idnumber: string
   expectedevalsnb: number
   evalgridid: number
+
+  constructor(input) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'expectedevalsnb')
+    parseIntMember(input, 'evalgridid')
+
+    super(input)
+  }
 }

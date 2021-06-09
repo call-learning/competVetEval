@@ -9,7 +9,6 @@
  */
 
 import { Injectable } from '@angular/core'
-import { cpuUsage } from 'process'
 
 import { combineLatest, from, of, BehaviorSubject, Observable } from 'rxjs'
 import { concatMap, filter, first, map, mapTo, tap } from 'rxjs/operators'
@@ -21,7 +20,6 @@ import { AuthService } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
-import { UserDataService } from './user-data.service'
 
 @Injectable({
   providedIn: 'root',

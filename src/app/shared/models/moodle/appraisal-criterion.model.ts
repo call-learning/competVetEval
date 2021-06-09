@@ -8,6 +8,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
+import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
 import { CriterionModel } from './criterion.model'
 
@@ -19,6 +20,16 @@ export class AppraisalCriterionModel extends BaseMoodleModel {
   grade: number
   comment: string
   commentformat: number
+
+  constructor(input) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'criterionid')
+    parseIntMember(input, 'appraisalid')
+    parseIntMember(input, 'grade')
+    parseIntMember(input, 'commentformat')
+
+    super(input)
+  }
 
   public static createFromCriterionModel(criterionModel: CriterionModel) {
     return new AppraisalCriterionModel({

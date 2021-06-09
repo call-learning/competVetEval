@@ -9,12 +9,17 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
+import { parseIntMember } from '../../utils/parse-functions'
+
 // This is the replica of the local_cveteval_evalgrid table.
 export class BaseMoodleModel {
   timecreated: number
   timemodified: number
 
   constructor(input) {
+    parseIntMember(input, 'timecreated')
+    parseIntMember(input, 'timemodified')
+
     Object.assign(this, input)
   }
 }

@@ -9,6 +9,7 @@
  * @copyright  2021 SAS CALL Learning
  */
 
+import { parseIntMember } from '../../utils/parse-functions'
 import { CevUser } from '../cev-user.model'
 import { EvalPlanModel } from '../moodle/eval-plan.model'
 import { CriterionForAppraisalTreeModel } from './criterion-for-appraisal-tree.model'
@@ -27,6 +28,29 @@ export class AppraisalUI {
   timeModified: number
 
   constructor(input: any) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'timeModified')
+
     Object.assign(this, input)
+
+    if (this.student) {
+      this.student = new CevUser(this.student)
+    }
+
+    if (this.appraiser) {
+      this.appraiser = new CevUser(this.appraiser)
+    }
+
+    if (this.evalPlan) {
+      this.evalPlan = new EvalPlanModel(this.evalPlan)
+    }
+
+    if (this.criteria) {
+      this.criteria = this.criteria.map((child) => {
+        return new CriterionForAppraisalTreeModel(child)
+      })
+    } else {
+      this.criteria = []
+    }
   }
 }

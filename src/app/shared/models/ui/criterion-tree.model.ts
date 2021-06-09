@@ -15,6 +15,22 @@ export class CriterionTreeModel {
   criterion: CriterionModel // Moodle internal model for criterion.
   subcriteria?: CriterionTreeModel[]
 
+  constructor(props) {
+    Object.assign(this, props)
+
+    if (this.criterion) {
+      this.criterion = new CriterionModel(this.criterion)
+    }
+
+    if (this.subcriteria) {
+      this.subcriteria = this.subcriteria.map((child) => {
+        return new CriterionTreeModel(child)
+      })
+    } else {
+      this.subcriteria = []
+    }
+  }
+
   /**
    * Convert a list of model into a treemodel list
    * @param criteriaModel
@@ -39,9 +55,5 @@ export class CriterionTreeModel {
       allHierarchicalCriteria.push(buildAllChildren(rootc))
     })
     return allHierarchicalCriteria
-  }
-
-  constructor(props) {
-    Object.assign(this, props)
   }
 }
