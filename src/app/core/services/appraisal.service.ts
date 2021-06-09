@@ -104,9 +104,18 @@ export class AppraisalService {
    */
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
     return combineLatest([
-      this.evalPlanService.plans$.pipe(filter((obj) => obj != null)),
-      this.baseDataService.situations$.pipe(filter((obj) => obj != null)),
-      this.baseDataService.roles$.pipe(filter((obj) => obj != null)),
+      this.evalPlanService.plans$.pipe(
+        filter((obj) => obj != null),
+        first()
+      ),
+      this.baseDataService.situations$.pipe(
+        filter((obj) => obj != null),
+        first()
+      ),
+      this.baseDataService.roles$.pipe(
+        filter((obj) => obj != null),
+        first()
+      ),
     ]).pipe(
       concatMap(([evalplans, situations, roles]) => {
         // First check all situations involved.
@@ -160,6 +169,7 @@ export class AppraisalService {
           ?.filter((app) => app.studentid === studentid)
       ) as Observable<AppraisalModel[]>
     ).pipe(
+      first(),
       tap((newAppraisals) => {
         // Merge existing values with new values
         mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
