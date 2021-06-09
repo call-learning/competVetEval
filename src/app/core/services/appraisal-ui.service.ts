@@ -211,9 +211,6 @@ export class AppraisalUiService {
     appraisalModels: AppraisalModel[],
     appraisalCriteriaModels: AppraisalCriterionModel[]
   ): Observable<AppraisalUI[]> {
-    const currentAppraisalEntities = this.appraisalEntities$.getValue()
-    const changed = false
-
     return from(appraisalModels).pipe(
       // Retrieve relevant appraisal models.
       concatMap((appraisalModel: AppraisalModel) => {
@@ -289,17 +286,17 @@ export class AppraisalUiService {
    *
    * @param appraisalId
    */
-  private getRelatedCriteriaAppraisals(
-    appraisalId
-  ): Observable<CriterionForAppraisalTreeModel[]> {
-    return this.appraisalServices
-      .appraisalsCriteriaForAppraisalId(appraisalId)
-      .pipe(
-        map((apprcriteria: AppraisalCriterionModel[]) => {
-          return this.convertAppraisalCriterionModelsToTree(apprcriteria)
-        })
-      )
-  }
+  // private getRelatedCriteriaAppraisals(
+  //   appraisalId
+  // ): Observable<CriterionForAppraisalTreeModel[]> {
+  //   return this.appraisalServices
+  //     .appraisalsCriteriaForAppraisalId(appraisalId)
+  //     .pipe(
+  //       map((apprcriteria: AppraisalCriterionModel[]) => {
+  //         return this.convertAppraisalCriterionModelsToTree(apprcriteria)
+  //       })
+  //     )
+  // }
 
   /**
    * Convert to appraisal model and get subcriteria information

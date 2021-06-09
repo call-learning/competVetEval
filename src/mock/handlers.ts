@@ -10,10 +10,70 @@ import role from './fixtures/role'
 import situations from './fixtures/situations'
 import allUsers from './fixtures/users'
 
+const parseFormDataVariable = (currentObj, key, val) => {
+  const keyValue = [...key.matchAll(/(\w+)(?=\[(\w+)\])*/g)]
+  let currentVariable = currentObj
+  keyValue.forEach((value, index, originalArray) => {
+    // Look ahead to check the variable type.
+    const isNumericIndex =
+      index + 1 < originalArray.length
+        ? !isNaN(originalArray[index + 1][0])
+        : false
+    const currentIndex = isNaN(value[0]) ? value[0] : parseInt(value[0], 10)
+
+    if (!currentVariable[currentIndex]) {
+      currentVariable[currentIndex] = isNumericIndex ? [] : {}
+    }
+    if (index === keyValue.length - 1) {
+      currentVariable[currentIndex] = val
+    }
+    currentVariable = currentVariable[currentIndex]
+  })
+}
+
+const entities = {
+  criterion,
+  clsituation: situations,
+  group_assign: groupassign,
+  group: groups,
+  role,
+  evalplan,
+  cevalgrid,
+  appraisal: appr,
+  appr_crit: apprcrit,
+}
+
+const getEntities = (entitytype, queryJSON) => {
+  let returnedEntities = []
+  if (entities[entitytype]) {
+    returnedEntities = entities[entitytype]
+    if (queryJSON) {
+      const query = JSON.parse(queryJSON)
+      returnedEntities = returnedEntities.filter((e) => {
+        let isMacthing = true
+        for (const property in query) {
+          if (e[property] !== query[property]) {
+            isMacthing = false
+          }
+        }
+        return isMacthing
+      })
+    }
+  }
+  return returnedEntities
+}
+
+const queryEntity = (entityType, req, res, ctx) => {
+  const { query } = req.body as any
+  const returnedEntities = getEntities(entityType, query)
+
+  return res(ctx.json(returnedEntities))
+}
+
 const restServerCallback = {
   core_webservice_get_site_info: (req, res, ctx) => {
     const { wstoken } = req.body as any
-    const foundUser = allUsers.find((u) => u.token == wstoken)
+    const foundUser = allUsers.find((u) => u.token === wstoken)
     if (foundUser) {
       return res(
         ctx.json({
@@ -31,7 +91,7 @@ const restServerCallback = {
   },
   local_cveteval_get_user_type: (req, res, ctx) => {
     const { wstoken } = req.body as any
-    const foundUser = allUsers.find((u) => u.token == wstoken)
+    const foundUser = allUsers.find((u) => u.token === wstoken)
     if (foundUser) {
       return res(
         ctx.json({
@@ -44,7 +104,7 @@ const restServerCallback = {
   },
   local_cveteval_get_user_profile: (req, res, ctx) => {
     const { userid } = req.body as any
-    const foundUser = allUsers.find((u) => u.userid == userid)
+    const foundUser = allUsers.find((u) => u.userid === userid)
     if (foundUser) {
       return res(ctx.json(foundUser))
     } else {
@@ -76,6 +136,7 @@ const restServerCallback = {
     return queryEntity('group_assign', req, res, ctx)
   },
   local_cveteval_get_latest_modifications: (req, res, ctx) => {
+    // @ts-ignore
     const { wstoken, entitytype, query } = req.body as any
     const selectedEntities = getEntities(entitytype, query)
     const latestModificationDate = selectedEntities.reduce(
@@ -142,21 +203,21 @@ const restServerCallback = {
       {}
     ) as any
     const returnedEntities = []
-    appraisalcriteriamodels.forEach((apprcrit) => {
-      if (apprcrit.id) {
+    appraisalcriteriamodels.forEach((apprcritModel) => {
+      if (apprcritModel.id) {
         const previousmodel = entities.appr_crit.find(
-          (app) => (app.id = apprcrit.id)
+          (app) => (app.id = apprcritModel.id)
         )
-        apprcrit.timemodified = Math.ceil(Date.now() / 1000)
-        Object.assign(previousmodel, apprcrit)
+        apprcritModel.timemodified = Math.ceil(Date.now() / 1000)
+        Object.assign(previousmodel, apprcritModel)
       } else {
-        apprcrit.timecreated = Math.ceil(Date.now() / 1000)
-        apprcrit.timemodified = Math.ceil(Date.now() / 1000)
-        apprcrit.usermodified = 1
-        apprcrit.id = entities.appr_crit.length
-        entities.appr_crit.push(apprcrit)
+        apprcritModel.timecreated = Math.ceil(Date.now() / 1000)
+        apprcritModel.timemodified = Math.ceil(Date.now() / 1000)
+        apprcritModel.usermodified = 1
+        apprcritModel.id = entities.appr_crit.length
+        entities.appr_crit.push(apprcritModel)
       }
-      returnedEntities.push(apprcrit)
+      returnedEntities.push(apprcritModel)
     })
     entities.appr_crit.concat(returnedEntities)
     return res(ctx.json([...returnedEntities]))
@@ -191,63 +252,3 @@ export const handlers = [
     }
   ),
 ]
-
-const parseFormDataVariable = (currentObj, key, val) => {
-  const keyValue = [...key.matchAll(/(\w+)(?=\[(\w+)\])*/g)]
-  let currentVariable = currentObj
-  keyValue.forEach((value, index, originalArray) => {
-    // Look ahead to check the variable type.
-    const isNumericIndex =
-      index + 1 < originalArray.length
-        ? !isNaN(originalArray[index + 1][0])
-        : false
-    const currentIndex = isNaN(value[0]) ? value[0] : parseInt(value[0])
-
-    if (!currentVariable[currentIndex]) {
-      currentVariable[currentIndex] = isNumericIndex ? [] : {}
-    }
-    if (index == keyValue.length - 1) {
-      currentVariable[currentIndex] = val
-    }
-    currentVariable = currentVariable[currentIndex]
-  })
-}
-
-const entities = {
-  criterion,
-  clsituation: situations,
-  group_assign: groupassign,
-  group: groups,
-  role,
-  evalplan,
-  cevalgrid,
-  appraisal: appr,
-  appr_crit: apprcrit,
-}
-
-const queryEntity = (entityType, req, res, ctx) => {
-  const { query } = req.body as any
-  const returnedEntities = getEntities(entityType, query)
-
-  return res(ctx.json(returnedEntities))
-}
-
-const getEntities = (entitytype, queryJSON) => {
-  let returnedEntities = []
-  if (entities[entitytype]) {
-    returnedEntities = entities[entitytype]
-    if (queryJSON) {
-      const query = JSON.parse(queryJSON)
-      returnedEntities = returnedEntities.filter((e) => {
-        let isMacthing = true
-        for (const property in query) {
-          if (e[property] != query[property]) {
-            isMacthing = false
-          }
-        }
-        return isMacthing
-      })
-    }
-  }
-  return returnedEntities
-}
