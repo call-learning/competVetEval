@@ -12,7 +12,7 @@
 import { Injectable } from '@angular/core'
 
 import { of, BehaviorSubject, Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { first, tap } from 'rxjs/operators'
 import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
@@ -40,7 +40,7 @@ const EntityClass: any = {
   providedIn: 'root',
 })
 export class BaseDataService {
-  private entities$ = {
+  entities$ = {
     clsituation: new BehaviorSubject<SituationModel[]>(null),
     criterion: new BehaviorSubject<CriterionModel[]>(null),
     cevalgrid: new BehaviorSubject<CriterionEvalgridModel[]>(null),
@@ -75,35 +75,35 @@ export class BaseDataService {
   /**
    * Get current situations
    */
-  public get situations$(): BehaviorSubject<SituationModel[]> {
-    return this.entities$.clsituation
+  public get situations$(): Observable<SituationModel[]> {
+    return this.entities$.clsituation.asObservable()
   }
 
   /**
    * Get current criteria
    */
-  public get criteria$(): BehaviorSubject<CriterionModel[]> {
-    return this.entities$.criterion
+  public get criteria$(): Observable<CriterionModel[]> {
+    return this.entities$.criterion.asObservable()
   }
 
   /**
    * Get current criteria evaluation grid
    */
-  public get criteriaEvalgrid$(): BehaviorSubject<CriterionEvalgridModel[]> {
-    return this.entities$.cevalgrid
+  public get criteriaEvalgrid$(): Observable<CriterionEvalgridModel[]> {
+    return this.entities$.cevalgrid.asObservable()
   }
   /**
    * Get role for current logged in user
    */
-  public get roles$(): BehaviorSubject<RoleModel[]> {
-    return this.entities$.role
+  public get roles$(): Observable<RoleModel[]> {
+    return this.entities$.role.asObservable()
   }
 
   /**
    * Get group assignment model
    */
-  public get groupAssignment$(): BehaviorSubject<GroupAssignmentModel[]> {
-    return this.entities$.group_assign
+  public get groupAssignment$(): Observable<GroupAssignmentModel[]> {
+    return this.entities$.group_assign.asObservable()
   }
 
   /**
@@ -133,7 +133,7 @@ export class BaseDataService {
       }
       return this.doRefreshData(entityType, query)
     } else {
-      return of([])
+      return of(this.entities$[entityType].getValue())
     }
   }
 

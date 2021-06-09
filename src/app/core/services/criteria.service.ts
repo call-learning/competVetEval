@@ -11,7 +11,8 @@
 
 import { Injectable } from '@angular/core'
 
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Observable, of, zip } from 'rxjs'
+import { concatMap, first, map, withLatestFrom } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { BaseDataService } from './base-data.service'
@@ -65,13 +66,21 @@ export class CriteriaService {
    * Get criteria from eval Grid
    * @param evalgridId
    */
-  public getCriteriaFromEvalGrid(evalgridId: number): CriterionModel[] {
-    const allCriteria = this.baseDataService.criteria$.getValue()
-    return this.baseDataService.criteriaEvalgrid$
-      .getValue()
-      .filter((ce) => ce.evalgridid === evalgridId)
-      .map((evalgridcrit) =>
-        allCriteria.find((c) => c.id === evalgridcrit.criterionid)
-      )
+  public getCriteriaFromEvalGrid(
+    evalgridId: number
+  ): Observable<CriterionModel[]> {
+    return zip(
+      this.baseDataService.criteria$,
+      this.baseDataService.criteriaEvalgrid$
+    ).pipe(
+      first(),
+      map(([allCriteria, allCriteraEvalGrid]) => {
+        return allCriteraEvalGrid.map((evalGridCrit) => {
+          return allCriteria.find((criteria) => {
+            return criteria.id === evalGridCrit.id
+          })
+        })
+      })
+    )
   }
 }

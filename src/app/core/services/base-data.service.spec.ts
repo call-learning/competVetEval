@@ -70,7 +70,7 @@ describe('BaseDataService', () => {
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refresh('criterion').toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(service.criteria$.getValue()).toContain(
+      expect(service.entities$.criterion.getValue()).toContain(
         new CriterionModel({
           id: '41',
           label: 'Savoir être',
@@ -95,7 +95,7 @@ describe('BaseDataService', () => {
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refresh('clsituation').toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(service.situations$.getValue()).toContain(
+      expect(service.entities$.clsituation.getValue()).toContain(
         new SituationModel({
           id: '1',
           title: 'Consultations de médecine générale',
@@ -123,7 +123,7 @@ describe('BaseDataService', () => {
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refresh('role').toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(service.roles$.getValue()).not.toContain(
+      expect(service.entities$.role.getValue()).not.toContain(
         new RoleModel({
           id: '1',
           userid: '5',
@@ -137,7 +137,7 @@ describe('BaseDataService', () => {
       authService.logout() // We login first using the Mocked Auth service.
       await authService.login('appraiser1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refresh('role').toPromise()
-      expect(service.roles$.getValue()).toContain(
+      expect(service.entities$.role.getValue()).toContain(
         new RoleModel({
           id: '1',
           userid: '5',
@@ -162,7 +162,7 @@ describe('BaseDataService', () => {
       await service.refresh('role').toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
       // We should have retrieved information for this user only.
-      expect(service.groupAssignment$.getValue()).not.toContain(
+      expect(service.entities$.group_assign.getValue()).not.toContain(
         new GroupAssignmentModel({
           id: '6',
           studentid: '2',
@@ -172,7 +172,7 @@ describe('BaseDataService', () => {
           timemodified: '1619376441',
         })
       )
-      expect(service.groupAssignment$.getValue()).toContain(
+      expect(service.entities$.group_assign.getValue()).toContain(
         new GroupAssignmentModel({
           id: '5',
           studentid: '1',
@@ -196,7 +196,7 @@ describe('BaseDataService', () => {
       // await service.groupAssignment.toPromise()
       await service.situations$.toPromise()
       await service.groupAssignment$.toPromise()
-      expect(service.groupAssignment$.getValue()).toContain(
+      expect(service.entities$.group_assign.getValue()).toContain(
         new GroupAssignmentModel({
           id: '5',
           studentid: '1',
@@ -206,7 +206,7 @@ describe('BaseDataService', () => {
           timemodified: '1619376441',
         })
       )
-      expect(service.situations$.getValue()).toContain(
+      expect(service.entities$.clsituation.getValue()).toContain(
         new SituationModel({
           id: '1',
           title: 'Consultations de médecine générale',

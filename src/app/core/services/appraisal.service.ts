@@ -241,33 +241,37 @@ export class AppraisalService {
       comment,
       context
     )
-    const appraisalCriteriaModel = this.criteriaService
-      .getCriteriaFromEvalGrid(evalGridId)
-      .map((criterionmodel) =>
-        AppraisalCriterionModel.createFromCriterionModel(criterionmodel)
-      )
 
-    // Submit the appraisal, get the ID and then submit the criteria.
-    const newAppraisalModel = this.submitAppraisal(appraisalModel)
-    // Then create the appraisal criterion
-    return newAppraisalModel.pipe(
-      concatMap((resAppraisalModel) => {
-        appraisalCriteriaModel.forEach(
-          (apc) => (apc.appraisalid = resAppraisalModel.id)
+    return this.criteriaService.getCriteriaFromEvalGrid(evalGridId).pipe(
+      concatMap((criteria) => {
+        console.log(criteria)
+        const appraisalCriteriaModel = criteria.map((criterionmodel) =>
+          AppraisalCriterionModel.createFromCriterionModel(criterionmodel)
         )
-        return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
-          mapTo(resAppraisalModel),
-          tap((newAppraisal) => {
-            mergeExistingBehaviourSubject(
-              this.appraisalModels$,
-              [newAppraisal],
-              ['id']
+
+        // Submit the appraisal, get the ID and then submit the criteria.
+        const newAppraisalModel = this.submitAppraisal(appraisalModel)
+        // Then create the appraisal criterion
+        return newAppraisalModel.pipe(
+          concatMap((resAppraisalModel) => {
+            appraisalCriteriaModel.forEach(
+              (apc) => (apc.appraisalid = appraisalModel.id)
+            )
+            return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
+              mapTo(appraisalModel),
+              tap((newAppraisal) => {
+                mergeExistingBehaviourSubject(
+                  this.appraisalModels$,
+                  [newAppraisal],
+                  ['id']
+                )
+              })
             )
           })
         )
+        // See: https://medium.com/@snorredanielsen/rxjs-accessing-a-previous-value-further-down-the-pipe-chain-b881026701c1
       })
     )
-    // See: https://medium.com/@snorredanielsen/rxjs-accessing-a-previous-value-further-down-the-pipe-chain-b881026701c1
   }
 
   /**
