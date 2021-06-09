@@ -1,3 +1,4 @@
+import { filter } from 'rxjs/operators'
 /**
  * Criteria based services
  *
@@ -70,16 +71,18 @@ export class CriteriaService {
     evalgridId: number
   ): Observable<CriterionModel[]> {
     return zip(
-      this.baseDataService.criteria$,
-      this.baseDataService.criteriaEvalgrid$
+      this.baseDataService.criteria$.pipe(filter((res) => !!res)),
+      this.baseDataService.criteriaEvalgrid$.pipe(filter((res) => !!res))
     ).pipe(
       first(),
-      map(([allCriteria, allCriteraEvalGrid]) => {
-        return allCriteraEvalGrid.map((evalGridCrit) => {
-          return allCriteria.find((criteria) => {
-            return criteria.id === evalGridCrit.id
+      map(([allCriteria, allCriteriaEvalGrid]) => {
+        return allCriteriaEvalGrid
+          .filter((evalGridCrit) => evalGridCrit.evalgridid === evalgridId)
+          .map((evalGridCrit) => {
+            return allCriteria.find((criteria) => {
+              return criteria.id === evalGridCrit.id
+            })
           })
-        })
       })
     )
   }
