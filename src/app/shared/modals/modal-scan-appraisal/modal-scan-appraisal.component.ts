@@ -70,7 +70,7 @@ export class ModalScanAppraisalComponent implements OnInit {
             toast.present()
           })
         this.dismissModal()
-        const appraisalId = Number.parseInt(barcodeData.text)
+        const appraisalId = Number.parseInt(barcodeData.text, 10)
 
         this.loadingController.create().then((res) => {
           this.loader = res

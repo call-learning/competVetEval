@@ -55,8 +55,8 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       this.loader.present().then(() =>
         this.scheduledSituationsService.situations$
           .pipe(takeUntil(this.alive$))
-          .subscribe((res) => {
-            const scheduledSituations = res
+          .subscribe((situations) => {
+            const scheduledSituations = situations
             if (scheduledSituations) {
               // console.log('Situations: ' + JSON.stringify(scheduledSituations))
               this.situations = scheduledSituations

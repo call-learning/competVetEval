@@ -53,7 +53,7 @@ export class EvalPlanService {
    */
   public planFromId(evalplanId): Observable<EvalPlanModel> {
     return this.plans$.pipe(
-      map((evalplans) => evalplans.find((plan) => plan.id == evalplanId))
+      map((evalplans) => evalplans.find((plan) => plan.id === evalplanId))
     )
   }
 

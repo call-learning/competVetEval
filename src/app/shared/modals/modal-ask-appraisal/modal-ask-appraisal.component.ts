@@ -71,7 +71,7 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
     this.errorMsg = ''
     this.formSubmitted = true
 
-    if (this.askAppraisalForm.valid && this.step != 'qr-code') {
+    if (this.askAppraisalForm.valid && this.step !== 'qr-code') {
       this.appraisalService
         .createBlankAppraisal(
           this.scheduledSituation.evalPlanId,

@@ -81,8 +81,8 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
               (situations) => {
                 this.scheduledSituation = situations.find(
                   (sit) =>
-                    sit.evalPlanId == this.appraisal.evalPlan.id &&
-                    sit.studentId == this.appraisal.student.userid
+                    sit.evalPlanId === this.appraisal.evalPlan.id &&
+                    sit.studentId === this.appraisal.student.userid
                 )
               }
             )

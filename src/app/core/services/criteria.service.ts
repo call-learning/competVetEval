@@ -69,9 +69,9 @@ export class CriteriaService {
     const allCriteria = this.baseDataService.criteria$.getValue()
     return this.baseDataService.criteriaEvalgrid$
       .getValue()
-      .filter((ce) => ce.evalgridid == evalgridId)
+      .filter((ce) => ce.evalgridid === evalgridId)
       .map((evalgridcrit) =>
-        allCriteria.find((c) => c.id == evalgridcrit.criterionid)
+        allCriteria.find((c) => c.id === evalgridcrit.criterionid)
       )
   }
 }

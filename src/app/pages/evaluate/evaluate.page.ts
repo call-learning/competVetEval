@@ -83,8 +83,8 @@ export class EvaluatePage extends BaseComponent implements OnInit {
           // due to Object assign.
           this.scheduledSituation = situations.find(
             (sit) =>
-              sit.evalPlanId == this.evalPlanId &&
-              (this.studentId == null || this.studentId == sit.studentId)
+              sit.evalPlanId === this.evalPlanId &&
+              (this.studentId == null || this.studentId === sit.studentId)
           )
           this.appraisalUIService
             .createBlankAppraisal(

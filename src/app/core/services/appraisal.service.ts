@@ -92,7 +92,7 @@ export class AppraisalService {
     return this.appraisalCriterionModels$.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
-        appraisals.filter((apc) => apc.appraisalid == appraisalId)
+        appraisals.filter((apc) => apc.appraisalid === appraisalId)
       )
     )
   }
@@ -111,13 +111,13 @@ export class AppraisalService {
       concatMap(([evalplans, situations, roles]) => {
         // First check all situations involved.
         const mySituations = situations.filter((sit) => {
-          return roles.find((r) => r.clsituationid == sit.id) !== undefined
+          return roles.find((r) => r.clsituationid === sit.id) !== undefined
         })
         // Filter all eval plan depending on the current appraiser.
         return from(
           evalplans.filter((evalplan) => {
             return (
-              mySituations.find((s) => s.id == evalplan.clsituationid) !==
+              mySituations.find((s) => s.id === evalplan.clsituationid) !==
               undefined
             )
           })
@@ -130,7 +130,7 @@ export class AppraisalService {
           { evalplanid: evalPlan.id },
           this.appraisalModels$
             .getValue()
-            ?.filter((app) => app.evalplanid == evalPlan.id)
+            ?.filter((app) => app.evalplanid === evalPlan.id)
         )
       ),
       tap((newAppraisals: AppraisalModel[]) => {
@@ -157,7 +157,7 @@ export class AppraisalService {
         { studentid },
         this.appraisalModels$
           .getValue()
-          ?.filter((app) => app.studentid == studentid)
+          ?.filter((app) => app.studentid === studentid)
       ) as Observable<AppraisalModel[]>
     ).pipe(
       tap((newAppraisals) => {
@@ -197,7 +197,7 @@ export class AppraisalService {
             { appraisalid: appraisal.id },
             this.appraisalCriterionModels$
               .getValue()
-              ?.filter((appc) => appc.appraisalid == appraisal.id)
+              ?.filter((appc) => appc.appraisalid === appraisal.id)
           )
           .pipe(
             map((appraisalCriteriaModels) =>
@@ -251,12 +251,12 @@ export class AppraisalService {
     const newAppraisalModel = this.submitAppraisal(appraisalModel)
     // Then create the appraisal criterion
     return newAppraisalModel.pipe(
-      concatMap((appraisalModel) => {
+      concatMap((resAppraisalModel) => {
         appraisalCriteriaModel.forEach(
-          (apc) => (apc.appraisalid = appraisalModel.id)
+          (apc) => (apc.appraisalid = resAppraisalModel.id)
         )
         return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
-          mapTo(appraisalModel),
+          mapTo(resAppraisalModel),
           tap((newAppraisal) => {
             mergeExistingBehaviourSubject(
               this.appraisalModels$,

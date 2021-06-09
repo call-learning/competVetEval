@@ -132,7 +132,7 @@ export class ScheduledSituationService {
     return this.studentSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id == evalPlanId)
+      filter((stat) => stat.id === evalPlanId)
     )
   }
 
@@ -152,7 +152,7 @@ export class ScheduledSituationService {
     return this.appraiserSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id == evalPlanId && stat.studentId == studentId)
+      filter((stat) => stat.id === evalPlanId && stat.studentId === studentId)
     )
   }
 
@@ -219,7 +219,7 @@ export class ScheduledSituationService {
     const scheduledSituations = []
     evalPlans.forEach((eplan: EvalPlanModel) => {
       const evalPlanInGroup = groupAssignments.find(
-        (ga) => ga.groupid == eplan.groupid
+        (ga) => ga.groupid === eplan.groupid
       )
       if (evalPlanInGroup) {
         const scheduledSituation = this.buildScheduledSituation(
@@ -254,13 +254,13 @@ export class ScheduledSituationService {
 
       const hasSituation = roles.find(
         (r) =>
-          r.userid == userid &&
-          r.clsituationid == scheduledSituation.situation.id
+          r.userid === userid &&
+          r.clsituationid === scheduledSituation.situation.id
       )
 
       if (hasSituation) {
         const assignedStudents = groupAssignment.filter(
-          (ga) => ga.groupid == eplan.groupid
+          (ga) => ga.groupid === eplan.groupid
         )
         if (assignedStudents) {
           assignedStudents.forEach((ga) => {
@@ -282,12 +282,12 @@ export class ScheduledSituationService {
     situations: SituationModel[]
   ): ScheduledSituation {
     const currentSituation = situations.find(
-      (s) => s.id == evalPlan.clsituationid
+      (s) => s.id === evalPlan.clsituationid
     )
     return new ScheduledSituation({
       evalPlanId: evalPlan.id,
       situation: currentSituation,
-      evalPlan: evalPlan,
+      evalPlan,
     })
   }
 
@@ -301,8 +301,8 @@ export class ScheduledSituationService {
             ? appraisals.filter(
                 (appraisal) =>
                   appraisal.evalPlan &&
-                  appraisal.student.userid == currentUserId &&
-                  appraisal.evalPlan.id == situation.evalPlanId &&
+                  appraisal.student.userid === currentUserId &&
+                  appraisal.evalPlan.id === situation.evalPlanId &&
                   appraisal.appraiser // Make sure we only count appraisal assigned to an appraiser
               ).length
             : 0
@@ -310,7 +310,7 @@ export class ScheduledSituationService {
           const studentStats = new StudentSituationStatsModel({
             id: situation.evalPlanId,
             appraisalsCompleted: nbAppraisalStudent,
-            appraisalsRequired: appraisalsRequired,
+            appraisalsRequired,
             status:
               nbAppraisalStudent >= appraisalsRequired
                 ? 'done'
@@ -342,13 +342,13 @@ export class ScheduledSituationService {
         const existingAppraisalAppraiser = appraisals
           ? appraisals.filter(
               (appraisal) =>
-                appraisal.evalPlan.id == situation.evalPlanId &&
+                appraisal.evalPlan.id === situation.evalPlanId &&
                 appraisal.appraiser // Make sure we only count appraisal assigned to an appraiser
             )
           : []
         // Now fetch all students involved
         const nbAppraisalAppraiserStudent = existingAppraisalAppraiser.filter(
-          (appraisal) => situation.studentId == appraisal.student.userid
+          (appraisal) => situation.studentId === appraisal.student.userid
         ).length
         appraiserStats.push(
           new AppraiserSituationStatsModel({

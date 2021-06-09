@@ -82,8 +82,8 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
             if (situations) {
               this.scheduledSituation = situations.find(
                 (s) =>
-                  s.evalPlanId == this.evalPlanId &&
-                  (this.studentId == null || this.studentId == s.studentId)
+                  s.evalPlanId === this.evalPlanId &&
+                  (this.studentId == null || this.studentId === s.studentId)
               )
               if (userProfile) {
                 this.studentInfo = userProfile
@@ -135,7 +135,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         .create({
           component: ShowAppraisalBarcodeComponent,
           componentProps: {
-            appraisalId: appraisalId,
+            appraisalId,
           },
         })
         .then((modal) => {

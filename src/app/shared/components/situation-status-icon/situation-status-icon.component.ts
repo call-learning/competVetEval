@@ -18,8 +18,6 @@ import { ScheduledSituationService } from '../../../core/services/scheduled-situ
 })
 export class SituationStatusIconComponent {
   @Input() status: string
-  constructor(
-    private scheduledSituationService: ScheduledSituationService,
-    private authService: AuthService
-  ) {}
+
+  constructor() {}
 }

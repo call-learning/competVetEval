@@ -53,7 +53,7 @@ export class UserDataService {
    */
   public getUserProfileInfo(userid: number): Observable<CevUser> {
     const existingProfile = this.userProfiles.find(
-      (user) => user.userid == userid
+      (user) => user.userid === userid
     )
     if (!userid) {
       return of(null)

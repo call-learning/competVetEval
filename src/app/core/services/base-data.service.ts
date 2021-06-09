@@ -60,14 +60,14 @@ export class BaseDataService {
   ) {
     this.authService.loggedUser.subscribe((cveUser) => {
       if (cveUser) {
-        for (const entityName in this.entities$) {
+        Object.keys(this.entities$).forEach((entityName) => {
           this.refresh(entityName).subscribe()
           // Subscribe for the whole service lifetime
-        }
+        })
       } else {
-        for (const entityName in this.entities$) {
+        Object.keys(this.entities$).forEach((entityName) => {
           this.entities$[entityName].next(null)
-        }
+        })
       }
     })
   }
@@ -115,7 +115,7 @@ export class BaseDataService {
   public getEntityById(entityType, id): BaseMoodleModel | null {
     const entities = this.entities$[entityType].getValue()
     if (entities) {
-      return entities.find((entity) => entity.id == id)
+      return entities.find((entity) => entity.id === id)
     }
     return null
   }
@@ -128,7 +128,7 @@ export class BaseDataService {
   public refresh(entityType: string): Observable<BaseMoodleModel[]> {
     if (this.authService.isStillLoggedIn()) {
       let query = {}
-      if (entityType == 'role') {
+      if (entityType === 'role') {
         query = { userid: this.authService.loggedUser.getValue().userid }
       }
       return this.doRefreshData(entityType, query)

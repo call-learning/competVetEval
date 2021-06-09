@@ -69,7 +69,7 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
           this.scheduledSituationService.situations$.subscribe((situations) => {
             if (situations) {
               this.scheduledSituation = situations.find(
-                (sit) => sit.evalPlanId == this.appraisal.evalPlan.id
+                (sit) => sit.evalPlanId === this.appraisal.evalPlan.id
               )
             }
           })

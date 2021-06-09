@@ -19,7 +19,7 @@ import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
 })
 export class ModalSituationChartComponent implements OnInit {
   @Input() appraisals: AppraisalUI[]
-  @Input() labels: String[]
+  @Input() labels: string[]
 
   constructor(private modalController: ModalController) {}
 

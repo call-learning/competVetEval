@@ -39,11 +39,11 @@ export class CriterionTreeModel {
     criteriaModel: CriterionModel[]
   ): CriterionTreeModel[] {
     const rootCriteria = criteriaModel.filter(
-      (criterion) => criterion.parentid == 0
+      (criterion) => criterion.parentid === 0
     )
     const buildAllChildren = (parentCriteria) => {
       const allSubcriteria = criteriaModel.filter(
-        (criterion) => criterion.parentid == parentCriteria.id
+        (criterion) => criterion.parentid === parentCriteria.id
       )
       return new CriterionTreeModel({
         criterion: parentCriteria,

@@ -92,7 +92,7 @@ export class AppraisalUiService {
     return this.appraisalEntities$.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
-        appraisals.find((appraisal) => appraisal.id == appraisalId)
+        appraisals.find((appraisal) => appraisal.id === appraisalId)
       )
     )
   }
@@ -118,8 +118,8 @@ export class AppraisalUiService {
         appraisals
           .filter(
             (appraisal: AppraisalUI) =>
-              appraisal.evalPlan.id == evalPlanId &&
-              (studentId == null || appraisal.student.userid == studentId)
+              appraisal.evalPlan.id === evalPlanId &&
+              (studentId == null || appraisal.student.userid === studentId)
           )
           .sort((app1, app2) => app2.timeModified - app1.timeModified)
       )
@@ -164,18 +164,18 @@ export class AppraisalUiService {
 
     // Submit the appraisal, get the ID and then submit the criteria.
     return this.appraisalServices.submitAppraisal(appraisalModel).pipe(
-      tap((appraisalModel) => {
+      tap((resAppraisalModel) => {
         // Make sure we setup the appraisal id.
         const allcriteria = flatternAppraisalCriteria(appraisal.criteria)
         allcriteria.forEach(
           (appraisalCriteria) =>
-            (appraisalCriteria.appraisalid = appraisalModel.id)
+            (appraisalCriteria.appraisalid = resAppraisalModel.id)
         )
 
         this.appraisalServices.submitAppraisalCriteria(allcriteria).subscribe()
-        return appraisalModel
+        return resAppraisalModel
       }),
-      map((appraisalModel) => appraisalModel.id)
+      map((resAppraisalModel) => resAppraisalModel.id)
     )
   }
 
@@ -224,7 +224,7 @@ export class AppraisalUiService {
             this.appraisalEntities$
               .getValue()
               .findIndex(
-                (appr) => appr.timeModified == appraisalModel.timemodified
+                (appr) => appr.timeModified === appraisalModel.timemodified
               ) !== -1
         }
         if (appraisalExistSameTime) {
@@ -234,7 +234,7 @@ export class AppraisalUiService {
           const appraisalCriteriaUI =
             this.convertAppraisalCriterionModelsToTree(
               appraisalCriteriaModels.filter(
-                (apc) => apc.appraisalid == appraisalModel.id
+                (apc) => apc.appraisalid === appraisalModel.id
               )
             )
           return this.convertAppraisalModel(appraisalModel, appraisalCriteriaUI)
@@ -263,7 +263,7 @@ export class AppraisalUiService {
   ): CriterionForAppraisalTreeModel[] {
     const recurseThroughCriteriaTree = (criterionmodel: CriterionTreeModel) => {
       const currentAppraisalCriteria = apprcriteria.find(
-        (c) => c.criterionid == criterionmodel.criterion.id
+        (c) => c.criterionid === criterionmodel.criterion.id
       )
       if (currentAppraisalCriteria) {
         return CriterionForAppraisalTreeModel.fromAppraisalCriterionModel(

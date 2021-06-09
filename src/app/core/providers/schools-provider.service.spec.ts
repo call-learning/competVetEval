@@ -9,14 +9,9 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Component } from '@angular/core'
 import { inject } from '@angular/core/testing'
 
 import { SchoolsProviderService } from './schools-provider.service'
-
-// Dummy component for routes.
-@Component({ template: '' })
-class TestComponent {}
 
 describe('SchoolsProviderService', () => {
   it('There should be no school selected at first', inject(
