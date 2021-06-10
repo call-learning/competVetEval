@@ -12,12 +12,11 @@ export const environment: IEnvironment = {
       moodleUrl: 'http://competveteval.local/',
     },
     {
-      id: 'vet-agro-sup',
-      name: 'VetAgro Sup',
-      logo: 'assets/images/schools/logo-vetagro.png',
-      // Test site
-      moodleUrl: 'https://vetagro-sup.call-learning.io/',
-      // moodleUrl: 'https://vetagrotice.vetagro-sup.fr/',
+      id: 'ENVT  Test',
+      name: 'ENVT Test',
+      logo: 'assets/images/schools/logo-envt.png',
+      // Test site for CAS
+      moodleUrl: 'https://moodle-tdtp.envt.fr/',
     },
   ],
   encryptSalt: 'iirrogzrtgeqeybhr7k98imwfcs52g',

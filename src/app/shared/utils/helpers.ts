@@ -13,6 +13,7 @@
  * @protected
  */
 import { BehaviorSubject } from 'rxjs'
+import { Md5 } from 'ts-md5'
 
 /**
  * Merge new array with existing and send a next signal
@@ -51,4 +52,29 @@ export const mergeExistingBehaviourSubject = (
 
     behaviourSubject.next(nextValues)
   }
+}
+
+export const getTokenFromLaunchURL = (launchURL, siteURL) => {
+  if (launchURL) {
+    const params = launchURL.split('://')
+
+    if (params) {
+      console.log('Token Params:' + params + ', Site URL:' + siteURL)
+      const searchParams = new URLSearchParams(params[1])
+      const tokenvalueb64 = searchParams.get('token')
+      const tokenvalue = atob(tokenvalueb64)
+
+      const tokenparts = tokenvalue.split(':::')
+      // No trailing space.
+      const hashedSiteURL = <string>(
+        Md5.hashAsciiStr(siteURL.replace(/^(.+?)\/*?$/, '$1'))
+      )
+      if (tokenparts[0] != hashedSiteURL) {
+        throw new Error("Le site d'origine ne correspond pas" + tokenparts[0])
+      }
+      console.log('User Token:' + tokenparts[1])
+      return tokenparts[1]
+    }
+  }
+  return null
 }

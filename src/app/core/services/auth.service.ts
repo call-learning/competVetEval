@@ -20,6 +20,7 @@ import { CevUser } from '../../shared/models/cev-user.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { HttpAuthService } from '../http-services/http-auth.service'
 import { SchoolsProviderService } from '../providers/schools-provider.service'
+import { IdpModel } from '../../shared/models/idp.model'
 
 export const LOGIN_STATE = {
   ATTEMPT_TO_RECOVER: 'ATTEMPT_TO_RECOVER',
@@ -36,6 +37,8 @@ export class AuthService {
   loginState = new BehaviorSubject<string>(LOGIN_STATE.ATTEMPT_TO_RECOVER)
   accessToken: string
   currentUserRole = new BehaviorSubject<'student' | 'appraiser'>(null)
+
+  idpList = new BehaviorSubject<IdpModel[]>(null)
 
   constructor(
     private router: Router,
@@ -55,13 +58,23 @@ export class AuthService {
           throw new Error(res.errorcode)
         }
       }),
-      tap((res) => {
-        this.setSession(res)
+      tap((res: LoginResult) => {
+        this.setSession(res.token)
       }),
       concatMap(() => {
         return this.loadUserProfile()
       }),
       tap(() => {
+        this.loginState.next(LOGIN_STATE.LOGGED)
+      })
+    )
+  }
+
+  loginWithToken(tokenString) {
+    this.setSession(tokenString)
+    return this.loadUserProfile().pipe(
+      tap(() => {
+        console.log('User logged in with Token')
         this.loginState.next(LOGIN_STATE.LOGGED)
       })
     )
@@ -82,6 +95,9 @@ export class AuthService {
   setChosenSchool(school: School) {
     if (school) {
       this.schoolsProviderService.setSelectedSchoolId(school.id)
+      this.httpAuthService
+        .getIdps()
+        .subscribe((newlist) => this.idpList.next(newlist))
     } else {
       this.schoolsProviderService.setSelectedSchoolId(null)
     }
@@ -99,8 +115,12 @@ export class AuthService {
         this.loginState.next(LOGIN_STATE.IDLE)
         return of(true)
       }
+      if (this.schoolsProviderService.getSelectedSchoolId()) {
+        this.httpAuthService
+          .getIdps()
+          .subscribe((newlist) => this.idpList.next(newlist))
+      }
     }
-
     if (this.variablesInSessionExists()) {
       return this.recoverStorageVariables().pipe(
         tap((res) => {
@@ -117,8 +137,8 @@ export class AuthService {
     }
   }
 
-  private setSession(loginResult: LoginResult) {
-    this.accessToken = loginResult.token
+  setSession(token: string) {
+    this.accessToken = token
     localStorage.setItem(LocaleKeys.tokenId, this.accessToken)
   }
 
@@ -184,6 +204,10 @@ export class AuthService {
   }
 
   get isAppraiser() {
-    return this.currentUserRole.getValue() === 'appraiser'
+    return this.currentUserRole.getValue() !== 'student'
+  }
+
+  getIdpList(): Observable<IdpModel[]> {
+    return this.idpList.asObservable()
   }
 }

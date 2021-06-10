@@ -12,6 +12,10 @@ import { throwError, Observable } from 'rxjs'
 import { catchError } from 'rxjs/operators'
 
 export class MoodleApiUtils {
+  static getServiceName(): string {
+    return 'cveteval_app_service'
+  }
+
   static apiCall(
     functionName: string,
     args: any,
@@ -50,7 +54,8 @@ export class MoodleApiUtils {
       for (const prop in value) {
         if (typeof value[prop] !== 'undefined') {
           const propName = argumentName ? `${argumentName}[${prop}]` : prop
-          MoodleApiUtils.convertArguments(formData, propName, value[prop])
+          const escapedQuoteValue = encodeURIComponent(value[prop])
+          MoodleApiUtils.convertArguments(formData, propName, escapedQuoteValue)
         }
       }
     } else {

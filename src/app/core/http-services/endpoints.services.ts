@@ -24,6 +24,10 @@ export class EndpointsServices {
   }
 
   login() {
-    return `${this.schoolsProviderService.getSelectedSchoolUrl()}/login/token.php`
+    return `${this.schoolsProviderService.getSelectedSchoolUrl()}/local/cveteval/login/token.php`
+  }
+
+  ajaxNoLogin() {
+    return `${this.schoolsProviderService.getSelectedSchoolUrl()}/local/cveteval/login/service-nologin.php`
   }
 }

@@ -1,7 +1,7 @@
 /**
- * Login result model
+ * Idp
  *
- * Internal model for login token exchange
+ * Internal model for Idp
  *
  * @author Marjory Gaillot <marjory.gaillot@gmail.com>
  * @author Laurent David <laurent@call-learning.fr>
@@ -9,9 +9,10 @@
  * @copyright  2021 SAS CALL Learning
  */
 
-export class LoginResult {
-  token?: string
-  errorcode?: string
+export class IdpModel {
+  url: string
+  name: string
+  iconurl?: string
 
   constructor(input) {
     Object.assign(this, input)

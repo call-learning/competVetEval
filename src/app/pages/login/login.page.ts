@@ -29,6 +29,8 @@ export class LoginPage implements OnInit {
   loader: HTMLIonLoadingElement
   isLoading = false
 
+  idpList = []
+
   formSubmitted = false
 
   constructor(
@@ -48,6 +50,9 @@ export class LoginPage implements OnInit {
     this.loadingController.create().then((res) => {
       this.loader = res
     })
+    this.authService
+      .getIdpList()
+      .subscribe((idplist) => (this.idpList = idplist))
   }
 
   ionViewDidEnter() {
@@ -122,6 +127,13 @@ export class LoginPage implements OnInit {
   goToSchoolChoice() {
     this.authService.setChosenSchool(null)
     this.router.navigate(['/school-choice'])
+  }
+
+ launchIdp(idpURL) {
+    window.open(idpURL, '_system')
+    if ((<any>navigator).app) {
+      ;(<any>navigator).app.exitApp()
+    }
   }
 
   saveLoginForm() {
