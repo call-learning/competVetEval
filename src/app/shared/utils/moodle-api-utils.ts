@@ -54,12 +54,13 @@ export class MoodleApiUtils {
       for (const prop in value) {
         if (typeof value[prop] !== 'undefined') {
           const propName = argumentName ? `${argumentName}[${prop}]` : prop
-          const escapedQuoteValue = encodeURIComponent(value[prop])
-          MoodleApiUtils.convertArguments(formData, propName, escapedQuoteValue)
+          const propValue = value[prop]
+          MoodleApiUtils.convertArguments(formData, propName, propValue)
         }
       }
     } else {
-      formData.append(argumentName, value)
+      const encodedValue = encodeURIComponent(value)
+      formData.append(argumentName, encodedValue)
     }
   }
 }

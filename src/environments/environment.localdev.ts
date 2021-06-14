@@ -18,6 +18,13 @@ export const environment: IEnvironment = {
       // Test site for CAS
       moodleUrl: 'https://moodle-tdtp.envt.fr/',
     },
+    {
+      id: 'vet-agro-sup',
+      name: 'VetAgro Sup',
+      logo: 'assets/images/schools/logo-vetagro.png',
+      // Test site
+      moodleUrl: 'https://vetagro-sup.call-learning.io/',
+    },
   ],
   encryptSalt: 'iirrogzrtgeqeybhr7k98imwfcs52g',
 }
