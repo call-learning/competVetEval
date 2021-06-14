@@ -70,11 +70,12 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         this.appraisals = appraisals
         this.appraisalsloaded = true
       })
+
     this.loadingController.create().then((res) => {
       this.loader = res
       this.loader.present()
       zip(
-        this.situationService.situations$,
+        this.situationService.situations$.pipe(filter((sit) => !!sit)),
         this.userDataService.getUserProfileInfo(this.studentId)
       )
         .pipe(
@@ -102,6 +103,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
     const criteriaLabels = this.appraisals
       ? this.appraisals[0].criteria.map((c) => c.label)
       : []
+
     this.modalController
       .create({
         component: ModalSituationChartComponent,

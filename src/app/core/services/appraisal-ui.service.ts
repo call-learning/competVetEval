@@ -18,6 +18,7 @@ import {
   filter,
   first,
   map,
+  skip,
   tap,
   toArray,
 } from 'rxjs/operators'
@@ -49,13 +50,17 @@ export class AppraisalUiService {
     combineLatest([
       this.authService.loggedUser,
       this.appraisalServices.appraisals$.pipe(filter((res) => !!res)),
-      this.appraisalServices.appraisalsCriteria$.pipe(filter((res) => !!res)),
+      this.appraisalServices.appraisalsCriteria$,
     ])
       .pipe(
         tap(([cveUser, appraisalModels, appraisalCriteria]) => {
+          console.log(appraisalModels, appraisalCriteria)
           if (!cveUser) {
             this.appraisalEntities$.next(null)
           } else {
+            if (appraisalCriteria === null) {
+              appraisalCriteria = []
+            }
             this.lazyConvertAppraisalModelToUI(
               appraisalModels,
               appraisalCriteria
@@ -223,7 +228,6 @@ export class AppraisalUiService {
           return of(null)
         } else {
           // Then we convert.
-
           return this.convertAppraisalCriterionModelsToTree(
             appraisalCriteriaModels.filter(
               (apc) => apc.appraisalid === appraisalModel.id
