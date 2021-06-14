@@ -10,7 +10,6 @@
 import { Component, Input, OnInit } from '@angular/core'
 
 import { first } from 'rxjs/operators'
-import { AuthService } from '../../../core/services/auth.service'
 import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
 import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
 import { StudentSituationStatsModel } from '../../models/ui/student-situation-stats.model'

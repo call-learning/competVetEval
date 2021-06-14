@@ -9,6 +9,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning
  */
+import { parseBooleanMember, parseIntMember } from '../../utils/parse-functions'
 import { AppraisalCriterionModel } from '../moodle/appraisal-criterion.model'
 import { CriterionModel } from '../moodle/criterion.model'
 
@@ -21,12 +22,29 @@ export class CriterionForAppraisalTreeModel {
   evaluating?: boolean
   subcriteria?: CriterionForAppraisalTreeModel[]
 
-  public get label() {
-    return this.criterion.label
+  constructor(input: any) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'grade')
+    parseIntMember(input, 'timeModified')
+    parseBooleanMember(input, 'evaluating')
+
+    Object.assign(this, input)
+
+    if (this.criterion) {
+      this.criterion = new CriterionModel(this.criterion)
+    }
+
+    if (this.subcriteria) {
+      this.subcriteria = this.subcriteria.map((child) => {
+        return new CriterionForAppraisalTreeModel(child)
+      })
+    } else {
+      this.subcriteria = []
+    }
   }
 
-  constructor(input: any) {
-    Object.assign(this, input)
+  public get label() {
+    return this.criterion.label
   }
 
   /**

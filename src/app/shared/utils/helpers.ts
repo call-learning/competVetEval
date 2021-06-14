@@ -36,7 +36,7 @@ export const mergeExistingBehaviourSubject = (
           acc.findIndex((e) => {
             let isMatching = true
             keynames.forEach((key) => {
-              if (e[key] != cval[key]) {
+              if (e[key] !== cval[key]) {
                 isMatching = false
               }
             })

@@ -14,8 +14,8 @@ import {
   MenuController,
   ModalController,
 } from '@ionic/angular'
-import { takeUntil } from 'rxjs/operators'
 
+import { takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
@@ -55,10 +55,9 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       this.loader.present().then(() =>
         this.scheduledSituationsService.situations$
           .pipe(takeUntil(this.alive$))
-          .subscribe((res) => {
-            const scheduledSituations = res
+          .subscribe((situations) => {
+            const scheduledSituations = situations
             if (scheduledSituations) {
-              // console.log('Situations: ' + JSON.stringify(scheduledSituations))
               this.situations = scheduledSituations
               this.filterSituations('all')
             }

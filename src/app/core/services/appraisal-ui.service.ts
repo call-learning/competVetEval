@@ -11,12 +11,22 @@
  */
 import { Injectable } from '@angular/core'
 
-import { combineLatest, from, of, zip, BehaviorSubject, Observable } from 'rxjs'
+import {
+  combineLatest,
+  from,
+  of,
+  zip,
+  BehaviorSubject,
+  Observable,
+  iif,
+} from 'rxjs'
 import {
   concatMap,
   debounceTime,
   filter,
+  first,
   map,
+  skip,
   tap,
   toArray,
 } from 'rxjs/operators'
@@ -26,10 +36,8 @@ import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
-import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AppraisalService } from './appraisal.service'
 import { AuthService } from './auth.service'
-import { BaseDataService } from './base-data.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
 import { UserDataService } from './user-data.service'
@@ -49,24 +57,21 @@ export class AppraisalUiService {
   ) {
     combineLatest([
       this.authService.loggedUser,
-      this.appraisalServices.appraisals$,
+      this.appraisalServices.appraisals$.pipe(filter((res) => !!res)),
       this.appraisalServices.appraisalsCriteria$,
     ])
       .pipe(
-        debounceTime(500),
         tap(([cveUser, appraisalModels, appraisalCriteria]) => {
           if (!cveUser) {
             this.appraisalEntities$.next(null)
           } else {
-            if (appraisalModels) {
-              if (!appraisalCriteria) {
-                appraisalCriteria = [] // If there are no appraisalCriteria, then still convert the appraisal.
-              }
-              this.lazyConvertAppraisalModelToUI(
-                appraisalModels,
-                appraisalCriteria
-              ).subscribe()
+            if (appraisalCriteria === null) {
+              appraisalCriteria = []
             }
+            this.lazyConvertAppraisalModelToUI(
+              appraisalModels,
+              appraisalCriteria
+            ).subscribe()
           }
         })
       )
@@ -76,8 +81,8 @@ export class AppraisalUiService {
   /**
    * Retrieve appraisals for currently logged in user
    */
-  public get appraisals$(): BehaviorSubject<AppraisalUI[]> {
-    return this.appraisalEntities$
+  public get appraisals$(): Observable<AppraisalUI[]> {
+    return this.appraisalEntities$.asObservable()
   }
 
   /**
@@ -88,14 +93,15 @@ export class AppraisalUiService {
     appraisalId: number,
     forceRefresh?: boolean
   ): Observable<AppraisalUI> {
-    if (forceRefresh) {
-      this.refreshAppraisals().subscribe()
-    }
-    return this.appraisalEntities$.pipe(
-      filter((obj) => obj != null),
-      map((appraisals) =>
-        appraisals.find((appraisal) => appraisal.id == appraisalId)
-      )
+    return iif(() => forceRefresh, this.refreshAppraisals(), of(null)).pipe(
+      concatMap(() => {
+        return this.appraisalEntities$.pipe(
+          filter((obj) => obj != null),
+          map((appraisals) =>
+            appraisals.find((appraisal) => appraisal.id === appraisalId)
+          )
+        )
+      })
     )
   }
 
@@ -120,8 +126,8 @@ export class AppraisalUiService {
         appraisals
           .filter(
             (appraisal: AppraisalUI) =>
-              appraisal.evalPlan.id == evalPlanId &&
-              (studentId == null || appraisal.student.userid == studentId)
+              appraisal.evalPlan.id === evalPlanId &&
+              (studentId == null || appraisal.student.userid === studentId)
           )
           .sort((app1, app2) => app2.timeModified - app1.timeModified)
       )
@@ -166,18 +172,18 @@ export class AppraisalUiService {
 
     // Submit the appraisal, get the ID and then submit the criteria.
     return this.appraisalServices.submitAppraisal(appraisalModel).pipe(
-      tap((appraisalModel) => {
+      tap((resAppraisalModel) => {
         // Make sure we setup the appraisal id.
         const allcriteria = flatternAppraisalCriteria(appraisal.criteria)
         allcriteria.forEach(
           (appraisalCriteria) =>
-            (appraisalCriteria.appraisalid = appraisalModel.id)
+            (appraisalCriteria.appraisalid = resAppraisalModel.id)
         )
 
         this.appraisalServices.submitAppraisalCriteria(allcriteria).subscribe()
-        return appraisalModel
+        return resAppraisalModel
       }),
-      map((appraisalModel) => appraisalModel.id)
+      map((resAppraisalModel) => resAppraisalModel.id)
     )
   }
 
@@ -206,16 +212,17 @@ export class AppraisalUiService {
         comment,
         context
       )
-      .pipe(map((newModel) => newModel.id))
+      .pipe(
+        map((newModel) => {
+          return newModel.id
+        })
+      )
   }
 
   private lazyConvertAppraisalModelToUI(
     appraisalModels: AppraisalModel[],
     appraisalCriteriaModels: AppraisalCriterionModel[]
   ): Observable<AppraisalUI[]> {
-    const currentAppraisalEntities = this.appraisalEntities$.getValue()
-    const changed = false
-
     return from(appraisalModels).pipe(
       // Retrieve relevant appraisal models.
       concatMap((appraisalModel: AppraisalModel) => {
@@ -226,31 +233,37 @@ export class AppraisalUiService {
             this.appraisalEntities$
               .getValue()
               .findIndex(
-                (appr) => appr.timeModified == appraisalModel.timemodified
+                (appr) => appr.timeModified === appraisalModel.timemodified
               ) !== -1
         }
-        if (appraisalExistSameTime) {
+        if (appraisalExistSameTime || !appraisalCriteriaModels.length) {
           return of(null)
         } else {
           // Then we convert.
-          const appraisalCriteriaUI =
-            this.convertAppraisalCriterionModelsToTree(
-              appraisalCriteriaModels.filter(
-                (apc) => apc.appraisalid == appraisalModel.id
-              )
+          return this.convertAppraisalCriterionModelsToTree(
+            appraisalCriteriaModels.filter(
+              (apc) => apc.appraisalid === appraisalModel.id
             )
-          return this.convertAppraisalModel(appraisalModel, appraisalCriteriaUI)
+          ).pipe(
+            concatMap((appraisalCriteriaUI) => {
+              return this.convertAppraisalModel(
+                appraisalModel,
+                appraisalCriteriaUI
+              )
+            }),
+            first()
+          )
         }
       }),
       // Filter out unwanted appraisals.
       filter((appraisalui) => appraisalui !== null),
       // Back to array.
       toArray(),
-      tap((appraisalsUI) =>
+      tap((appraisalsUI) => {
         mergeExistingBehaviourSubject(this.appraisalEntities$, appraisalsUI, [
           'id',
         ])
-      )
+      })
     )
   }
 
@@ -262,10 +275,10 @@ export class AppraisalUiService {
    */
   private convertAppraisalCriterionModelsToTree(
     apprcriteria: AppraisalCriterionModel[]
-  ): CriterionForAppraisalTreeModel[] {
+  ): Observable<CriterionForAppraisalTreeModel[]> {
     const recurseThroughCriteriaTree = (criterionmodel: CriterionTreeModel) => {
       const currentAppraisalCriteria = apprcriteria.find(
-        (c) => c.criterionid == criterionmodel.criterion.id
+        (c) => c.criterionid === criterionmodel.criterion.id
       )
       if (currentAppraisalCriteria) {
         return CriterionForAppraisalTreeModel.fromAppraisalCriterionModel(
@@ -279,11 +292,14 @@ export class AppraisalUiService {
         return null
       }
     }
-    const criteriaForAppraisalTree = this.criteriaService.criteriaTree$
-      .getValue()
-      .map((criteriontree) => recurseThroughCriteriaTree(criteriontree))
-      .filter((c) => c != null) // Remove null value.
-    return criteriaForAppraisalTree
+
+    return this.criteriaService.criteriaTree$.pipe(
+      map((criteriaTree) => {
+        return criteriaTree
+          .map((criteriontree) => recurseThroughCriteriaTree(criteriontree))
+          .filter((c) => c != null) // Remove null value.
+      })
+    )
   }
 
   /**
@@ -291,17 +307,17 @@ export class AppraisalUiService {
    *
    * @param appraisalId
    */
-  private getRelatedCriteriaAppraisals(
-    appraisalId
-  ): Observable<CriterionForAppraisalTreeModel[]> {
-    return this.appraisalServices
-      .appraisalsCriteriaForAppraisalId(appraisalId)
-      .pipe(
-        map((apprcriteria: AppraisalCriterionModel[]) => {
-          return this.convertAppraisalCriterionModelsToTree(apprcriteria)
-        })
-      )
-  }
+  // private getRelatedCriteriaAppraisals(
+  //   appraisalId
+  // ): Observable<CriterionForAppraisalTreeModel[]> {
+  //   return this.appraisalServices
+  //     .appraisalsCriteriaForAppraisalId(appraisalId)
+  //     .pipe(
+  //       map((apprcriteria: AppraisalCriterionModel[]) => {
+  //         return this.convertAppraisalCriterionModelsToTree(apprcriteria)
+  //       })
+  //     )
+  // }
 
   /**
    * Convert to appraisal model and get subcriteria information
@@ -322,6 +338,7 @@ export class AppraisalUiService {
       this.userDataService.getUserProfileInfo(app.appraiserid),
       this.evalPlanService.planFromId(app.evalplanid)
     ).pipe(
+      first(),
       map(([studentInfo, appraiserInfo, evalplanInfo]) => {
         return new AppraisalUI({
           id: app.id,

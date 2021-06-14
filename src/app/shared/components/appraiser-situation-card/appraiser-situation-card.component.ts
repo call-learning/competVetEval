@@ -41,7 +41,6 @@ export class AppraiserSituationCardComponent implements OnInit {
       .subscribe((stats) => (this.appraiserSituationStats = stats))
     this.userDataService
       .getUserProfileInfo(this.studentId)
-      .pipe(first())
       .subscribe((userInfo) => (this.studentInfo = userInfo))
   }
 }

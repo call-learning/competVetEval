@@ -9,17 +9,12 @@
 
 import { Component, Input } from '@angular/core'
 
-import { AuthService } from '../../../core/services/auth.service'
-import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
-
 @Component({
   selector: 'app-situation-status-icon',
   templateUrl: './situation-status-icon.component.html',
 })
 export class SituationStatusIconComponent {
   @Input() status: string
-  constructor(
-    private scheduledSituationService: ScheduledSituationService,
-    private authService: AuthService
-  ) {}
+
+  constructor() {}
 }

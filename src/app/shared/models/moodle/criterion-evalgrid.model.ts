@@ -1,3 +1,4 @@
+import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
 
 /**
@@ -18,4 +19,13 @@ export class CriterionEvalgridModel extends BaseMoodleModel {
   criterionid: number
   evalgridid: number
   sort: number
+
+  constructor(input) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'criterionid')
+    parseIntMember(input, 'evalgridid')
+    parseIntMember(input, 'sort')
+
+    super(input)
+  }
 }

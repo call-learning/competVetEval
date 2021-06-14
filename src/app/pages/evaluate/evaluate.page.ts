@@ -15,6 +15,8 @@ import {
   ModalController,
   ToastController,
 } from '@ionic/angular'
+import { pipe } from 'rxjs'
+import { filter } from 'rxjs/operators'
 
 import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { AuthService } from '../../core/services/auth.service'
@@ -78,28 +80,32 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       this.loadingController.create().then((res) => {
         this.loader = res
         this.loader.present()
-        this.situationService.situations$.subscribe((situations) => {
-          // TODO: beware of triple === as sometimes the data is not correctly typed
-          // due to Object assign.
-          this.scheduledSituation = situations.find(
-            (sit) =>
-              sit.evalPlanId == this.evalPlanId &&
-              (this.studentId == null || this.studentId == sit.studentId)
-          )
-          this.appraisalUIService
-            .createBlankAppraisal(
-              this.scheduledSituation.evalPlanId,
-              this.scheduledSituation.situation.evalgridid,
-              this.studentId,
-              this.authService.loggedUser.getValue().userid
+        this.situationService.situations$
+          .pipe(filter((res) => !!res))
+          .subscribe((situations) => {
+            this.scheduledSituation = situations.find(
+              (sit) =>
+                sit.evalPlanId === this.evalPlanId &&
+                (this.studentId == null || this.studentId === sit.studentId)
             )
-            .subscribe((appraisalId) => {
-              this.appraisalUIService
-                .waitForAppraisalId(appraisalId)
-                .subscribe((appraisal) => (this.appraisal = appraisal))
-              this.loader.dismiss()
-            })
-        })
+
+            this.appraisalUIService
+              .createBlankAppraisal(
+                this.scheduledSituation.evalPlanId,
+                this.scheduledSituation.situation.evalgridid,
+                this.studentId,
+                this.authService.loggedUser.getValue().userid
+              )
+              .subscribe((appraisalId) => {
+                this.appraisalUIService
+                  .waitForAppraisalId(appraisalId, true)
+                  .pipe(filter((res) => !!res))
+                  .subscribe((appraisal) => {
+                    this.appraisal = appraisal
+                  })
+                this.loader.dismiss()
+              })
+          })
       })
     } else {
       this.router.navigate(['/scheduled-situation-detail', this.evalPlanId])
@@ -178,7 +184,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
 
   getSubcriteriaGradedNumber(criterion: CriterionForAppraisalTreeModel) {
     return criterion.subcriteria.filter((sc) => {
-      return sc.grade !== 0
+      return !!sc.grade
     }).length
   }
 

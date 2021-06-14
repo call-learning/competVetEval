@@ -1,3 +1,4 @@
+import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
 
 /**
@@ -21,4 +22,14 @@ export class EvalPlanModel extends BaseMoodleModel {
   clsituationid: number
   starttime: number
   endtime: number
+
+  constructor(input) {
+    parseIntMember(input, 'id')
+    parseIntMember(input, 'groupid')
+    parseIntMember(input, 'clsituationid')
+    parseIntMember(input, 'starttime')
+    parseIntMember(input, 'endtime')
+
+    super(input)
+  }
 }

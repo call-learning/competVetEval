@@ -28,7 +28,6 @@ import { AppraiserSituationStatsModel } from '../../shared/models/ui/appraiser-s
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 import { StudentSituationStatsModel } from '../../shared/models/ui/student-situation-stats.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
-import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AppraisalUiService } from './appraisal-ui.service'
 import { AuthService } from './auth.service'
 import { BaseDataService } from './base-data.service'
@@ -50,8 +49,6 @@ export class ScheduledSituationService {
     AppraiserSituationStatsModel[]
   >(null)
 
-  subscription: Subscription
-
   constructor(
     private baseDataService: BaseDataService,
     private authService: AuthService,
@@ -63,56 +60,76 @@ export class ScheduledSituationService {
         this.scheduledSituationsEntities$.next(null)
         this.studentSituationStats$.next(null)
         this.appraiserSituationStats$.next(null)
-
-        if (this.subscription) {
-          this.subscription.unsubscribe()
-        }
       } else {
         this.refresh().subscribe()
-        this.subscription = combineLatest([
-          this.appraisalUIService.appraisals$,
-          this.scheduledSituationsEntities$,
-          this.baseDataService.groupAssignment$,
-          this.evalPlanService.plans$,
-        ])
-          .pipe(
-            filter(
-              ([appraisals, allsituations, groupAssignments, evalplan]) =>
-                appraisals != null &&
-                allsituations != null &&
-                loggedUser != null &&
-                evalplan != null
-            ),
-            tap(([appraisals, allsituations, groupAssignments, evalplan]) => {
-              if (
-                this.authService.isStillLoggedIn() &&
-                this.authService.isStudent
-              ) {
-                this.buildStudentStatistics(
-                  allsituations,
-                  appraisals,
-                  loggedUser.userid
-                )
-              }
-            }),
-            tap(([appraisals, allsituations, groupAssignments, evalplan]) => {
-              if (
-                this.authService.isStillLoggedIn() &&
-                this.authService.isAppraiser &&
-                groupAssignments
-              ) {
-                this.buildAppraiserStatistics(
-                  appraisals,
-                  allsituations,
-                  groupAssignments,
-                  evalplan
-                )
-              }
-            })
-          )
-          .subscribe()
       }
     })
+
+    combineLatest([
+      this.authService.loggedUser,
+      this.appraisalUIService.appraisals$,
+      this.scheduledSituationsEntities$,
+      this.baseDataService.groupAssignment$,
+      this.evalPlanService.plans$,
+    ])
+      .pipe(
+        filter(
+          ([
+            loggedUser,
+            appraisals,
+            allsituations,
+            groupAssignments,
+            evalplan,
+          ]) =>
+            appraisals != null &&
+            allsituations != null &&
+            loggedUser != null &&
+            evalplan != null
+        ),
+        tap(
+          ([
+            loggedUser,
+            appraisals,
+            allsituations,
+            groupAssignments,
+            evalplan,
+          ]) => {
+            if (
+              this.authService.isStillLoggedIn() &&
+              this.authService.isStudent
+            ) {
+              this.buildStudentStatistics(
+                allsituations,
+                appraisals,
+                loggedUser.userid
+              )
+            }
+          }
+        ),
+        tap(
+          ([
+            loggedUser,
+            appraisals,
+            allsituations,
+            groupAssignments,
+            evalplan,
+          ]) => {
+            if (
+              this.authService.isStillLoggedIn() &&
+              this.authService.isAppraiser &&
+              groupAssignments
+            ) {
+              this.buildAppraiserStatistics(
+                appraisals,
+                allsituations,
+                groupAssignments,
+                evalplan
+              )
+            }
+          }
+        )
+      )
+      .subscribe()
   }
 
   public get situations$(): Observable<ScheduledSituation[]> {
@@ -133,7 +150,7 @@ export class ScheduledSituationService {
     return this.studentSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id == evalPlanId)
+      filter((stat) => stat.id === evalPlanId)
     )
   }
 
@@ -153,7 +170,7 @@ export class ScheduledSituationService {
     return this.appraiserSituationStats$.pipe(
       filter((obj) => obj != null),
       concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id == evalPlanId && stat.studentId == studentId)
+      filter((stat) => stat.id === evalPlanId && stat.studentId === studentId)
     )
   }
 
@@ -220,7 +237,7 @@ export class ScheduledSituationService {
     const scheduledSituations = []
     evalPlans.forEach((eplan: EvalPlanModel) => {
       const evalPlanInGroup = groupAssignments.find(
-        (ga) => ga.groupid == eplan.groupid
+        (ga) => ga.groupid === eplan.groupid
       )
       if (evalPlanInGroup) {
         const scheduledSituation = this.buildScheduledSituation(
@@ -255,13 +272,13 @@ export class ScheduledSituationService {
 
       const hasSituation = roles.find(
         (r) =>
-          r.userid == userid &&
-          r.clsituationid == scheduledSituation.situation.id
+          r.userid === userid &&
+          r.clsituationid === scheduledSituation.situation.id
       )
 
       if (hasSituation) {
         const assignedStudents = groupAssignment.filter(
-          (ga) => ga.groupid == eplan.groupid
+          (ga) => ga.groupid === eplan.groupid
         )
         if (assignedStudents) {
           assignedStudents.forEach((ga) => {
@@ -283,17 +300,17 @@ export class ScheduledSituationService {
     situations: SituationModel[]
   ): ScheduledSituation {
     const currentSituation = situations.find(
-      (s) => s.id == evalPlan.clsituationid
+      (s) => s.id === evalPlan.clsituationid
     )
     return new ScheduledSituation({
       evalPlanId: evalPlan.id,
       situation: currentSituation,
-      evalPlan: evalPlan,
+      evalPlan,
     })
   }
 
   private buildStudentStatistics(allsituations, appraisals, currentUserId) {
-    let allStudentStats = []
+    const allStudentStats = []
     if (allsituations) {
       allsituations.forEach((situation) => {
         if (situation.evalPlan) {
@@ -302,8 +319,8 @@ export class ScheduledSituationService {
             ? appraisals.filter(
                 (appraisal) =>
                   appraisal.evalPlan &&
-                  appraisal.student.userid == currentUserId &&
-                  appraisal.evalPlan.id == situation.evalPlanId &&
+                  appraisal.student.userid === currentUserId &&
+                  appraisal.evalPlan.id === situation.evalPlanId &&
                   appraisal.appraiser // Make sure we only count appraisal assigned to an appraiser
               ).length
             : 0
@@ -311,7 +328,7 @@ export class ScheduledSituationService {
           const studentStats = new StudentSituationStatsModel({
             id: situation.evalPlanId,
             appraisalsCompleted: nbAppraisalStudent,
-            appraisalsRequired: appraisalsRequired,
+            appraisalsRequired,
             status:
               nbAppraisalStudent >= appraisalsRequired
                 ? 'done'
@@ -337,19 +354,19 @@ export class ScheduledSituationService {
     evalplan
   ) {
     if (allsituations) {
-      let appraiserStats = []
+      const appraiserStats = []
       allsituations.forEach((situation) => {
         const appraisalsRequired = situation.situation.expectedevalsnb
         const existingAppraisalAppraiser = appraisals
           ? appraisals.filter(
               (appraisal) =>
-                appraisal.evalPlan.id == situation.evalPlanId &&
+                appraisal.evalPlan.id === situation.evalPlanId &&
                 appraisal.appraiser // Make sure we only count appraisal assigned to an appraiser
             )
           : []
         // Now fetch all students involved
         const nbAppraisalAppraiserStudent = existingAppraisalAppraiser.filter(
-          (appraisal) => situation.studentId == appraisal.student.userid
+          (appraisal) => situation.studentId === appraisal.student.userid
         ).length
         appraiserStats.push(
           new AppraiserSituationStatsModel({

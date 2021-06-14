@@ -52,12 +52,14 @@ export class UserDataService {
    * @param userid
    */
   public getUserProfileInfo(userid: number): Observable<CevUser> {
-    const existingProfile = this.userProfiles.find(
-      (user) => user.userid == userid
-    )
     if (!userid) {
       return of(null)
     }
+
+    const existingProfile = this.userProfiles.find(
+      (user) => user.userid === userid
+    )
+
     if (!existingProfile) {
       return this.moodleApiService
         .getUserProfileInfo(userid)

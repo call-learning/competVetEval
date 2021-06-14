@@ -1,3 +1,4 @@
+import { filter } from 'rxjs/operators'
 /**
  * Criteria based services
  *
@@ -11,7 +12,8 @@
 
 import { Injectable } from '@angular/core'
 
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Observable, of, zip } from 'rxjs'
+import { concatMap, first, map, withLatestFrom } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { BaseDataService } from './base-data.service'
@@ -35,16 +37,18 @@ export class CriteriaService {
    * @param authService
    */
   constructor(private baseDataService: BaseDataService) {
-    this.baseDataService.criteria$.subscribe((newcriteria) => {
-      this.refreshCriteria(newcriteria)
-    })
+    this.baseDataService.criteria$
+      .pipe(filter((res) => !!res))
+      .subscribe((newcriteria) => {
+        this.refreshCriteria(newcriteria)
+      })
   }
 
   /**
    * Get current criteria tree
    */
-  public get criteriaTree$(): BehaviorSubject<CriterionTreeModel[]> {
-    return this.criteriaTreeEntities$
+  public get criteriaTree$(): Observable<CriterionTreeModel[]> {
+    return this.criteriaTreeEntities$.asObservable()
   }
 
   /**
@@ -53,25 +57,33 @@ export class CriteriaService {
    * @param newcriteria
    */
   public refreshCriteria(newcriteria: CriterionModel[]): CriterionTreeModel[] {
-    if (newcriteria) {
-      const allHierarchicalCriteria =
-        CriterionTreeModel.convertToTree(newcriteria)
-      this.criteriaTreeEntities$.next(allHierarchicalCriteria)
-      return allHierarchicalCriteria
-    }
+    const allHierarchicalCriteria =
+      CriterionTreeModel.convertToTree(newcriteria)
+    this.criteriaTreeEntities$.next(allHierarchicalCriteria)
+    return allHierarchicalCriteria
   }
 
   /**
    * Get criteria from eval Grid
    * @param evalgridId
    */
-  public getCriteriaFromEvalGrid(evalgridId: number): CriterionModel[] {
-    const allCriteria = this.baseDataService.criteria$.getValue()
-    return this.baseDataService.criteriaEvalgrid$
-      .getValue()
-      .filter((ce) => ce.evalgridid == evalgridId)
-      .map((evalgridcrit) =>
-        allCriteria.find((c) => c.id == evalgridcrit.criterionid)
-      )
+  public getCriteriaFromEvalGrid(
+    evalgridId: number
+  ): Observable<CriterionModel[]> {
+    return zip(
+      this.baseDataService.criteria$.pipe(filter((res) => !!res)),
+      this.baseDataService.criteriaEvalgrid$.pipe(filter((res) => !!res))
+    ).pipe(
+      first(),
+      map(([allCriteria, allCriteriaEvalGrid]) => {
+        return allCriteriaEvalGrid
+          .filter((evalGridCrit) => evalGridCrit.evalgridid === evalgridId)
+          .map((evalGridCrit) => {
+            return allCriteria.find((criteria) => {
+              return criteria.id === evalGridCrit.id
+            })
+          })
+      })
+    )
   }
 }

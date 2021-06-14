@@ -17,9 +17,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 import { IonTextarea, ModalController } from '@ionic/angular'
 
-import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
 import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
 import { AuthService } from '../../../core/services/auth.service'
+import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
 
 @Component({
   selector: 'app-modal-ask-appraisal',
@@ -71,7 +71,7 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
     this.errorMsg = ''
     this.formSubmitted = true
 
-    if (this.askAppraisalForm.valid && this.step != 'qr-code') {
+    if (this.askAppraisalForm.valid && this.step !== 'qr-code') {
       this.appraisalService
         .createBlankAppraisal(
           this.scheduledSituation.evalPlanId,

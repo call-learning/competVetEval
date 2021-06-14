@@ -16,11 +16,10 @@ import {
   ToastController,
 } from '@ionic/angular'
 
+import { filter, first } from 'rxjs/operators'
 import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
 import { AuthService } from '../../../core/services/auth.service'
 import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
-import appr from '../../../../mock/fixtures/appr'
-import { filter, first } from 'rxjs/operators'
 
 @Component({
   selector: 'app-modal-scan-appraisal',
@@ -71,7 +70,7 @@ export class ModalScanAppraisalComponent implements OnInit {
             toast.present()
           })
         this.dismissModal()
-        const appraisalId = Number.parseInt(barcodeData.text)
+        const appraisalId = Number.parseInt(barcodeData.text, 10)
 
         this.loadingController.create().then((res) => {
           this.loader = res

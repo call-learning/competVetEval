@@ -9,6 +9,8 @@
  * @copyright  2021 SAS CALL Learning
  */
 
+import { parseIntMember } from '../utils/parse-functions'
+
 export class CevUser {
   userid: number
   fullname?: string
@@ -18,6 +20,8 @@ export class CevUser {
   userpictureurl?: string
 
   constructor(input: any) {
+    parseIntMember(input, 'userid')
+
     Object.assign(this, input)
   }
 }

@@ -51,7 +51,7 @@ export class AuthService {
     return this.httpAuthService.login(username, password).pipe(
       tap((res: LoginResult) => {
         if (res.errorcode) {
-          console.log(`Erreur de connexion: (${res.errorcode})`)
+          console.error(`Erreur de connexion: (${res.errorcode})`)
           throw new Error(res.errorcode)
         }
       }),
@@ -184,6 +184,6 @@ export class AuthService {
   }
 
   get isAppraiser() {
-    return this.currentUserRole.getValue() == 'appraiser'
+    return this.currentUserRole.getValue() === 'appraiser'
   }
 }

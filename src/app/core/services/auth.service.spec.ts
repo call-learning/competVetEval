@@ -81,7 +81,9 @@ describe('AuthService', () => {
         new Observable((subscriber) => subscriber.next('student'))
       )
       service.login('username', 'password').subscribe(() => {
-        expect(service.loginState.getValue() == LOGIN_STATE.LOGGED).toBeTruthy()
+        expect(
+          service.loginState.getValue() === LOGIN_STATE.LOGGED
+        ).toBeTruthy()
         expect(service.loggedUser.getValue().username).toEqual('username')
         expect(service.loggedUser.getValue().userid).toEqual(12345)
       })
@@ -100,7 +102,7 @@ describe('AuthService', () => {
         () => {},
         (error) => {
           expect(
-            service.loginState.getValue() == LOGIN_STATE.LOGGED
+            service.loginState.getValue() === LOGIN_STATE.LOGGED
           ).toBeFalse()
         }
       )
@@ -132,7 +134,9 @@ describe('AuthService', () => {
         new Observable((subscriber) => subscriber.next('student'))
       )
       service.login('username', 'password').subscribe(() => {
-        expect(service.loginState.getValue() == LOGIN_STATE.LOGGED).toBeTruthy()
+        expect(
+          service.loginState.getValue() === LOGIN_STATE.LOGGED
+        ).toBeTruthy()
         expect(service.loggedUser.getValue().username).toEqual('username')
         expect(service.loggedUser.getValue().userid).toEqual(12345)
       })

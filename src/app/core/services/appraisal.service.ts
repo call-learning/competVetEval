@@ -9,9 +9,8 @@
  */
 
 import { Injectable } from '@angular/core'
-import { cpuUsage } from 'process'
 
-import { combineLatest, from, of, BehaviorSubject, Observable } from 'rxjs'
+import { combineLatest, from, of, BehaviorSubject, Observable, iif } from 'rxjs'
 import { concatMap, filter, first, map, mapTo, tap } from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
@@ -21,7 +20,6 @@ import { AuthService } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
-import { UserDataService } from './user-data.service'
 
 @Injectable({
   providedIn: 'root',
@@ -71,15 +69,15 @@ export class AppraisalService {
   /**
    * Retrieve appraisals for currently logged in user
    */
-  public get appraisals$(): BehaviorSubject<AppraisalModel[]> {
-    return this.appraisalModels$
+  public get appraisals$(): Observable<AppraisalModel[]> {
+    return this.appraisalModels$.asObservable()
   }
 
   /**
    * Retrieve appraisals criteria for currently logged in user
    */
-  public get appraisalsCriteria$(): BehaviorSubject<AppraisalCriterionModel[]> {
-    return this.appraisalCriterionModels$
+  public get appraisalsCriteria$(): Observable<AppraisalCriterionModel[]> {
+    return this.appraisalCriterionModels$.asObservable()
   }
 
   /**
@@ -94,7 +92,7 @@ export class AppraisalService {
     return this.appraisalCriterionModels$.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
-        appraisals.filter((apc) => apc.appraisalid == appraisalId)
+        appraisals.filter((apc) => apc.appraisalid === appraisalId)
       )
     )
   }
@@ -106,20 +104,29 @@ export class AppraisalService {
    */
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
     return combineLatest([
-      this.evalPlanService.plans$.pipe(filter((obj) => obj != null)),
-      this.baseDataService.situations$.pipe(filter((obj) => obj != null)),
-      this.baseDataService.roles$.pipe(filter((obj) => obj != null)),
+      this.evalPlanService.plans$.pipe(
+        filter((obj) => obj != null),
+        first()
+      ),
+      this.baseDataService.situations$.pipe(
+        filter((obj) => obj != null),
+        first()
+      ),
+      this.baseDataService.roles$.pipe(
+        filter((obj) => obj != null),
+        first()
+      ),
     ]).pipe(
       concatMap(([evalplans, situations, roles]) => {
         // First check all situations involved.
         const mySituations = situations.filter((sit) => {
-          return roles.find((r) => r.clsituationid == sit.id) !== undefined
+          return roles.find((r) => r.clsituationid === sit.id) !== undefined
         })
         // Filter all eval plan depending on the current appraiser.
         return from(
           evalplans.filter((evalplan) => {
             return (
-              mySituations.find((s) => s.id == evalplan.clsituationid) !==
+              mySituations.find((s) => s.id === evalplan.clsituationid) !==
               undefined
             )
           })
@@ -132,7 +139,7 @@ export class AppraisalService {
           { evalplanid: evalPlan.id },
           this.appraisalModels$
             .getValue()
-            ?.filter((app) => app.evalplanid == evalPlan.id)
+            ?.filter((app) => app.evalplanid === evalPlan.id)
         )
       ),
       tap((newAppraisals: AppraisalModel[]) => {
@@ -159,9 +166,10 @@ export class AppraisalService {
         { studentid },
         this.appraisalModels$
           .getValue()
-          ?.filter((app) => app.studentid == studentid)
+          ?.filter((app) => app.studentid === studentid)
       ) as Observable<AppraisalModel[]>
     ).pipe(
+      first(),
       tap((newAppraisals) => {
         // Merge existing values with new values
         mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
@@ -177,20 +185,13 @@ export class AppraisalService {
    * @protected
    */
   public refresh(): Observable<AppraisalCriterionModel[]> {
-    // At login we refresh always.
-    return this.authService.currentUserRole.pipe(
-      filter((roletype) => roletype != null),
-      first(),
-      concatMap((userType) => {
-        if (this.authService.isStudent) {
-          const userid = this.authService.loggedUser.getValue().userid
-          // Retrieve all appraisal marked with my id as studentid.
-          return this.getAppraisalsModelForStudent(userid)
-        } else {
-          // Retrieve all appraisals I am involved in.
-          return this.getAppraisalModelForAppraiser()
-        }
-      }),
+    return iif(
+      () => this.authService.isStudent,
+      this.getAppraisalsModelForStudent(
+        this.authService.loggedUser.getValue().userid
+      ),
+      this.getAppraisalModelForAppraiser()
+    ).pipe(
       concatMap((appraisalModels) => from(appraisalModels)),
       concatMap((appraisal: AppraisalModel) => {
         return this.moodleApiService
@@ -199,14 +200,14 @@ export class AppraisalService {
             { appraisalid: appraisal.id },
             this.appraisalCriterionModels$
               .getValue()
-              ?.filter((appc) => appc.appraisalid == appraisal.id)
+              ?.filter((appc) => appc.appraisalid === appraisal.id)
           )
           .pipe(
-            map((appraisalCriteriaModels) =>
-              appraisalCriteriaModels.map(
+            map((appraisalCriteriaModels) => {
+              return appraisalCriteriaModels.map(
                 (model) => new AppraisalCriterionModel(model)
               )
-            )
+            })
           )
       }),
       map((appraisalsCriteria) => {
@@ -243,33 +244,37 @@ export class AppraisalService {
       comment,
       context
     )
-    const appraisalCriteriaModel = this.criteriaService
-      .getCriteriaFromEvalGrid(evalGridId)
-      .map((criterionmodel) =>
-        AppraisalCriterionModel.createFromCriterionModel(criterionmodel)
-      )
 
-    // Submit the appraisal, get the ID and then submit the criteria.
-    const newAppraisalModel = this.submitAppraisal(appraisalModel)
-    // Then create the appraisal criterion
-    return newAppraisalModel.pipe(
-      concatMap((appraisalModel) => {
-        appraisalCriteriaModel.forEach(
-          (apc) => (apc.appraisalid = appraisalModel.id)
+    return this.criteriaService.getCriteriaFromEvalGrid(evalGridId).pipe(
+      concatMap((criteria) => {
+        const appraisalCriteriaModel = criteria.map((criterionmodel) =>
+          AppraisalCriterionModel.createFromCriterionModel(criterionmodel)
         )
-        return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
-          mapTo(appraisalModel),
-          tap((newAppraisal) => {
-            mergeExistingBehaviourSubject(
-              this.appraisalModels$,
-              [newAppraisal],
-              ['id']
+
+        // Submit the appraisal, get the ID and then submit the criteria.
+        const newAppraisalModel = this.submitAppraisal(appraisalModel)
+        // Then create the appraisal criterion
+        return newAppraisalModel.pipe(
+          concatMap((resAppraisalModel) => {
+            appraisalCriteriaModel.forEach(
+              (apc) => (apc.appraisalid = resAppraisalModel.id)
+            )
+            return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
+              mapTo(appraisalModel),
+              tap((newAppraisal) => {
+                appraisalModel.id = resAppraisalModel.id
+                mergeExistingBehaviourSubject(
+                  this.appraisalModels$,
+                  [newAppraisal],
+                  ['id']
+                )
+              })
             )
           })
         )
+        // See: https://medium.com/@snorredanielsen/rxjs-accessing-a-previous-value-further-down-the-pipe-chain-b881026701c1
       })
     )
-    // See: https://medium.com/@snorredanielsen/rxjs-accessing-a-previous-value-further-down-the-pipe-chain-b881026701c1
   }
 
   /**

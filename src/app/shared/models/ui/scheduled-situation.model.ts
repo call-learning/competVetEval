@@ -1,5 +1,6 @@
 // This is an entity managed essentially by the app and display and transferred partially
 // when needed to the server.
+import { parseIntMember } from '../../utils/parse-functions'
 import { EvalPlanModel } from '../moodle/eval-plan.model'
 import { SituationModel } from '../moodle/situation.model'
 
@@ -15,6 +16,17 @@ export class ScheduledSituation {
   studentId?: number
 
   constructor(input: any) {
+    parseIntMember(input, 'evalPlanId')
+    parseIntMember(input, 'studentId')
+
     Object.assign(this, input)
+
+    if (this.situation) {
+      this.situation = new SituationModel(this.situation)
+    }
+
+    if (this.evalPlan) {
+      this.evalPlan = new EvalPlanModel(this.evalPlan)
+    }
   }
 }
