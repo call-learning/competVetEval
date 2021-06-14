@@ -12,6 +12,8 @@
   justify-content: center;
 
   margin: 1px;
+
+  position: relative;
 }
 
 .criteria-label {
@@ -29,4 +31,10 @@ td:nth-child(2n + 2) {
   .td-content {
     background: var(--primary-background);
   }
+}
+
+.icon-comment {
+  position: absolute;
+  bottom: -1px;
+  right: -5px;
 }

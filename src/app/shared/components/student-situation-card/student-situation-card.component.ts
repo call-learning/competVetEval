@@ -30,7 +30,6 @@ export class StudentSituationCardComponent implements OnInit {
     const evalPlanId = this.scheduledSituation.evalPlan.id
     this.scheduledSituationService
       .getMyScheduledSituationStats(evalPlanId)
-      .pipe(first())
       .subscribe((stats) => {
         this.studentSituationStats = stats
       })

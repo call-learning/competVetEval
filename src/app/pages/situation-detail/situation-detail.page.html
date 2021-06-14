@@ -34,8 +34,8 @@
           {{ scheduledSituation.situation.description }}
         </div>
         <div class="page-dates">
-          {{ scheduledSituation.evalPlan.starttime * 1000 | date:'d/MM/yy' }}/{{
-          scheduledSituation.evalPlan.endtime * 1000 | date:'d/MM/yy' }}
+          {{ scheduledSituation.evalPlan.starttime * 1000 | date:'d/MM/yy' }} -
+          {{ scheduledSituation.evalPlan.endtime * 1000 | date:'d/MM/yy' }}
         </div>
         <div *ngIf="authService.isStudent" class="situations-list__card-item">
           <app-student-situation-card
@@ -77,7 +77,11 @@
                   <ion-avatar slot="start"
                     ><img src="{{appraisal.appraiser?.userpictureurl}}"
                   /></ion-avatar>
-                  <ion-label>{{ appraisal.appraiser?.fullname }}</ion-label>
+                  <ion-label
+                    ><strong
+                      >{{ appraisal.appraiser?.fullname }}</strong
+                    ></ion-label
+                  >
                 </ion-item>
               </div>
               <div class="list-item-subtitle">
@@ -99,7 +103,7 @@
                 src="assets/images/svg-icons/icon-calendar.svg"
                 [svgStyle]="{ 'width.px':16 }"
               ></svg-icon>
-              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (hh:mm)' }}
+              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (HH:mm)' }}
             </div>
           </a>
           <a
@@ -120,7 +124,7 @@
                 src="assets/images/svg-icons/icon-calendar.svg"
                 [svgStyle]="{ 'width.px':16 }"
               ></svg-icon>
-              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (hh:mm)' }}
+              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (HH:mm)' }}
             </div>
           </a>
         </ion-list>

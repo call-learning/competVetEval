@@ -36,6 +36,13 @@
               }}.svg"
               [svgStyle]="{ 'width.px': 32 }"
             ></svg-icon>
+
+            <svg-icon
+              *ngIf="criterion.comment?.length"
+              src="assets/images/svg-icons/icon-comment.svg"
+              [svgStyle]="{ 'width.px': 32 }"
+              class="icon-comment"
+            ></svg-icon>
           </div>
         </td>
       </tr>
