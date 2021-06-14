@@ -257,7 +257,7 @@ export class AppraisalService {
         return newAppraisalModel.pipe(
           concatMap((resAppraisalModel) => {
             appraisalCriteriaModel.forEach(
-              (apc) => (apc.appraisalid = appraisalModel.id)
+              (apc) => (apc.appraisalid = resAppraisalModel.id)
             )
             return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
               mapTo(appraisalModel),

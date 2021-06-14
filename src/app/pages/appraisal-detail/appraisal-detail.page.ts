@@ -1,3 +1,4 @@
+import { filter } from 'rxjs/operators'
 /**
  * Appraisal details page
  *
@@ -64,6 +65,7 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
 
       this.appraisalUIService
         .waitForAppraisalId(this.appraisalId)
+        .pipe(filter((res) => !!res))
         .subscribe((appraisal) => {
           this.appraisal = appraisal
           this.scheduledSituationService.situations$.subscribe((situations) => {
@@ -82,7 +84,7 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
 
   getSubcriteriaGradedNumber(criterion: CriterionForAppraisalTreeModel) {
     return criterion.subcriteria.filter((sc) => {
-      return sc.grade !== 0
+      return !!sc.grade
     }).length
   }
 

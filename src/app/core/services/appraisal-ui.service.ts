@@ -50,7 +50,7 @@ export class AppraisalUiService {
     combineLatest([
       this.authService.loggedUser,
       this.appraisalServices.appraisals$.pipe(filter((res) => !!res)),
-      this.appraisalServices.appraisalsCriteria$.pipe(filter((res) => !!res)),
+      this.appraisalServices.appraisalsCriteria$,
     ])
       .pipe(
         tap(([cveUser, appraisalModels, appraisalCriteria]) => {
@@ -223,7 +223,7 @@ export class AppraisalUiService {
                 (appr) => appr.timeModified === appraisalModel.timemodified
               ) !== -1
         }
-        if (appraisalExistSameTime) {
+        if (appraisalExistSameTime || !appraisalCriteriaModels.length) {
           return of(null)
         } else {
           // Then we convert.
