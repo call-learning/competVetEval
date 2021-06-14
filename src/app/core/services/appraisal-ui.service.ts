@@ -11,7 +11,15 @@
  */
 import { Injectable } from '@angular/core'
 
-import { combineLatest, from, of, zip, BehaviorSubject, Observable } from 'rxjs'
+import {
+  combineLatest,
+  from,
+  of,
+  zip,
+  BehaviorSubject,
+  Observable,
+  iif,
+} from 'rxjs'
 import {
   concatMap,
   debounceTime,
@@ -85,14 +93,15 @@ export class AppraisalUiService {
     appraisalId: number,
     forceRefresh?: boolean
   ): Observable<AppraisalUI> {
-    if (forceRefresh) {
-      this.refreshAppraisals().subscribe()
-    }
-    return this.appraisalEntities$.pipe(
-      filter((obj) => obj != null),
-      map((appraisals) =>
-        appraisals.find((appraisal) => appraisal.id === appraisalId)
-      )
+    return iif(() => forceRefresh, this.refreshAppraisals(), of(null)).pipe(
+      concatMap(() => {
+        return this.appraisalEntities$.pipe(
+          filter((obj) => obj != null),
+          map((appraisals) =>
+            appraisals.find((appraisal) => appraisal.id === appraisalId)
+          )
+        )
+      })
     )
   }
 
@@ -203,7 +212,11 @@ export class AppraisalUiService {
         comment,
         context
       )
-      .pipe(map((newModel) => newModel.id))
+      .pipe(
+        map((newModel) => {
+          return newModel.id
+        })
+      )
   }
 
   private lazyConvertAppraisalModelToUI(

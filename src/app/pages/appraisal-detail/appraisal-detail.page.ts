@@ -65,7 +65,7 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
 
       this.appraisalUIService
         .waitForAppraisalId(this.appraisalId)
-        .pipe(filter((res) => !!res))
+        .pipe(filter((app) => !!app))
         .subscribe((appraisal) => {
           this.appraisal = appraisal
           this.scheduledSituationService.situations$.subscribe((situations) => {

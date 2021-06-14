@@ -262,6 +262,7 @@ export class AppraisalService {
             return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
               mapTo(appraisalModel),
               tap((newAppraisal) => {
+                appraisalModel.id = resAppraisalModel.id
                 mergeExistingBehaviourSubject(
                   this.appraisalModels$,
                   [newAppraisal],

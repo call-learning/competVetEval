@@ -15,6 +15,7 @@ import {
   ModalController,
   ToastController,
 } from '@ionic/angular'
+import { filter } from 'rxjs/operators'
 
 import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { AuthService } from '../../core/services/auth.service'
@@ -75,17 +76,18 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
         this.loader.present()
         this.appraisalUIService
           .waitForAppraisalId(this.appraisalId)
+          .pipe(filter((app) => !!app))
           .subscribe((appraisal) => {
             this.appraisal = appraisal
-            this.scheduledSituationService.situations$.subscribe(
-              (situations) => {
+            this.scheduledSituationService.situations$
+              .pipe(filter((sit) => !!sit))
+              .subscribe((situations) => {
                 this.scheduledSituation = situations.find(
                   (sit) =>
                     sit.evalPlanId === this.appraisal.evalPlan.id &&
                     sit.studentId === this.appraisal.student.userid
                 )
-              }
-            )
+              })
             this.contextForm.setValue({ context: appraisal.context })
             this.commentForm.setValue({ comment: appraisal.comment })
             this.loader.dismiss()
