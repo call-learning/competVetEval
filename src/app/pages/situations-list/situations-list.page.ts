@@ -15,7 +15,7 @@ import {
   ModalController,
 } from '@ionic/angular'
 
-import { takeUntil } from 'rxjs/operators'
+import { debounceTime, filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
@@ -23,7 +23,7 @@ import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appr
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 
 const DAY_SECONDS = 3600 * 24
-const MAX_INTERVAL = 8
+const MAX_INTERVAL = 4
 @Component({
   selector: 'app-situations-list',
   templateUrl: './situations-list.page.html',
@@ -54,13 +54,13 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       this.loader = res
       this.loader.present().then(() =>
         this.scheduledSituationsService.situations$
-          .pipe(takeUntil(this.alive$))
+          .pipe(
+            takeUntil(this.alive$),
+            filter((res) => !!res)
+          )
           .subscribe((situations) => {
-            const scheduledSituations = situations
-            if (scheduledSituations) {
-              this.situations = scheduledSituations
-              this.filterSituations('all')
-            }
+            this.situations = situations
+            this.filterSituations('today')
             if (this.loader.animated) {
               this.loader.dismiss()
             }

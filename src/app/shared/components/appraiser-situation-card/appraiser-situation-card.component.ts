@@ -37,7 +37,6 @@ export class AppraiserSituationCardComponent implements OnInit {
     const evalPlanId = this.scheduledSituation.evalPlan.id
     this.scheduledSituationService
       .getAppraiserScheduledSituationStats(evalPlanId, this.studentId)
-      // .pipe(first())
       .subscribe((stats) => (this.appraiserSituationStats = stats))
     this.userDataService
       .getUserProfileInfo(this.studentId)

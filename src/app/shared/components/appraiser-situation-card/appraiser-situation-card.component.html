@@ -17,7 +17,9 @@
             <ion-avatar slot="start"
               ><img src="{{ studentInfo.userpictureurl }}"
             /></ion-avatar>
-            <ion-label>{{ studentInfo.fullname }}</ion-label>
+            <ion-label
+              ><strong>{{ studentInfo.fullname }}</strong></ion-label
+            >
           </ion-item>
         </div>
         <div *ngIf="!studentInfo">
