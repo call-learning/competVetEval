@@ -203,11 +203,11 @@ export class AppraisalService {
               ?.filter((appc) => appc.appraisalid === appraisal.id)
           )
           .pipe(
-            map((appraisalCriteriaModels) =>
-              appraisalCriteriaModels.map(
+            map((appraisalCriteriaModels) => {
+              return appraisalCriteriaModels.map(
                 (model) => new AppraisalCriterionModel(model)
               )
-            )
+            })
           )
       }),
       map((appraisalsCriteria) => {

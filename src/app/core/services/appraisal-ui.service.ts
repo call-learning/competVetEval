@@ -50,11 +50,10 @@ export class AppraisalUiService {
     combineLatest([
       this.authService.loggedUser,
       this.appraisalServices.appraisals$.pipe(filter((res) => !!res)),
-      this.appraisalServices.appraisalsCriteria$,
+      this.appraisalServices.appraisalsCriteria$.pipe(filter((res) => !!res)),
     ])
       .pipe(
         tap(([cveUser, appraisalModels, appraisalCriteria]) => {
-          console.log(appraisalModels, appraisalCriteria)
           if (!cveUser) {
             this.appraisalEntities$.next(null)
           } else {
