@@ -14,6 +14,8 @@ import { LoadingController } from '@ionic/angular'
 
 import { finalize } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
+import { EncryptService } from 'src/app/core/services/encrypt.service'
+import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
 
 @Component({
   selector: 'app-login',
@@ -33,7 +35,8 @@ export class LoginPage implements OnInit {
     private formBuilder: FormBuilder,
     public authService: AuthService,
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private encryptService: EncryptService
   ) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -45,6 +48,33 @@ export class LoginPage implements OnInit {
     this.loadingController.create().then((res) => {
       this.loader = res
     })
+  }
+
+  ionViewDidEnter() {
+    this.prefillLoginForm()
+  }
+
+  prefillLoginForm() {
+    if (localStorage.getItem(LocaleKeys.rememberMeUsername)) {
+      const rememberedUsername = localStorage.getItem(
+        LocaleKeys.rememberMeUsername
+      )
+      this.loginForm.get('username').setValue(rememberedUsername)
+    }
+
+    if (localStorage.getItem(LocaleKeys.rememberMePassword)) {
+      try {
+        const rememberedPassword = this.encryptService.decrypt(
+          localStorage.getItem(LocaleKeys.rememberMePassword)
+        )
+        this.loginForm.get('password').setValue(rememberedPassword)
+      } catch {
+        console.error(
+          'crpyto error, encrypted password is',
+          localStorage.getItem(LocaleKeys.rememberMePassword)
+        )
+      }
+    }
   }
 
   login() {
@@ -65,9 +95,11 @@ export class LoginPage implements OnInit {
           )
           .subscribe(
             () => {
+              this.saveLoginForm()
               this.router.navigate(['/situations-list'])
               this.loader.dismiss()
               this.loginForm.reset()
+              this.loginForm.markAsUntouched()
             },
             (err: Error) => {
               if (err.message === 'invalidlogin') {
@@ -90,5 +122,16 @@ export class LoginPage implements OnInit {
   goToSchoolChoice() {
     this.authService.setChosenSchool(null)
     this.router.navigate(['/school-choice'])
+  }
+
+  saveLoginForm() {
+    localStorage.setItem(
+      LocaleKeys.rememberMeUsername,
+      this.loginForm.value.username
+    )
+    localStorage.setItem(
+      LocaleKeys.rememberMePassword,
+      this.encryptService.encrypt(this.loginForm.value.password)
+    )
   }
 }

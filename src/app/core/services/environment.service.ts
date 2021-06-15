@@ -22,11 +22,13 @@ export class EnvironmentService implements IEnvironment {
   schools: Array<School>
   production: boolean
   helpUrl: string
+  encryptSalt: string
 
   constructor() {
     this.schools = environment.schools
     this.production = environment.production
     this.mockServer = environment.mockServer
     this.helpUrl = environment.helpUrl
+    this.encryptSalt = environment.encryptSalt
   }
 }

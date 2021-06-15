@@ -12,4 +12,5 @@ export const environment: IEnvironment = {
       moodleUrl: 'https://moodle.local',
     },
   ],
+  encryptSalt: 'iirrogzrtgeqeybhr7k98imwfcs52g',
 }

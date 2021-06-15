@@ -37,6 +37,7 @@
     "angularx-qrcode": "^10.0.12",
     "phonegap-plugin-barcodescanner": "^8.1.0",
     "rxjs": "~6.5.5",
+    "simple-crypto-js": "^3.0.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.10.3"
   },
@@ -73,5 +74,17 @@
   "description": "An Ionic project",
   "msw": {
     "workerDirectory": "src"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false,
+    "crypto": false,
+    "stream": false,
+    "http": false,
+    "tls": false,
+    "zlib": false,
+    "https": false,
+    "net": false
   }
 }

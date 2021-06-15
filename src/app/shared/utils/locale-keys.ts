@@ -11,11 +11,17 @@ export class LocaleKeys {
   static schoolChoiceId = 'CVE_AUTH-school-choice'
   static tokenId = 'CVE_AUTH-access-token'
   static authProfile = 'CVE_AUTH-user-profile'
+
+  static rememberMePassword = 'CVE_PWD_rememberMe_password'
+  static rememberMeUsername = 'CVE_PWD_rememberMe_username'
+
   static criteria = 'CVE_DATA-criteria'
 
   static cleanupAllLocalStorage() {
     LocaleKeys.cleanupAuthStorage()
     localStorage.removeItem(LocaleKeys.schoolChoiceId)
+    localStorage.removeItem(LocaleKeys.rememberMePassword)
+    localStorage.removeItem(LocaleKeys.rememberMeUsername)
   }
   static cleanupAuthStorage() {
     localStorage.removeItem(LocaleKeys.tokenId)
