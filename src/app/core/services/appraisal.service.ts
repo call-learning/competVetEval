@@ -16,7 +16,7 @@ import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-cr
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
 import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService } from './auth.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
@@ -55,8 +55,8 @@ export class AppraisalService {
     private baseDataService: BaseDataService,
     private evalPlanService: EvalPlanService
   ) {
-    this.authService.loggedUser.subscribe((cevUser) => {
-      if (cevUser) {
+    this.authService.loginState.subscribe((state) => {
+      if (state === LOGIN_STATE.LOGGED) {
         // Get all appraisals and appraisal criteria for this user.
         this.refresh().subscribe()
       } else {
@@ -285,7 +285,16 @@ export class AppraisalService {
   public submitAppraisal(
     appraisalModel: AppraisalModel
   ): Observable<AppraisalModel> {
-    return this.moodleApiService.submitAppraisal(appraisalModel)
+    return this.moodleApiService.submitAppraisal(appraisalModel).pipe(
+      tap((newAppraisalModel) => {
+        // Update internal cached data.
+        mergeExistingBehaviourSubject(
+          this.appraisalModels$,
+          [newAppraisalModel],
+          ['id']
+        )
+      })
+    )
   }
 
   /**

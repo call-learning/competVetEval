@@ -41,7 +41,7 @@ export class MoodleApiUtils {
       )
   }
 
-  protected static convertArguments(formData, argumentName, value) {
+  static convertArguments(formData, argumentName, value) {
     if (Array.isArray(value)) {
       value.forEach((itemValue, index) => {
         MoodleApiUtils.convertArguments(

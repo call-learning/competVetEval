@@ -13,7 +13,7 @@ import { BehaviorSubject, Observable } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService } from './auth.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
 
 @Injectable({
   providedIn: 'root',
@@ -32,8 +32,8 @@ export class EvalPlanService {
     private authService: AuthService
   ) {
     // Subscribe for the the whole service lifetime
-    this.authService.loggedUser.subscribe((cveUser) => {
-      if (cveUser) {
+    this.authService.loginState.subscribe((loginState) => {
+      if (loginState === LOGIN_STATE.LOGGED) {
         this.refresh().subscribe()
       } else {
         this.planningEntities$.next(null)

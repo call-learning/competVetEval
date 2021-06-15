@@ -29,7 +29,7 @@ import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.m
 import { StudentSituationStatsModel } from '../../shared/models/ui/student-situation-stats.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
 import { AppraisalUiService } from './appraisal-ui.service'
-import { AuthService } from './auth.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { EvalPlanService } from './eval-plan.service'
 
@@ -55,8 +55,8 @@ export class ScheduledSituationService {
     private appraisalUIService: AppraisalUiService,
     private evalPlanService: EvalPlanService
   ) {
-    this.authService.loggedUser.subscribe((loggedUser) => {
-      if (!loggedUser) {
+    this.authService.loginState.subscribe((loginState) => {
+      if (loginState !== LOGIN_STATE.LOGGED) {
         this.scheduledSituationsEntities$.next(null)
         this.studentSituationStats$.next(null)
         this.appraiserSituationStats$.next(null)
@@ -66,7 +66,7 @@ export class ScheduledSituationService {
     })
 
     combineLatest([
-      this.authService.loggedUser,
+      this.authService.loginState,
       this.appraisalUIService.appraisals$,
       this.scheduledSituationsEntities$,
       this.baseDataService.groupAssignment$,
@@ -75,7 +75,7 @@ export class ScheduledSituationService {
       .pipe(
         filter(
           ([
-            loggedUser,
+            loginState,
             appraisals,
             allsituations,
             groupAssignments,
@@ -83,12 +83,12 @@ export class ScheduledSituationService {
           ]) =>
             appraisals != null &&
             allsituations != null &&
-            loggedUser != null &&
+            loginState === LOGIN_STATE.LOGGED &&
             evalplan != null
         ),
         tap(
           ([
-            loggedUser,
+            loginState,
             appraisals,
             allsituations,
             groupAssignments,
@@ -101,14 +101,14 @@ export class ScheduledSituationService {
               this.buildStudentStatistics(
                 allsituations,
                 appraisals,
-                loggedUser.userid
+                this.authService.loggedUser.getValue().userid
               )
             }
           }
         ),
         tap(
           ([
-            loggedUser,
+            loginState,
             appraisals,
             allsituations,
             groupAssignments,

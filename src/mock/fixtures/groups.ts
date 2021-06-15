@@ -8,17 +8,17 @@
  */
 export default [
   {
-    id: '1',
+    id: 1,
     name: 'Groupe A',
-    usermodified: '0',
-    timecreated: '1619376389',
-    timemodified: '1619376389',
+    usermodified: 0,
+    timecreated: 1619376389,
+    timemodified: 1619376389,
   },
   {
-    id: '2',
+    id: 2,
     name: 'Groupe B',
-    usermodified: '0',
-    timecreated: '1619376389',
-    timemodified: '1619376389',
+    usermodified: 0,
+    timecreated: 1619376389,
+    timemodified: 1619376389,
   },
 ]
