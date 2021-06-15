@@ -5,4 +5,5 @@ export interface IEnvironment {
   mockServer: boolean
   helpUrl: string
   schools: Array<School>
+  encryptSalt: string
 }

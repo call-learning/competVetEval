@@ -37,4 +37,5 @@ export const environment: IEnvironment = {
       // moodleUrl: 'https://vetagrotice.vetagro-sup.fr/',
     },
   ],
+  encryptSalt: 'iirrogzrtgeqeybhr7k98imwfcs52g',
 }

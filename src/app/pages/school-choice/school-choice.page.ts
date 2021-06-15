@@ -11,6 +11,7 @@ import { Router } from '@angular/router'
 
 import { SchoolsProviderService } from 'src/app/core/providers/schools-provider.service'
 import { School } from 'src/app/shared/models/school.model'
+import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
 import { AuthService } from './../../core/services/auth.service'
 
 @Component({
@@ -29,6 +30,7 @@ export class SchoolChoicePage implements OnInit {
 
   ngOnInit() {
     this.schoolsList = this.schoolProviderService.getSchoolsList()
+    LocaleKeys.cleanupAllLocalStorage()
   }
 
   chooseSchool(school: School) {
