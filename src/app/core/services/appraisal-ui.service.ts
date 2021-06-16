@@ -56,13 +56,12 @@ export class AppraisalUiService {
     private appraisalServices: AppraisalService
   ) {
     combineLatest([
-      this.authService.loginState,
       this.appraisalServices.appraisals$.pipe(filter((res) => !!res)),
       this.appraisalServices.appraisalsCriteria$,
     ])
       .pipe(
-        tap(([loginState, appraisalModels, appraisalCriteria]) => {
-          if (loginState !== LOGIN_STATE.LOGGED) {
+        tap(([appraisalModels, appraisalCriteria]) => {
+          if (this.authService.loginState.getValue() !== LOGIN_STATE.LOGGED) {
             this.appraisalEntities$.next(null)
           } else {
             if (appraisalCriteria === null) {
