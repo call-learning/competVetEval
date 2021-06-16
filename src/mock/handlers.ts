@@ -9,6 +9,7 @@ import groups from './fixtures/groups'
 import role from './fixtures/role'
 import situations from './fixtures/situations'
 import allUsers from './fixtures/users'
+import { isNumeric } from 'rxjs/internal-compatibility'
 
 const parseFormDataVariable = (currentObj, key, val) => {
   const keyValue = [...key.matchAll(/(\w+)(?=\[(\w+)\])*/g)]
@@ -65,10 +66,13 @@ const getEntities = (entitytype, queryJSON) => {
 
 const queryEntity = (entityType, req, res, ctx) => {
   const { query } = req.body as any
-  const returnedEntities = getEntities(entityType, query)
+  const decodedQuery = decodeURIComponent(query)
+  const returnedEntities = getEntities(entityType, decodedQuery)
 
   return res(ctx.json(returnedEntities))
 }
+
+let currentUserId = 0
 
 const restServerCallback = {
   core_webservice_get_site_info: (req, res, ctx) => {
@@ -103,7 +107,11 @@ const restServerCallback = {
     }
   },
   local_cveteval_get_user_profile: (req, res, ctx) => {
-    const { userid } = req.body as any
+    let { userid } = req.body as any
+    userid = parseInt(userid)
+    if (!userid) {
+      userid = currentUserId
+    }
     const foundUser = allUsers.find((u) => u.userid === userid)
     if (foundUser) {
       return res(ctx.json(foundUser))
@@ -138,16 +146,17 @@ const restServerCallback = {
   local_cveteval_get_latest_modifications: (req, res, ctx) => {
     // @ts-ignore
     const { wstoken, entitytype, query } = req.body as any
-    const selectedEntities = getEntities(entitytype, query)
+    const decodedQuery = decodeURIComponent(query)
+    const selectedEntities = getEntities(entitytype, decodedQuery)
     const latestModificationDate = selectedEntities.reduce(
       (acc, e) => (acc > e.timemodified ? acc : e.timemodified),
       0
     )
-    return res(ctx.json(latestModificationDate))
+    return res(ctx.json({ latestmodifications: latestModificationDate }))
   },
   local_cveteval_submit_appraisal: (req, res, ctx) => {
     // Eval is evil but really practical here :)
-    const {
+    let {
       id,
       studentid,
       appraiserid,
@@ -160,6 +169,27 @@ const restServerCallback = {
       timemodified,
       timecreated,
     } = req.body as any
+    if (id) {
+      id = parseInt(id)
+    }
+    if (!usermodified) {
+      usermodified = 1
+    } else {
+      usermodified = parseInt(usermodified)
+    }
+    if (!timecreated) {
+      timecreated = Math.ceil(Date.now() / 1000)
+    } else {
+      timecreated = parseInt(timecreated)
+    }
+    if (!timemodified) {
+      timemodified = Math.ceil(Date.now() / 1000)
+    } else {
+      timemodified = parseInt(timemodified)
+    }
+    studentid = parseInt(studentid)
+    appraiserid = parseInt(appraiserid)
+    evalplanid = parseInt(evalplanid)
 
     const appraisalmodel = {
       id,
@@ -175,13 +205,17 @@ const restServerCallback = {
       timecreated,
     }
     if (appraisalmodel.id) {
-      const previousmodel = entities.appraisal.find(
-        (app) => (app.id = appraisalmodel.id)
+      const previousmodelIndex = entities.appraisal.findIndex(
+        (app) => app.id == appraisalmodel.id
       )
       appraisalmodel.timemodified = Math.ceil(Date.now() / 1000)
-      Object.assign(previousmodel, appraisalmodel)
+      if (previousmodelIndex !== -1) {
+        entities.appraisal[previousmodelIndex] = appraisalmodel
+      } else {
+        entities.appraisal.push(appraisalmodel)
+      }
     } else {
-      appraisalmodel.id = entities.appraisal.length
+      appraisalmodel.id = entities.appraisal.length + 1
       appraisalmodel.timecreated = Math.ceil(Date.now() / 1000)
       appraisalmodel.timemodified = Math.ceil(Date.now() / 1000)
       appraisalmodel.usermodified = 1
@@ -197,6 +231,9 @@ const restServerCallback = {
     // Eval is evil but really practical here :)
     const { appraisalcriteriamodels } = Object.entries(req.body).reduce(
       (acc, [key, val]) => {
+        if (isNumeric(val)) {
+          val = Number(val)
+        }
         parseFormDataVariable(acc, key, val)
         return acc
       },
@@ -205,38 +242,50 @@ const restServerCallback = {
     const returnedEntities = []
     appraisalcriteriamodels.forEach((apprcritModel) => {
       if (apprcritModel.id) {
-        const previousmodel = entities.appr_crit.find(
-          (app) => (app.id = apprcritModel.id)
+        const previousmodelIndex = entities.appr_crit.findIndex(
+          (app) => app.id === apprcritModel.id
         )
         apprcritModel.timemodified = Math.ceil(Date.now() / 1000)
-        Object.assign(previousmodel, apprcritModel)
+        if (previousmodelIndex === -1) {
+          entities.appr_crit.push(apprcritModel)
+        } else {
+          entities.appr_crit[previousmodelIndex] = apprcritModel
+        }
       } else {
         apprcritModel.timecreated = Math.ceil(Date.now() / 1000)
         apprcritModel.timemodified = Math.ceil(Date.now() / 1000)
         apprcritModel.usermodified = 1
-        apprcritModel.id = entities.appr_crit.length
+        apprcritModel.id = entities.appr_crit.length + 1
         entities.appr_crit.push(apprcritModel)
       }
       returnedEntities.push(apprcritModel)
     })
-    entities.appr_crit.concat(returnedEntities)
     return res(ctx.json([...returnedEntities]))
   },
 }
 
 export const handlers = [
-  rest.post('https://moodle.local/login/token.php', (req, res, ctx) => {
-    const { username, password } = req.body as any
-    const returnValue: any = {}
+  rest.post(
+    'https://moodle.local/local/cveteval/login/token.php',
+    (req, res, ctx) => {
+      const { username, password } = req.body as any
+      const returnValue: any = {}
 
-    const foundUser = allUsers.find((u) => u.username === username)
-    if (username && password && foundUser && foundUser.password === password) {
-      returnValue.token = foundUser.token
-    } else {
-      returnValue.errorcode = 'wronguser'
+      const foundUser = allUsers.find((u) => u.username === username)
+      if (
+        username &&
+        password &&
+        foundUser &&
+        foundUser.password === password
+      ) {
+        returnValue.token = foundUser.token
+        currentUserId = foundUser.userid
+      } else {
+        returnValue.errorcode = 'wronguser'
+      }
+      return res(ctx.json(returnValue))
     }
-    return res(ctx.json(returnValue))
-  }),
+  ),
   rest.post(
     'https://moodle.local/webservice/rest/server.php',
     (req, res, ctx) => {
@@ -249,6 +298,23 @@ export const handlers = [
           ctx.json({ error: 'Method not implemented in mocks' })
         )
       }
+    }
+  ),
+  rest.get(
+    'https://moodle.local/local/cveteval/login/service-nologin.php',
+    (req, res, ctx) => {
+      return res(
+        ctx.json([
+          {
+            data: [
+              {
+                url: 'http://cas.local/',
+                name: 'CAS Test',
+              },
+            ],
+          },
+        ])
+      )
     }
   ),
 ]

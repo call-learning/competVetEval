@@ -12,6 +12,10 @@ import { throwError, Observable } from 'rxjs'
 import { catchError } from 'rxjs/operators'
 
 export class MoodleApiUtils {
+  static getServiceName(): string {
+    return 'cveteval_app_service'
+  }
+
   static apiCall(
     functionName: string,
     args: any,
@@ -37,7 +41,7 @@ export class MoodleApiUtils {
       )
   }
 
-  protected static convertArguments(formData, argumentName, value) {
+  static convertArguments(formData, argumentName, value) {
     if (Array.isArray(value)) {
       value.forEach((itemValue, index) => {
         MoodleApiUtils.convertArguments(
@@ -50,11 +54,13 @@ export class MoodleApiUtils {
       for (const prop in value) {
         if (typeof value[prop] !== 'undefined') {
           const propName = argumentName ? `${argumentName}[${prop}]` : prop
-          MoodleApiUtils.convertArguments(formData, propName, value[prop])
+          const propValue = value[prop]
+          MoodleApiUtils.convertArguments(formData, propName, propValue)
         }
       }
     } else {
-      formData.append(argumentName, value)
+      const encodedValue = encodeURIComponent(value)
+      formData.append(argumentName, encodedValue)
     }
   }
 }

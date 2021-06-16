@@ -37,7 +37,7 @@ import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
 import { AppraisalService } from './appraisal.service'
-import { AuthService } from './auth.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
 import { UserDataService } from './user-data.service'
@@ -56,13 +56,13 @@ export class AppraisalUiService {
     private appraisalServices: AppraisalService
   ) {
     combineLatest([
-      this.authService.loggedUser,
+      this.authService.loginState,
       this.appraisalServices.appraisals$.pipe(filter((res) => !!res)),
       this.appraisalServices.appraisalsCriteria$,
     ])
       .pipe(
-        tap(([cveUser, appraisalModels, appraisalCriteria]) => {
-          if (!cveUser) {
+        tap(([loginState, appraisalModels, appraisalCriteria]) => {
+          if (loginState !== LOGIN_STATE.LOGGED) {
             this.appraisalEntities$.next(null)
           } else {
             if (appraisalCriteria === null) {
@@ -226,34 +226,20 @@ export class AppraisalUiService {
     return from(appraisalModels).pipe(
       // Retrieve relevant appraisal models.
       concatMap((appraisalModel: AppraisalModel) => {
-        let appraisalExistSameTime = false
-        // First check that the appraisal does not exist currently.
-        if (this.appraisalEntities$.getValue()) {
-          appraisalExistSameTime =
-            this.appraisalEntities$
-              .getValue()
-              .findIndex(
-                (appr) => appr.timeModified === appraisalModel.timemodified
-              ) !== -1
-        }
-        if (appraisalExistSameTime || !appraisalCriteriaModels.length) {
-          return of(null)
-        } else {
-          // Then we convert.
-          return this.convertAppraisalCriterionModelsToTree(
-            appraisalCriteriaModels.filter(
-              (apc) => apc.appraisalid === appraisalModel.id
-            )
-          ).pipe(
-            concatMap((appraisalCriteriaUI) => {
-              return this.convertAppraisalModel(
-                appraisalModel,
-                appraisalCriteriaUI
-              )
-            }),
-            first()
+        return this.convertAppraisalCriterionModelsToTree(
+          appraisalCriteriaModels.filter(
+            (apc) => apc.appraisalid === appraisalModel.id
           )
-        }
+        ).pipe(
+          concatMap((appraisalCriteriaUI) => {
+            return this.convertAppraisalModel(
+              appraisalModel,
+              appraisalCriteriaUI
+            )
+          }),
+          first()
+        )
+        // }
       }),
       // Filter out unwanted appraisals.
       filter((appraisalui) => appraisalui !== null),

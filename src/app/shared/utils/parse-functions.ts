@@ -1,3 +1,12 @@
+/**
+ * Parse functions
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
+
 export function parseIntMember(object: any, value: string) {
   if (object && object[value] && typeof (object[value] === 'string'))
     object[value] = parseInt(object[value], 10)

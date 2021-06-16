@@ -71,4 +71,17 @@
       <a>Mot de passe oublié ?</a>
     </div> -->
   </form>
+  <ion-content class="ion-padding-vertical ion-text-center">
+    <div *ngFor="let idp of idpList">
+      <button class="btn btn-primary btn-full" (click)="launchIdp(idp.url)">
+        <ion-img
+          *ngIf="idp.iconurl"
+          src="{{idp.iconurl}}"
+          role="presentation"
+          class="login__cas-icon"
+        ></ion-img>
+        Se connecter avec {{ idp.name }}
+      </button>
+    </div>
+  </ion-content>
 </ion-content>

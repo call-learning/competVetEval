@@ -20,7 +20,7 @@ import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignmen
 import { RoleModel } from '../../shared/models/moodle/role.model'
 import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService } from './auth.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
 
 const EntityClass: any = {
   clsituation: SituationModel,
@@ -58,8 +58,8 @@ export class BaseDataService {
     private moodleApiService: MoodleApiService,
     private authService: AuthService
   ) {
-    this.authService.loggedUser.subscribe((cveUser) => {
-      if (cveUser) {
+    this.authService.loginState.subscribe((loginState) => {
+      if (loginState === LOGIN_STATE.LOGGED) {
         Object.keys(this.entities$).forEach((entityName) => {
           this.refresh(entityName).subscribe()
           // Subscribe for the whole service lifetime
