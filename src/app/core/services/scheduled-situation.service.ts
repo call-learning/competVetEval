@@ -358,11 +358,12 @@ export class ScheduledSituationService {
       allsituations.forEach((situation) => {
         const appraisalsRequired = situation.situation.expectedevalsnb
         const existingAppraisalAppraiser = appraisals
-          ? appraisals.filter(
-              (appraisal) =>
+          ? appraisals.filter((appraisal) => {
+              return (
                 appraisal.evalPlan.id === situation.evalPlanId &&
-                appraisal.appraiser // Make sure we only count appraisal assigned to an appraiser
-            )
+                appraisal.appraiser
+              ) // Make sure we only count appraisal assigned to an appraiser
+            })
           : []
         // Now fetch all students involved
         const nbAppraisalAppraiserStudent = existingAppraisalAppraiser.filter(

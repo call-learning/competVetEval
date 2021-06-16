@@ -41,6 +41,13 @@
               class="nnki-pointer"
               [class.-selected]="subcriterion.grade == grade"
             ></svg-icon>
+            <svg-icon
+              src="assets/images/svg-icons/emojis/ranking-active-add.svg"
+              [svgStyle]="{ 'width.px': 36 }"
+              (click)="selectGrade(subcriterion, null)"
+              class="nnki-pointer"
+              [class.-selected]="subcriterion.grade == null"
+            ></svg-icon>
           </div>
         </div>
       </div>

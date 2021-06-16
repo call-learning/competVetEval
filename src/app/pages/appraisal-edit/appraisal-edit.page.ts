@@ -113,7 +113,12 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
 
   selectGrade(criterion, grade, event) {
     event.stopPropagation()
-    criterion.grade = grade
+
+    if (grade === null) {
+      delete criterion.grade
+    } else {
+      criterion.grade = grade
+    }
     this.dismissEvaluateCriterion(criterion, null)
   }
 
@@ -168,7 +173,7 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
 
   getSubcriteriaGradedNumber(criterion: CriterionForAppraisalTreeModel) {
     return criterion.subcriteria.filter((sc) => {
-      return sc.grade !== 0
+      return !!sc.grade
     }).length
   }
 
