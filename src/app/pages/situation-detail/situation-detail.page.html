@@ -54,7 +54,9 @@
       </div>
     </div>
     <div class="page-subtitle">Observations</div>
-
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
     <div *ngIf="!appraisalsloaded">
       <ion-skeleton-text animated></ion-skeleton-text>
     </div>

@@ -59,8 +59,7 @@ export class MoodleApiUtils {
         }
       }
     } else {
-      const encodedValue = encodeURIComponent(value)
-      formData.append(argumentName, encodedValue)
+      formData.append(argumentName, value)
     }
   }
 }

@@ -163,4 +163,15 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         })
     }
   }
+
+  /**
+   * Refresh situation
+   *
+   * @param event
+   */
+  doRefresh(event) {
+    this.appraisalUIService.refreshAppraisals().subscribe((allsituations) => {
+      event.target.complete()
+    })
+  }
 }

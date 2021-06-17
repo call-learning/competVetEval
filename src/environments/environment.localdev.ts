@@ -4,6 +4,8 @@ export const environment: IEnvironment = {
   production: false,
   mockServer: false,
   helpUrl: 'http://pedagogie.vetagro-sup.fr/Pages/CompetVet/co/guide-ts.html',
+  schoolConfigUrl:
+    'https://raw.githubusercontent.com/call-learning/competVetEval/public/capacitor.config.json',
   schools: [
     {
       id: 'local-server',

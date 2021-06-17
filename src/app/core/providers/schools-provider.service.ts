@@ -14,19 +14,64 @@ import { Injectable } from '@angular/core'
 import { School } from 'src/app/shared/models/school.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { EnvironmentService } from '../services/environment.service'
+import { BehaviorSubject, throwError } from 'rxjs'
+import {
+  catchError,
+  concat,
+  concatMap,
+  map,
+  tap,
+  toArray,
+} from 'rxjs/operators'
+import { HttpClient, HttpBackend, HttpHeaders } from '@angular/common/http'
 
 @Injectable({
   providedIn: 'root',
 })
 export class SchoolsProviderService {
-  constructor(private environment: EnvironmentService) {}
+  public schoolList$ = new BehaviorSubject<School[]>(null)
+  // Specific HTTP Client without any injector
+  private httpClient: HttpClient
 
-  /**
-   * Get all school list
-   * @return School[] a list of schools to connect to
-   */
-  getSchoolsList(): Array<School> {
-    return this.environment.schools
+  constructor(private environment: EnvironmentService, handler: HttpBackend) {
+    if (this.environment.schoolConfigUrl) {
+      const httpClient = new HttpClient(handler)
+      httpClient
+        .get<School[]>(this.environment.schoolConfigUrl, {
+          responseType: 'json',
+          headers: new HttpHeaders({
+            'Access-Control-Allow-Origin': '*',
+          }),
+        })
+        .pipe(
+          map((schoolList) => {
+            // Add school, and override it if needed.
+            const allSchool = { ...this.environment.schools, ...schoolList }
+            return allSchool.reduce((uniqueSchools, item) => {
+              const hasItemIndex = uniqueSchools.findIndex(
+                (el) => el.id === item.id
+              )
+              if (hasItemIndex !== -1) {
+                uniqueSchools[hasItemIndex] = item
+              } else {
+                uniqueSchools.push(item)
+              }
+              return uniqueSchools
+            }, [])
+          }),
+          catchError((err) => {
+            console.log(
+              `Cannot fetch school information: (${err.name}:${err.message})`
+            )
+            return this.environment.schools
+          }),
+          toArray(),
+          tap((schoolList: School[]) => this.schoolList$.next(schoolList))
+        )
+        .subscribe()
+    } else {
+      this.schoolList$.next(this.environment.schools)
+    }
   }
 
   /**
@@ -35,9 +80,14 @@ export class SchoolsProviderService {
    * @param id
    */
   getSchoolFromId(id: string) {
-    return this.getSchoolsList().find((school) => {
-      return school.id === id
-    })
+    const currentList = this.schoolList$.getValue()
+    if (id && currentList) {
+      return this.schoolList$.getValue().find((school) => {
+        return school.id === id
+      })
+    } else {
+      return null
+    }
   }
 
   /**
@@ -64,6 +114,10 @@ export class SchoolsProviderService {
    * Get currently selected school or null
    */
   setSelectedSchoolId(id: string | null) {
-    localStorage.setItem(LocaleKeys.schoolChoiceId, id)
+    if (id === 'null' || id === null) {
+      localStorage.removeItem(LocaleKeys.schoolChoiceId)
+    } else {
+      localStorage.setItem(LocaleKeys.schoolChoiceId, id)
+    }
   }
 }

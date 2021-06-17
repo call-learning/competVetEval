@@ -29,7 +29,9 @@ export class SchoolChoicePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.schoolsList = this.schoolProviderService.getSchoolsList()
+    this.schoolProviderService.schoolList$.subscribe((slist) => {
+      this.schoolsList = slist
+    })
     LocaleKeys.cleanupAllLocalStorage()
   }
 
