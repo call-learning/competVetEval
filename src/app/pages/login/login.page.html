@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goToSchoolChoice()">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        Écoles
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Identification</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding ion-text-center">
+  <img [src]="authService.chosenSchool?.logo" class="login__school-logo" />
+
+  <!-- todo: implement-->
+  <!-- <button
+    class="btn btn-primary btn-full btn-icon-right"
+    (click)="notImplemented()"
+  >
+    Se connecter avec <img src="assets/images/logos/logo-cas.png" />
+  </button> -->
+
+  <!-- <p class="login__form-separator">
+    <span> ou </span>
+  </p> -->
+
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="login()"
+    (keyup.enter)="login()"
+    class="form"
+    [class.-submitted]="formSubmitted"
+  >
+    <label class="form-label">Nom d'utilisateur</label>
+    <ion-item class="form-input -backgroundIcon" lines="none">
+      <ion-input
+        formControlName="username"
+        autocomplete="off"
+        spellcheck="false"
+      ></ion-input>
+      <svg-icon
+        src="assets/images/svg-icons/icon-email.svg"
+        [svgStyle]="{ 'width.px':17 }"
+      ></svg-icon>
+    </ion-item>
+
+    <label class="form-label">Mot de passe</label>
+    <ion-item class="form-input -backgroundIcon" lines="none">
+      <app-show-hide-password>
+        <ion-input
+          type="password"
+          placeholder="Password"
+          formControlName="password"
+        ></ion-input>
+      </app-show-hide-password>
+      <svg-icon
+        src="assets/images/svg-icons/icon-password.svg"
+        [svgStyle]="{ 'width.px':17 }"
+      ></svg-icon>
+    </ion-item>
+
+    <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
+
+    <button class="btn btn-primary btn-full" (click)="login()">
+      Se connecter
+    </button>
+
+    <!-- todo: implement-->
+    <!-- <div class="button-link" (click)="notImplemented()">
+      <a>Mot de passe oublié ?</a>
+    </div> -->
+  </form>
+  <ion-content class="ion-padding-vertical ion-text-center">
+    <div *ngFor="let idp of idpList">
+      <button class="btn btn-primary btn-full" (click)="launchIdp(idp.url)">
+        <ion-img
+          *ngIf="idp.iconurl"
+          src="{{idp.iconurl}}"
+          role="presentation"
+          class="login__cas-icon"
+        ></ion-img>
+        Se connecter avec {{ idp.name }}
+      </button>
+    </div>
+  </ion-content>
+</ion-content>

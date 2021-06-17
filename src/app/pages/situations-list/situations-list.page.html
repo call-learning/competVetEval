@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-row>
+      <ion-col>
+        <div class="situations-list__toolbar">
+          <div class="situations-list__top-toolbar">
+            <div class="situations-list__avatar" (click)="openMenu()">
+              <img src="https://via.placeholder.com/50x50" />
+            </div>
+            <div class="situations-list__title">
+              <ng-container *ngIf="authService.isStudent">
+                Situations
+              </ng-container>
+              <ng-container *ngIf="authService.isAppraiser">
+                Observations
+              </ng-container>
+            </div>
+          </div>
+          <div class="situations-list__bottom-toolbar">
+            <ion-segment
+              (ionChange)="segmentChanged($event)"
+              value="today"
+              mode="ios"
+            >
+              <ion-segment-button value="today">Maintenant</ion-segment-button>
+              <ion-segment-button value="all">Toutes</ion-segment-button>
+            </ion-segment>
+
+            <!-- todo : implement -->
+            <!-- <button
+              class="btn btn-primary btn-icon-left btn-light"
+              (click)="filterSituations()"
+            >
+              <ion-icon name="filter"></ion-icon>
+              Filtrer
+            </button> -->
+          </div>
+        </div>
+      </ion-col>
+      <ion-col class="ion-align-self-center">
+        <div class="situations-username">
+          <ng-container *ngIf="authService.loggedUser.getValue()">
+            {{authService.loggedUser.getValue().fullname}}
+          </ng-container>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="ion-margin-vertical">
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+    <div
+      class="list-item"
+      [routerLink]="authService.isStudent ? ['/scheduled-situation-detail', situation.evalPlanId] :
+      ['/scheduled-situation-detail', situation.evalPlanId, situation.studentId ]"
+      routerDirection="forward"
+      *ngFor="let situation of situationsDisplayed"
+    >
+      <div *ngIf="authService.isStudent" class="situations-list__card-item">
+        <app-student-situation-card
+          [scheduledSituation]="situation"
+        ></app-student-situation-card>
+      </div>
+      <div *ngIf="authService.isAppraiser" class="situations-list__card-item">
+        <app-appraiser-situation-card
+          [scheduledSituation]="situation"
+          [studentId]="situation.studentId"
+        >
+        </app-appraiser-situation-card>
+      </div>
+    </div>
+  </div>
+
+  <ion-fab
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed"
+    *ngIf="authService.isAppraiser"
+    (click)="openModalScanAppraisal()"
+  >
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar>
+    <ng-container *ngIf="step == 'context'">
+      <ion-buttons slot="start">
+        <ion-button (click)="dismissModal()"> Annuler</ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end">
+        <ion-button (click)="nextStep()" [disabled]="!askAppraisalForm.valid">
+          Suivant
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ng-container *ngIf="step == 'qr-code'">
+      <ion-buttons slot="start">
+        <ion-button (click)="previousStep()">
+          <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end">
+        <ion-button (click)="dismissModal()"> OK</ion-button>
+      </ion-buttons>
+    </ng-container>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ng-container *ngIf="step == 'context'">
+    <form
+      class="form"
+      [formGroup]="askAppraisalForm"
+      (ngSubmit)="nextStep()"
+      [class.-submitted]="formSubmitted"
+    >
+      <p class="ion-text-center page-text">
+        Précisez la situation de cette observation.
+      </p>
+
+      <ion-item class="form-input" lines="none">
+        <ion-textarea
+          class="-big"
+          formControlName="context"
+          #contextInput
+        ></ion-textarea>
+      </ion-item>
+
+      <button class="btn btn-primary btn-full">Suivant</button>
+    </form>
+  </ng-container>
+
+  <ng-container *ngIf="step == 'qr-code'">
+    <p class="ion-text-center page-text">
+      Présentez ce QR Code à votre observateur pour qu’il puisse démarrer
+      l’observation
+    </p>
+
+    <div class="modal-ask-appraisal__qr-code ion-text-center">
+      <qrcode
+        [qrdata]="qrCodeData"
+        [width]="256"
+        [errorCorrectionLevel]="'M'"
+      ></qrcode>
+    </div>
+
+    <!-- todo : implement -->
+    <!-- <div class="button-link nnki-mb4">
+      <a (click)="notImplemented()">Envoyer une demande par mail</a>
+    </div> -->
+  </ng-container>
+</ion-content>

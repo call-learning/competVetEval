@@ -1,0 +1,50 @@
+// toolbar
+
+ion-title {
+  padding-left: unset;
+  padding-right: unset;
+  padding-inline-start: 20px;
+  padding-inline-end: 20px;
+}
+
+.sc-ion-buttons-ios-s ion-button,
+.sc-ion-buttons-md-s ion-button {
+  font-size: 14px;
+}
+
+.sc-ion-buttons-ios-s ion-icon[slot='start'],
+.sc-ion-buttons-md-s ion-icon[slot='start'] {
+  margin-inline-end: 3px;
+}
+
+ion-button {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+ion-toolbar.menu-toolbar ion-title {
+  height: 126px;
+}
+
+// buttons
+
+ion-fab-button {
+  width: 48px;
+  height: 48px;
+}
+
+// segment
+
+ion-segment.in-toolbar-color:not(.ion-color) {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+// fab
+
+ion-fab.fab-vertical-bottom {
+  bottom: 20px;
+}
+
+ion-fab.fab-horizontal-end {
+  right: calc(20px + var(--ion-safe-area-right, 0px));
+}

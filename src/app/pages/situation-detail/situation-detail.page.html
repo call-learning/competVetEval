@@ -1,0 +1,152 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button [routerLink]="['/situations-list']" routerDirection="back">
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <button
+        class="btn btn-transparent"
+        (click)="openModalSituationChart()"
+        color="primary"
+        [disabled]="!appraisals?.length"
+      >
+        <svg-icon
+          src="assets/images/svg-icons/icon-chart.svg"
+          [svgStyle]="{ 'width.px':31 }"
+        ></svg-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="situation-detail__illustration">
+    <img src="assets/images/illustrations/illustration-surgeon.png" />
+  </div>
+
+  <ng-container *ngIf="scheduledSituation">
+    <div class="situation-detail__header">
+      <div class="situation-detail__header-content">
+        <div class="page-title">{{ scheduledSituation.situation.title }}</div>
+        <div class="page-descr">
+          {{ scheduledSituation.situation.description }}
+        </div>
+        <div class="page-dates">
+          {{ scheduledSituation.evalPlan.starttime * 1000 | date:'d/MM/yy' }} -
+          {{ scheduledSituation.evalPlan.endtime * 1000 | date:'d/MM/yy' }}
+        </div>
+        <div *ngIf="authService.isStudent" class="situations-list__card-item">
+          <app-student-situation-card
+            [scheduledSituation]="scheduledSituation"
+            [showHeader]="false"
+          ></app-student-situation-card>
+        </div>
+        <div *ngIf="authService.isAppraiser" class="situations-list__card-item">
+          <app-appraiser-situation-card
+            [scheduledSituation]="scheduledSituation"
+            [studentId]="scheduledSituation.studentId"
+            [showHeader]="false"
+          >
+          </app-appraiser-situation-card>
+        </div>
+      </div>
+    </div>
+    <div class="page-subtitle">Observations</div>
+
+    <div *ngIf="!appraisalsloaded">
+      <ion-skeleton-text animated></ion-skeleton-text>
+    </div>
+    <div *ngIf="appraisalsloaded">
+      <div class="situation-detail__no-appraisals" *ngIf="!appraisals?.length">
+        Cette situation n’a pas encore été évaluée
+      </div>
+      <div class="ion-margin-vertical" *ngIf="appraisals?.length">
+        <ion-list *ngFor="let appraisal of appraisals">
+          <a
+            class="list-item"
+            [routerLink]="(appraisal.appraiser?.userid === currentUserId) ? ['/appraisal-edit', appraisal.id]
+        : ['/appraisal-detail', appraisal.id]"
+            routerDirection="forward"
+            *ngIf="appraisal.appraiser"
+          >
+            <div class="list-item-content">
+              <div class="list-item-title">
+                <ion-item lines="none">
+                  <ion-avatar slot="start"
+                    ><img src="{{appraisal.appraiser?.userpictureurl}}"
+                  /></ion-avatar>
+                  <ion-label
+                    ><strong
+                      >{{ appraisal.appraiser?.fullname }}</strong
+                    ></ion-label
+                  >
+                </ion-item>
+              </div>
+              <div class="list-item-subtitle">
+                <ng-container *ngIf="appraisal.type == 1">
+                  <span>Observateur</span>
+                </ng-container>
+                <!-- todo : implement -->
+                <ng-container *ngIf="appraisal.type == 2">
+                  <span>Responsable</span>
+                  <svg-icon
+                    src="assets/images/svg-icons/icon-star.svg"
+                    [svgStyle]="{ 'width.px':18 }"
+                  ></svg-icon>
+                </ng-container>
+              </div>
+            </div>
+            <div class="list-item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-calendar.svg"
+                [svgStyle]="{ 'width.px':16 }"
+              ></svg-icon>
+              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (HH:mm)' }}
+            </div>
+          </a>
+          <a
+            class="list-item"
+            (click)="showPendingAppraisal(appraisal.id)"
+            *ngIf="!appraisal.appraiser"
+          >
+            <div class="list-item-content">
+              <div class="list-item-title">
+                <ion-item lines="none" *ngIf="!appraisal.appraiser">
+                  <ion-icon name="help-circle-outline"></ion-icon>
+                  <ion-label>En attente...</ion-label>
+                </ion-item>
+              </div>
+            </div>
+            <div class="list-item-info">
+              <svg-icon
+                src="assets/images/svg-icons/icon-calendar.svg"
+                [svgStyle]="{ 'width.px':16 }"
+              ></svg-icon>
+              {{ appraisal.timeModified * 1000 | date:'d/MM/yy (HH:mm)' }}
+            </div>
+          </a>
+        </ion-list>
+      </div>
+    </div>
+    <div class="situation-detail__ask-appraisal" *ngIf="authService.isStudent">
+      <ion-button
+        class="btn btn-primary btn-full nnki-mb4"
+        (click)="openModalAskAppraisal()"
+        [disabled]="!appraisalsloaded"
+      >
+        Demander une observation
+      </ion-button>
+    </div>
+    <ion-button
+      class="btn-full"
+      [routerLink]="['/evaluate', evalPlanId, studentId]"
+      [disabled]="!appraisalsloaded"
+      *ngIf="authService.isAppraiser"
+    >
+      <ion-icon name="chevron-forward"></ion-icon>
+      Démarrer l'observation
+    </ion-button>
+  </ng-container>
+</ion-content>

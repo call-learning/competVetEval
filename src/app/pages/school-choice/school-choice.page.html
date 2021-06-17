@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sélection de l'école</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <a
+    class="card card--school"
+    *ngFor="let school of schoolsList"
+    (click)="chooseSchool(school)"
+  >
+    <img [src]="school.logo" />
+  </a>
+
+  <!-- todo: implement-->
+  <!-- <div class="button-link">
+    <a (click)="notImplemented()">Connexion manuelle</a>
+  </div> -->
+</ion-content>

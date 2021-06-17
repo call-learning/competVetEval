@@ -1,0 +1,16 @@
+.card {
+  display: flex;
+
+  margin-bottom: 15px;
+
+  border-radius: 7px;
+  background-color: var(--white);
+  @include shadow();
+}
+
+.card--school {
+  height: 81px;
+
+  align-items: center;
+  justify-content: center;
+}

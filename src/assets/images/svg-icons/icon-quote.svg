@@ -1,0 +1,9 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='16' height='11' viewBox='0 0 16 11'>
+  <g fill='none' fill-opacity='.25' fill-rule='evenodd'>
+    <g fill='currentColor' fill-rule='nonzero'>
+      <path
+        d='M37.746 901L40 896.579V890h-6.873v6.579h3.437L34.309 901h3.437zm-9.182 0l2.309-4.421V890H24v6.579h3.436L25.127 901h3.437z'
+        transform='translate(-24 -890) matrix(-1 0 0 1 64 0)' />
+    </g>
+  </g>
+</svg>
