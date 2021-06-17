@@ -15,38 +15,26 @@ import { School } from 'src/app/shared/models/school.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { EnvironmentService } from '../services/environment.service'
 import { BehaviorSubject, throwError } from 'rxjs'
-import {
-  catchError,
-  concat,
-  concatMap,
-  map,
-  tap,
-  toArray,
-} from 'rxjs/operators'
-import { HttpClient, HttpBackend, HttpHeaders } from '@angular/common/http'
+import { catchError, map, tap } from 'rxjs/operators'
+import { HttpClient, HttpBackend } from '@angular/common/http'
 
 @Injectable({
   providedIn: 'root',
 })
 export class SchoolsProviderService {
   public schoolList$ = new BehaviorSubject<School[]>(null)
-  // Specific HTTP Client without any injector
+  // Specific HTTP Client without any injector.
   private httpClient: HttpClient
 
   constructor(private environment: EnvironmentService, handler: HttpBackend) {
     if (this.environment.schoolConfigUrl) {
       const httpClient = new HttpClient(handler)
       httpClient
-        .get<School[]>(this.environment.schoolConfigUrl, {
-          responseType: 'json',
-          headers: new HttpHeaders({
-            'Access-Control-Allow-Origin': '*',
-          }),
-        })
+        .get<School[]>(this.environment.schoolConfigUrl)
         .pipe(
           map((schoolList) => {
             // Add school, and override it if needed.
-            const allSchool = { ...this.environment.schools, ...schoolList }
+            const allSchool = [...this.environment.schools, ...schoolList]
             return allSchool.reduce((uniqueSchools, item) => {
               const hasItemIndex = uniqueSchools.findIndex(
                 (el) => el.id === item.id
@@ -65,7 +53,6 @@ export class SchoolsProviderService {
             )
             return this.environment.schools
           }),
-          toArray(),
           tap((schoolList: School[]) => this.schoolList$.next(schoolList))
         )
         .subscribe()

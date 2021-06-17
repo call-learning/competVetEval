@@ -15,7 +15,7 @@ import {
   ModalController,
 } from '@ionic/angular'
 
-import { debounceTime, filter, takeUntil } from 'rxjs/operators'
+import { filter, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
