@@ -57,7 +57,11 @@ export class ModalAppraisalCriterionComponent implements OnInit {
   }
 
   selectGrade(subcriterion, grade) {
-    subcriterion.grade = grade
+    if (grade === null) {
+      delete subcriterion.grade
+    } else {
+      subcriterion.grade = grade
+    }
     this.dismissEvaluateSubcriterion(subcriterion)
   }
 }
