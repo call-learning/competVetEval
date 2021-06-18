@@ -170,8 +170,18 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
    * @param event
    */
   doRefresh(event) {
-    this.appraisalUIService.refreshAppraisals().subscribe((allsituations) => {
+    const REFRESH_TIMEOUT = 10000 // If after 10 sec we have no refresh even
+    // we stop the spinner. This happens when there is no appraisal at all but
+    // this is a temporary solution that has to be dealt with differently.
+    const refresh = this.appraisalUIService
+      .refreshAppraisals()
+      .subscribe((allsituations) => {
+        event.target.complete()
+      })
+    setTimeout(() => {
+      console.log('Situation list: refresh event cancelled')
       event.target.complete()
-    })
+      refresh.unsubscribe()
+    }, REFRESH_TIMEOUT)
   }
 }

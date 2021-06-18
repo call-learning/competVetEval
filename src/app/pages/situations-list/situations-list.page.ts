@@ -133,10 +133,18 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   doRefresh(event) {
-    this.scheduledSituationsService
+    const REFRESH_TIMEOUT = 10000 // If after 10 sec we have no refresh even
+    // we stop the spinner. This happens when there is no appraisal at all but
+    // this is a temporary solution that has to be dealt with differently.
+    const refresh = this.scheduledSituationsService
       .refreshStats()
       .subscribe((allsituations) => {
         event.target.complete()
       })
+    setTimeout(() => {
+      console.log('Situation list: refresh event cancelled')
+      event.target.complete()
+      refresh.unsubscribe()
+    }, REFRESH_TIMEOUT)
   }
 }
