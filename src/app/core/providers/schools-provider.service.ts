@@ -53,11 +53,15 @@ export class SchoolsProviderService {
             )
             return this.environment.schools
           }),
-          tap((schoolList: School[]) => this.schoolList$.next(schoolList))
+          tap((schoolList: School[]) => {
+            this.schoolList$.next(schoolList)
+            this.schoolList$.complete()
+          })
         )
         .subscribe()
     } else {
       this.schoolList$.next(this.environment.schools)
+      this.schoolList$.complete()
     }
   }
 

@@ -73,9 +73,11 @@ export class ModalScanAppraisalComponent implements OnInit {
         const appraisalId = Number.parseInt(barcodeData.text, 10)
 
         this.loadingController.create().then((res) => {
-          this.loader = res
-          this.loader.present()
-          this.appraisalUIService
+          const REFRESH_TIMEOUT = 30000 // If after 30 sec we have no refresh even
+          // we stop the spinner. This happens mostly when the appraiser is not linked
+          // to the student.
+          let loaderDismissed = false
+          const refresh = this.appraisalUIService
             .waitForAppraisalId(appraisalId, true)
             .pipe(
               filter(
@@ -85,7 +87,9 @@ export class ModalScanAppraisalComponent implements OnInit {
             )
             .subscribe((appraisal: AppraisalUI) => {
               if (this.loader.animated) {
-                this.loader.dismiss()
+                this.loader.dismiss().then(() => {
+                  loaderDismissed = true
+                })
               }
               if (appraisal.appraiser !== null) {
                 this.toastController
@@ -108,6 +112,28 @@ export class ModalScanAppraisalComponent implements OnInit {
                   })
               }
             })
+
+          setTimeout(() => {
+            console.log('Scan cancelled')
+            if (!loaderDismissed) {
+              this.loader.dismiss()
+              this.toastController
+                .create({
+                  message:
+                    "L'observation n'a pas pu être récupérée, pourriez-vous " +
+                    'vérifier que vous êtes bien dans la liste des observateurs de cet étudiant?',
+                  duration: 2000,
+                  color: 'warning',
+                })
+                .then((toast) => {
+                  toast.present()
+                })
+              refresh.unsubscribe()
+            }
+          }, REFRESH_TIMEOUT)
+
+          this.loader = res
+          this.loader.present()
         })
       })
       .catch((err) => {

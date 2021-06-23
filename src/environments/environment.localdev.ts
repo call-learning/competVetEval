@@ -4,6 +4,8 @@ export const environment: IEnvironment = {
   production: false,
   mockServer: false,
   helpUrl: 'http://pedagogie.vetagro-sup.fr/Pages/CompetVet/co/guide-ts.html',
+  schoolConfigUrl:
+    'https://competveteval.s3.eu-west-3.amazonaws.com/schools.json',
   schools: [
     {
       id: 'local-server',

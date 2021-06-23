@@ -13,7 +13,15 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { of, throwError, BehaviorSubject, Observable } from 'rxjs'
-import { catchError, concatMap, map, tap } from 'rxjs/operators'
+import {
+  catchError,
+  concatMap,
+  filter,
+  last,
+  map,
+  switchAll,
+  tap,
+} from 'rxjs/operators'
 import { School } from 'src/app/shared/models/school.model'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
@@ -105,36 +113,40 @@ export class AuthService {
     this.chosenSchool = school
   }
 
-  recoverSession() {
-    if (this.schoolsProviderService.getSelectedSchoolId()) {
-      this.chosenSchool = this.schoolsProviderService.getSchoolFromId(
-        this.schoolsProviderService.getSelectedSchoolId()
-      )
-      if (!this.chosenSchool) {
-        LocaleKeys.cleanupAllLocalStorage()
-        this.loginState.next(LOGIN_STATE.IDLE)
-        return of(true)
-      }
-      if (this.schoolsProviderService.getSelectedSchoolId()) {
-        this.httpAuthService
-          .getIdps()
-          .subscribe((newlist) => this.idpList.next(newlist))
-      }
-    }
-    if (this.variablesInSessionExists()) {
-      return this.recoverStorageVariables().pipe(
-        tap((res) => {
-          this.loginState.next(LOGIN_STATE.LOGGED)
-        }),
-        catchError((err) => {
-          this.logout()
-          return throwError(err)
-        })
-      )
-    } else {
-      this.loginState.next(LOGIN_STATE.IDLE)
-      return of(true)
-    }
+  recoverSession(): Observable<boolean> {
+    return this.schoolsProviderService.schoolList$.pipe(
+      filter((res) => !!res),
+      map(() => {
+        if (this.schoolsProviderService.getSelectedSchoolId()) {
+          this.chosenSchool = this.schoolsProviderService.getSchoolFromId(
+            this.schoolsProviderService.getSelectedSchoolId()
+          )
+          if (!this.chosenSchool) {
+            LocaleKeys.cleanupAllLocalStorage()
+            this.loginState.next(LOGIN_STATE.IDLE)
+            return of(true)
+          }
+          this.httpAuthService
+            .getIdps()
+            .subscribe((newlist) => this.idpList.next(newlist))
+        }
+        if (this.variablesInSessionExists()) {
+          return this.recoverStorageVariables().pipe(
+            tap((res) => {
+              this.loginState.next(LOGIN_STATE.LOGGED)
+            }),
+            catchError((err) => {
+              this.logout()
+              return throwError(err)
+            })
+          )
+        } else {
+          this.loginState.next(LOGIN_STATE.IDLE)
+          return of(true)
+        }
+      }),
+      switchAll()
+    )
   }
 
   setSession(token: string) {
