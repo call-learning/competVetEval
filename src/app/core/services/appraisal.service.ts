@@ -103,25 +103,26 @@ export class AppraisalService {
    * @protected
    */
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
-    return combineLatest([
-      this.evalPlanService.plans$.pipe(
-        filter((obj) => obj != null),
-        first()
-      ),
-      this.baseDataService.situations$.pipe(
-        filter((obj) => obj != null),
-        first()
-      ),
-      this.baseDataService.roles$.pipe(
-        filter((obj) => obj != null),
-        first()
-      ),
-    ]).pipe(
-      concatMap(([evalplans, situations, roles]) => {
+    return this.baseDataService.isLoaded$.pipe(
+      filter((isLoaded) => isLoaded),
+      first(),
+      concatMap(() => {
+        return this.evalPlanService.plans$.pipe(
+          filter((obj) => obj != null),
+          first()
+        )
+      }),
+      concatMap((evalplans) => {
         // First check all situations involved.
-        const mySituations = situations.filter((sit) => {
-          return roles.find((r) => r.clsituationid === sit.id) !== undefined
-        })
+        const mySituations = this.baseDataService.entities.situations.filter(
+          (sit) => {
+            return (
+              this.baseDataService.entities.roles.find(
+                (r) => r.clsituationid === sit.id
+              ) !== undefined
+            )
+          }
+        )
         // Filter all eval plan depending on the current appraiser.
         return from(
           evalplans.filter((evalplan) => {

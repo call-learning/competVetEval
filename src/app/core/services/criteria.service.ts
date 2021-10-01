@@ -37,10 +37,10 @@ export class CriteriaService {
    * @param authService
    */
   constructor(private baseDataService: BaseDataService) {
-    this.baseDataService.criteria$
-      .pipe(filter((res) => !!res))
-      .subscribe((newcriteria) => {
-        this.refreshCriteria(newcriteria)
+    this.baseDataService.isLoaded$
+      .pipe(filter((isLoaded) => isLoaded))
+      .subscribe(() => {
+        this.refreshCriteria(this.baseDataService.entities.criteria)
       })
   }
 
@@ -70,16 +70,14 @@ export class CriteriaService {
   public getCriteriaFromEvalGrid(
     evalgridId: number
   ): Observable<CriterionModel[]> {
-    return zip(
-      this.baseDataService.criteria$.pipe(filter((res) => !!res)),
-      this.baseDataService.criteriaEvalgrid$.pipe(filter((res) => !!res))
-    ).pipe(
+    return this.baseDataService.isLoaded$.pipe(
+      filter((isLoaded) => isLoaded),
       first(),
-      map(([allCriteria, allCriteriaEvalGrid]) => {
-        return allCriteriaEvalGrid
+      map(() => {
+        return this.baseDataService.entities.criteriaEvalGrid
           .filter((evalGridCrit) => evalGridCrit.evalgridid === evalgridId)
           .map((evalGridCrit) => {
-            return allCriteria.find((criteria) => {
+            return this.baseDataService.entities.criteria.find((criteria) => {
               return criteria.id === evalGridCrit.id
             })
           })

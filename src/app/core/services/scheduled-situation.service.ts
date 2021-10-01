@@ -65,69 +65,52 @@ export class ScheduledSituationService {
       }
     })
 
-    combineLatest([
-      this.authService.loginState$,
-      this.appraisalUIService.appraisals$,
-      this.scheduledSituationsEntities$,
-      this.baseDataService.groupAssignment$,
-      this.evalPlanService.plans$,
-    ])
+    this.baseDataService.isLoaded$
       .pipe(
-        filter(
-          ([
-            loginState,
-            appraisals,
-            allsituations,
-            groupAssignments,
-            evalplan,
-          ]) =>
-            appraisals != null &&
-            allsituations != null &&
-            loginState === LOGIN_STATE.LOGGED &&
-            evalplan != null
-        ),
-        tap(
-          ([
-            loginState,
-            appraisals,
-            allsituations,
-            groupAssignments,
-            evalplan,
-          ]) => {
-            if (
-              this.authService.isStillLoggedIn() &&
-              this.authService.isStudent
-            ) {
-              this.buildStudentStatistics(
-                allsituations,
-                appraisals,
-                this.authService.loggedUser$.getValue().userid
+        filter((isLoaded) => isLoaded),
+        concatMap(() => {
+          return combineLatest([
+            this.authService.loginState$,
+            this.appraisalUIService.appraisals$,
+            this.scheduledSituationsEntities$,
+            this.evalPlanService.plans$,
+          ]).pipe(
+            filter(([loginState, appraisals, allsituations, evalplan]) => {
+              return (
+                appraisals != null &&
+                allsituations != null &&
+                loginState === LOGIN_STATE.LOGGED &&
+                evalplan != null
               )
-            }
-          }
-        ),
-        tap(
-          ([
-            loginState,
-            appraisals,
-            allsituations,
-            groupAssignments,
-            evalplan,
-          ]) => {
-            if (
-              this.authService.isStillLoggedIn() &&
-              this.authService.isAppraiser &&
-              groupAssignments
-            ) {
-              this.buildAppraiserStatistics(
-                appraisals,
-                allsituations,
-                groupAssignments,
-                evalplan
-              )
-            }
-          }
-        )
+            }),
+            tap(([loginState, appraisals, allsituations, evalplan]) => {
+              if (
+                this.authService.isStillLoggedIn() &&
+                this.authService.isStudent
+              ) {
+                this.buildStudentStatistics(
+                  allsituations,
+                  appraisals,
+                  this.authService.loggedUser$.getValue().userid
+                )
+              }
+            }),
+            tap(([loginState, appraisals, allsituations, evalplan]) => {
+              if (
+                this.authService.isStillLoggedIn() &&
+                this.authService.isAppraiser &&
+                this.baseDataService.entities.groupAssignments
+              ) {
+                this.buildAppraiserStatistics(
+                  appraisals,
+                  allsituations,
+                  this.baseDataService.entities.groupAssignments,
+                  evalplan
+                )
+              }
+            })
+          )
+        })
       )
       .subscribe()
   }
@@ -187,29 +170,27 @@ export class ScheduledSituationService {
    */
   public refresh(): Observable<ScheduledSituation[]> {
     if (this.authService.isStillLoggedIn()) {
-      return zip(
-        this.evalPlanService.plans$.pipe(filter((obj) => obj != null)),
-        this.baseDataService.situations$.pipe(filter((obj) => obj != null)),
-        this.baseDataService.groupAssignment$.pipe(
-          filter((obj) => obj != null)
-        ),
-        this.baseDataService.roles$.pipe(filter((obj) => obj != null))
-      ).pipe(
+      return this.baseDataService.isLoaded$.pipe(
+        filter((isLoaded) => isLoaded),
         first(),
-        map(([evalplans, situations, groupAssignments, roles]) => {
+        concatMap(() => {
+          return this.evalPlanService.plans$.pipe(filter((obj) => obj != null))
+        }),
+        first(),
+        map((evalplans) => {
           if (this.authService.isStillLoggedIn()) {
             if (this.authService.isStudent) {
               return this.buildScheduledSituationsForStudent(
                 evalplans as EvalPlanModel[],
-                situations as SituationModel[],
-                groupAssignments as GroupAssignmentModel[]
+                this.baseDataService.entities.situations,
+                this.baseDataService.entities.groupAssignments
               )
             } else {
               return this.buildScheduledSituationsForAppraiser(
                 evalplans as EvalPlanModel[],
-                situations as SituationModel[],
-                roles as RoleModel[],
-                groupAssignments as GroupAssignmentModel[],
+                this.baseDataService.entities.situations,
+                this.baseDataService.entities.roles,
+                this.baseDataService.entities.groupAssignments,
                 this.authService.loggedUser$.getValue().userid
               )
             }

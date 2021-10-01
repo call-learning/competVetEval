@@ -11,8 +11,8 @@
 
 import { Injectable } from '@angular/core'
 
-import { of, BehaviorSubject, Observable } from 'rxjs'
-import { first, tap } from 'rxjs/operators'
+import { of, BehaviorSubject, Observable, forkJoin } from 'rxjs'
+import { filter, first, tap } from 'rxjs/operators'
 import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
@@ -21,14 +21,6 @@ import { RoleModel } from '../../shared/models/moodle/role.model'
 import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
-// nnkitodo[FILE]
-const EntityClass: any = {
-  clsituation: SituationModel,
-  criterion: CriterionModel,
-  cevalgrid: CriterionEvalgridModel,
-  role: RoleModel,
-  group_assign: GroupAssignmentModel,
-}
 
 /**
  * Load basic user data (stable data that does not change with user interaction with the app), like
@@ -40,13 +32,15 @@ const EntityClass: any = {
   providedIn: 'root',
 })
 export class BaseDataService {
-  entities$ = {
-    clsituation: new BehaviorSubject<SituationModel[]>(null),
-    criterion: new BehaviorSubject<CriterionModel[]>(null),
-    cevalgrid: new BehaviorSubject<CriterionEvalgridModel[]>(null),
-    role: new BehaviorSubject<RoleModel[]>(null),
-    group_assign: new BehaviorSubject<GroupAssignmentModel[]>(null),
-  }
+  entities: {
+    situations: SituationModel[]
+    criteria: CriterionModel[]
+    criteriaEvalGrid: CriterionEvalgridModel[]
+    roles: RoleModel[]
+    groupAssignments: GroupAssignmentModel[]
+  } = null
+
+  isLoaded$ = new BehaviorSubject<boolean>(false)
 
   /**
    * Build the base data service
@@ -60,64 +54,35 @@ export class BaseDataService {
   ) {
     this.authService.loginState$.subscribe((loginState) => {
       if (loginState === LOGIN_STATE.LOGGED) {
-        Object.keys(this.entities$).forEach((entityName) => {
-          this.refresh(entityName).subscribe()
-          // Subscribe for the whole service lifetime
-        })
+        this.refreshAllEntities().subscribe()
       } else {
-        Object.keys(this.entities$).forEach((entityName) => {
-          this.entities$[entityName].next(null)
-        })
+        this.isLoaded$.next(false)
+        this.entities = null
       }
     })
   }
 
-  /**
-   * Get current situations
-   */
-  public get situations$(): Observable<SituationModel[]> {
-    return this.entities$.clsituation.asObservable()
-  }
-
-  /**
-   * Get current criteria
-   */
-  public get criteria$(): Observable<CriterionModel[]> {
-    return this.entities$.criterion.asObservable()
-  }
-
-  /**
-   * Get current criteria evaluation grid
-   */
-  public get criteriaEvalgrid$(): Observable<CriterionEvalgridModel[]> {
-    return this.entities$.cevalgrid.asObservable()
-  }
-  /**
-   * Get role for current logged in user
-   */
-  public get roles$(): Observable<RoleModel[]> {
-    return this.entities$.role.asObservable()
-  }
-
-  /**
-   * Get group assignment model
-   */
-  public get groupAssignment$(): Observable<GroupAssignmentModel[]> {
-    return this.entities$.group_assign.asObservable()
-  }
-
-  /**
-   * Get entity by Id
-   *
-   * @param entityType
-   * @param id
-   */
-  public getEntityById(entityType, id): BaseMoodleModel | null {
-    const entities = this.entities$[entityType].getValue()
-    if (entities) {
-      return entities.find((entity) => entity.id === id)
-    }
-    return null
+  refreshAllEntities() {
+    return forkJoin([
+      this.refresh('clsituation'),
+      this.refresh('criterion'),
+      this.refresh('cevalgrid'),
+      this.refresh('role'),
+      this.refresh('group_assign'),
+    ]).pipe(
+      tap(
+        ([situations, criteria, criteriaEvalGrid, roles, groupAssignments]) => {
+          this.entities = {
+            situations: situations as SituationModel[],
+            criteria: criteria as CriterionModel[],
+            criteriaEvalGrid: criteriaEvalGrid as CriterionEvalgridModel[],
+            roles: roles as RoleModel[],
+            groupAssignments: groupAssignments as GroupAssignmentModel[],
+          }
+          this.isLoaded$.next(true)
+        }
+      )
+    )
   }
 
   /**
@@ -133,7 +98,7 @@ export class BaseDataService {
       }
       return this.doRefreshData(entityType, query)
     } else {
-      return of(this.entities$[entityType].getValue())
+      return of(null)
     }
   }
 
@@ -146,18 +111,10 @@ export class BaseDataService {
     entityType,
     query: object
   ): Observable<BaseMoodleModel[]> {
-    return this.moodleApiService
-      .fetchMoreRecentData(
-        entityType,
-        query,
-        this.entities$[entityType].getValue()
-      )
-      .pipe(
-        tap((entities: BaseMoodleModel[]) => {
-          this.entities$[entityType].next(
-            entities.map((e) => new EntityClass[entityType](e))
-          )
-        })
-      )
+    return this.moodleApiService.fetchMoreRecentData(
+      entityType,
+      query,
+      this.entities ? this.entities[entityType] : null
+    )
   }
 }
