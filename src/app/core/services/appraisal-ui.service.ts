@@ -41,7 +41,7 @@ import { AuthService, LOGIN_STATE } from './auth.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
 import { UserDataService } from './user-data.service'
-
+// nnkitodo[FILE]
 @Injectable({
   providedIn: 'root',
 })

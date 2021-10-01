@@ -34,6 +34,7 @@ export class AppraiserSituationCardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // nnkitodo[SL] : simplifier
     const evalPlanId = this.scheduledSituation.evalPlan.id
     this.scheduledSituationService
       .getAppraiserScheduledSituationStats(evalPlanId, this.studentId)

@@ -21,7 +21,7 @@ import { RoleModel } from '../../shared/models/moodle/role.model'
 import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
-
+// nnkitodo[FILE]
 const EntityClass: any = {
   clsituation: SituationModel,
   criterion: CriterionModel,
@@ -147,7 +147,7 @@ export class BaseDataService {
     query: object
   ): Observable<BaseMoodleModel[]> {
     return this.moodleApiService
-      .fetchIfMoreRecent(
+      .fetchMoreRecentData(
         entityType,
         query,
         this.entities$[entityType].getValue()

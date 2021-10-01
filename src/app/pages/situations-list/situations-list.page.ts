@@ -33,8 +33,6 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   situations: ScheduledSituation[]
   situationsDisplayed: ScheduledSituation[]
 
-  loader: HTMLIonLoadingElement
-
   constructor(
     private menuController: MenuController,
     public authService: AuthService,
@@ -50,9 +48,9 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   loadData() {
-    this.loadingController.create().then((res) => {
-      this.loader = res
-      this.loader.present().then(() =>
+    this.loadingController.create().then((loader) => {
+      loader.present().then(() =>
+        // nnkitodo[SL] : simplifier
         this.scheduledSituationsService.situations$
           .pipe(
             takeUntil(this.alive$),
@@ -61,9 +59,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
           .subscribe((situations) => {
             this.situations = situations
             this.filterSituations('today')
-            if (this.loader.animated) {
-              this.loader.dismiss()
-            }
+            loader.dismiss()
           })
       )
     })
@@ -86,6 +82,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   filterSituations(status: 'today' | 'all') {
+    // nnkitodo[SL] : simplifier
     this.situationsDisplayed = this.situations
     if (status === 'today') {
       this.situationsDisplayed = this.filterSituationAroundCurrentTime()
@@ -99,6 +96,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     }
   }
 
+  // nnkitodo[SL] : simplifier
   protected filterSituationAroundCurrentTime() {
     let filteredSituations = []
     const now = new Date()
@@ -132,6 +130,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       })
   }
 
+  // nnkitodo[SL] : marche pas
   doRefresh(event) {
     const REFRESH_TIMEOUT = 10000 // If after 10 sec we have no refresh even
     // we stop the spinner. This happens when there is no appraisal at all but

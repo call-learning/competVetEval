@@ -10,7 +10,7 @@
  */
 import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
-
+// nnkitodo[FILE]
 // This is the replica of the local_cveteval_evalgrid table.
 export class CeevalgridModel extends BaseMoodleModel {
   id: number

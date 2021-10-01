@@ -9,8 +9,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { of, throwError, Observable } from 'rxjs'
-import { catchError, map, mergeMap } from 'rxjs/operators'
+import { of, throwError, Observable, iif } from 'rxjs'
+import { catchError, concatMap, map, mergeMap, tap } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
@@ -63,26 +63,36 @@ export class MoodleApiService {
    * @param args
    * @param currentEntities
    */
-  public fetchIfMoreRecent(
+  public fetchMoreRecentData(
+    entityType: string,
+    args: object,
+    currentEntities: BaseMoodleModel[]
+  ): Observable<BaseMoodleModel[]> {
+    return iif(
+      () => !!currentEntities,
+      this.fetchIfMoreRecent(entityType, args, currentEntities),
+      this.getEntities(entityType, args)
+    )
+  }
+
+  fetchIfMoreRecent(
     entityType: string,
     args: object,
     currentEntities: BaseMoodleModel[]
   ): Observable<BaseMoodleModel[]> {
     return this.getLatestModificationDate(entityType, args).pipe(
-      map((latestModif: number) => {
-        if (currentEntities) {
-          const currentStoredEntitiesMaxModified = currentEntities.reduce(
-            (acc, entity) =>
-              acc > entity.timemodified ? acc : entity.timemodified,
-            0
-          )
-          if (currentStoredEntitiesMaxModified >= latestModif) {
-            return of(currentEntities)
-          }
+      concatMap((latestModif: number) => {
+        const currentStoredEntitiesMaxModified = currentEntities.reduce(
+          (acc, entity) =>
+            acc > entity.timemodified ? acc : entity.timemodified,
+          0
+        )
+        if (currentStoredEntitiesMaxModified >= latestModif) {
+          return of(currentEntities)
+        } else {
+          return this.getEntities(entityType, args)
         }
-        return this.getEntities(entityType, args)
       }),
-      mergeMap((value) => value),
       catchError((err) => {
         console.error(err)
         return throwError(err)
@@ -90,6 +100,7 @@ export class MoodleApiService {
     )
   }
 
+  // nnkitodo[FUNCTION]
   public submitUserAppraisal(appraisal: AppraisalUI) {
     const formatCriterionForApi = (criteria) => {
       const apiCrit: any = {
@@ -134,7 +145,7 @@ export class MoodleApiService {
     ).pipe(
       map((latestmodifobject) => {
         const { latestmodifications } = latestmodifobject
-        return latestmodifications
+        return latestmodifications as number
       })
     )
   }
@@ -187,6 +198,7 @@ export class MoodleApiService {
    * @param appraisalModel
    * @param appraisalCriteriaModel
    */
+  // nnkitodo[FUNCTION]
   public submitAppraisal(
     appraisalModel: AppraisalModel
   ): Observable<AppraisalModel> {
@@ -214,6 +226,7 @@ export class MoodleApiService {
    * @param appraisalModel
    * @param appraisalCriteriaModel
    */
+  // nnkitodo[FUNCTION]
   public submitAppraisalCriteria(
     appraisalCriteriaModels: AppraisalCriterionModel[]
   ): Observable<AppraisalCriterionModel[]> {

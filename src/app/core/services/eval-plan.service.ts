@@ -14,7 +14,7 @@ import { filter, map } from 'rxjs/operators'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
-
+// nnkitodo[FILE]
 @Injectable({
   providedIn: 'root',
 })
@@ -67,7 +67,7 @@ export class EvalPlanService {
    */
   public refresh(): Observable<EvalPlanModel[]> {
     return this.moodleApiService
-      .fetchIfMoreRecent('evalplan', {}, this.planningEntities$.getValue())
+      .fetchMoreRecentData('evalplan', {}, this.planningEntities$.getValue())
       .pipe(
         map((evalplans) => {
           const evalplanmodels = evalplans.map(

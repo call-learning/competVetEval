@@ -20,7 +20,7 @@ import { AuthService, LOGIN_STATE } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
-
+// nnkitodo[FILE]
 @Injectable({
   providedIn: 'root',
 })
@@ -134,7 +134,7 @@ export class AppraisalService {
       }),
       // Now fetch the matching appraisal.
       concatMap((evalPlan) =>
-        this.moodleApiService.fetchIfMoreRecent(
+        this.moodleApiService.fetchMoreRecentData(
           'appraisal',
           { evalplanid: evalPlan.id },
           this.appraisalModels$
@@ -161,7 +161,7 @@ export class AppraisalService {
     studentid
   ): Observable<AppraisalModel[]> {
     return (
-      this.moodleApiService.fetchIfMoreRecent(
+      this.moodleApiService.fetchMoreRecentData(
         'appraisal',
         { studentid },
         this.appraisalModels$
@@ -195,7 +195,7 @@ export class AppraisalService {
       concatMap((appraisalModels) => from(appraisalModels)),
       concatMap((appraisal: AppraisalModel) => {
         return this.moodleApiService
-          .fetchIfMoreRecent(
+          .fetchMoreRecentData(
             'appr_crit',
             { appraisalid: appraisal.id },
             this.appraisalCriterionModels$

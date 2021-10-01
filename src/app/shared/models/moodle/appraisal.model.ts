@@ -10,7 +10,7 @@
  */
 import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
-
+// nnkitodo[FILE]
 // This is the replica of the local_cveteval_clsituation table.
 // We do not use lowerCamelCase for entities that are directly retrieved via API
 // as Moodle does not use this convention in usual APIs

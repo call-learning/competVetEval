@@ -17,7 +17,7 @@ import { concatMap, first, map, withLatestFrom } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { BaseDataService } from './base-data.service'
-
+// nnkitodo[FILE]
 /**
  * Manage criteria hierarchical view
  * - criteria / evaluation grid

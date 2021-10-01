@@ -27,6 +27,7 @@ export class StudentSituationCardComponent implements OnInit {
   constructor(private scheduledSituationService: ScheduledSituationService) {}
 
   ngOnInit() {
+    // nnkitodo[SL] : simplifier
     const evalPlanId = this.scheduledSituation.evalPlan.id
     this.scheduledSituationService
       .getMyScheduledSituationStats(evalPlanId)
