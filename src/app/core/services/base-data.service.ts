@@ -58,7 +58,7 @@ export class BaseDataService {
     private moodleApiService: MoodleApiService,
     private authService: AuthService
   ) {
-    this.authService.loginState.subscribe((loginState) => {
+    this.authService.loginState$.subscribe((loginState) => {
       if (loginState === LOGIN_STATE.LOGGED) {
         Object.keys(this.entities$).forEach((entityName) => {
           this.refresh(entityName).subscribe()
@@ -129,7 +129,7 @@ export class BaseDataService {
     if (this.authService.isStillLoggedIn()) {
       let query = {}
       if (entityType === 'role') {
-        query = { userid: this.authService.loggedUser.getValue().userid }
+        query = { userid: this.authService.loggedUser$.getValue().userid }
       }
       return this.doRefreshData(entityType, query)
     } else {

@@ -14,55 +14,51 @@ import { Injectable } from '@angular/core'
 import { School } from 'src/app/shared/models/school.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { EnvironmentService } from '../services/environment.service'
-import { BehaviorSubject, throwError } from 'rxjs'
+import { BehaviorSubject, iif, Observable, of, throwError } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
 import { HttpClient, HttpBackend } from '@angular/common/http'
-
+import { uniqBy } from 'lodash'
 @Injectable({
   providedIn: 'root',
 })
 export class SchoolsProviderService {
-  public schoolList$ = new BehaviorSubject<School[]>(null)
-  // Specific HTTP Client without any injector.
-  private httpClient: HttpClient
+  public schoolsList: School[] = null
 
-  constructor(private environment: EnvironmentService, handler: HttpBackend) {
-    if (this.environment.schoolConfigUrl) {
-      const httpClient = new HttpClient(handler)
-      httpClient
-        .get<School[]>(this.environment.schoolConfigUrl)
-        .pipe(
-          map((schoolList) => {
-            // Add school, and override it if needed.
-            const allSchool = [...this.environment.schools, ...schoolList]
-            return allSchool.reduce((uniqueSchools, item) => {
-              const hasItemIndex = uniqueSchools.findIndex(
-                (el) => el.id === item.id
-              )
-              if (hasItemIndex !== -1) {
-                uniqueSchools[hasItemIndex] = item
-              } else {
-                uniqueSchools.push(item)
-              }
-              return uniqueSchools
-            }, [])
-          }),
-          catchError((err) => {
-            console.log(
-              `Cannot fetch school information: (${err.name}:${err.message})`
-            )
-            return this.environment.schools
-          }),
-          tap((schoolList: School[]) => {
-            this.schoolList$.next(schoolList)
-            this.schoolList$.complete()
-          })
+  constructor(
+    private environment: EnvironmentService,
+    private handler: HttpBackend
+  ) {}
+
+  loadSchools() {
+    return iif(
+      () => !!this.environment.schoolConfigUrl,
+      this.getSchoolsFromHttp(),
+      of(this.environment.schools)
+    ).pipe(
+      tap((schools) => {
+        this.schoolsList = schools
+      })
+    )
+  }
+
+  getSchoolsFromHttp() {
+    const httpClient = new HttpClient(this.handler)
+    return httpClient.get<School[]>(this.environment.schoolConfigUrl).pipe(
+      map((schoolList) => {
+        return uniqBy(
+          [...schoolList, ...this.environment.schools],
+          (school) => {
+            return school.id
+          }
         )
-        .subscribe()
-    } else {
-      this.schoolList$.next(this.environment.schools)
-      this.schoolList$.complete()
-    }
+      }),
+      catchError((err) => {
+        console.error(
+          `Cannot fetch school information: (${err.name}:${err.message})`
+        )
+        return of(this.environment.schools)
+      })
+    )
   }
 
   /**
@@ -71,14 +67,20 @@ export class SchoolsProviderService {
    * @param id
    */
   getSchoolFromId(id: string) {
-    const currentList = this.schoolList$.getValue()
-    if (id && currentList) {
-      return this.schoolList$.getValue().find((school) => {
+    if (id) {
+      return this.schoolsList.find((school) => {
         return school.id === id
       })
     } else {
       return null
     }
+  }
+
+  /**
+   * Get currently selected school or null
+   */
+  getSelectedSchoolId(): string | null {
+    return localStorage.getItem(LocaleKeys.schoolChoiceId)
   }
 
   /**
@@ -92,13 +94,6 @@ export class SchoolsProviderService {
       return currentSchool.moodleUrl
     }
     throw new Error(`Ecole ${schoolId} non trouvée parmi la liste des écoles`)
-  }
-
-  /**
-   * Get currently selected school or null
-   */
-  getSelectedSchoolId(): string | null {
-    return localStorage.getItem(LocaleKeys.schoolChoiceId)
   }
 
   /**

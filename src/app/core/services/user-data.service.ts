@@ -37,7 +37,7 @@ export class UserDataService {
     private moodleApiService: MoodleApiService,
     private authService: AuthService
   ) {
-    this.authService.loggedUser.subscribe((cveUser) => {
+    this.authService.loggedUser$.subscribe((cveUser) => {
       if (!this.authService.isStillLoggedIn()) {
         this.userProfiles = []
       }

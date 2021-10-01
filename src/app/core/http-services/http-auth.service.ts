@@ -49,7 +49,7 @@ export class HttpAuthService {
       }),
       catchError((err) => {
         const endpoint = this.endPointService.login()
-        console.log(
+        console.error(
           `Erreur de connexion: (${err.name}:${err.message}) - ${endpoint}`
         )
         return throwError(err)

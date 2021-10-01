@@ -55,7 +55,7 @@ export class ScheduledSituationService {
     private appraisalUIService: AppraisalUiService,
     private evalPlanService: EvalPlanService
   ) {
-    this.authService.loginState.subscribe((loginState) => {
+    this.authService.loginState$.subscribe((loginState) => {
       if (loginState !== LOGIN_STATE.LOGGED) {
         this.scheduledSituationsEntities$.next(null)
         this.studentSituationStats$.next(null)
@@ -66,7 +66,7 @@ export class ScheduledSituationService {
     })
 
     combineLatest([
-      this.authService.loginState,
+      this.authService.loginState$,
       this.appraisalUIService.appraisals$,
       this.scheduledSituationsEntities$,
       this.baseDataService.groupAssignment$,
@@ -101,7 +101,7 @@ export class ScheduledSituationService {
               this.buildStudentStatistics(
                 allsituations,
                 appraisals,
-                this.authService.loggedUser.getValue().userid
+                this.authService.loggedUser$.getValue().userid
               )
             }
           }
@@ -210,7 +210,7 @@ export class ScheduledSituationService {
                 situations as SituationModel[],
                 roles as RoleModel[],
                 groupAssignments as GroupAssignmentModel[],
-                this.authService.loggedUser.getValue().userid
+                this.authService.loggedUser$.getValue().userid
               )
             }
           }

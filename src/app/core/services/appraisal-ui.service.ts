@@ -61,7 +61,7 @@ export class AppraisalUiService {
     ])
       .pipe(
         tap(([appraisalModels, appraisalCriteria]) => {
-          if (this.authService.loginState.getValue() !== LOGIN_STATE.LOGGED) {
+          if (this.authService.loginState$.getValue() !== LOGIN_STATE.LOGGED) {
             this.appraisalEntities$.next(null)
           } else {
             if (appraisalCriteria === null) {

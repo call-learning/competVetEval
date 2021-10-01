@@ -142,7 +142,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
         event.target.complete()
       })
     setTimeout(() => {
-      console.log('Situation list: refresh event cancelled')
+      console.warn('Situation list: refresh event cancelled')
       event.target.complete()
       refresh.unsubscribe()
     }, REFRESH_TIMEOUT)

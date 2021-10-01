@@ -62,7 +62,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       this.studentId = null
     }
 
-    this.currentUserId = this.authService.loggedUser.getValue().userid
+    this.currentUserId = this.authService.loggedUser$.getValue().userid
     // Refresh when we change the appraisals.
     this.appraisalUIService
       .fetchAppraisalsForEvalPlanStudentId(this.evalPlanId, this.studentId)
@@ -151,7 +151,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
           first()
         )
         .subscribe((appraisal: AppraisalUI) => {
-          appraisal.appraiser = this.authService.loggedUser.getValue()
+          appraisal.appraiser = this.authService.loggedUser$.getValue()
           if (this.loader.animated) {
             this.loader.dismiss()
           }
@@ -179,7 +179,7 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
         event.target.complete()
       })
     setTimeout(() => {
-      console.log('Situation list: refresh event cancelled')
+      console.warn('Situation list: refresh event cancelled')
       event.target.complete()
       refresh.unsubscribe()
     }, REFRESH_TIMEOUT)

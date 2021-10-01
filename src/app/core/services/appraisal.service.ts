@@ -55,7 +55,7 @@ export class AppraisalService {
     private baseDataService: BaseDataService,
     private evalPlanService: EvalPlanService
   ) {
-    this.authService.loginState.subscribe((state) => {
+    this.authService.loginState$.subscribe((state) => {
       if (state === LOGIN_STATE.LOGGED) {
         // Get all appraisals and appraisal criteria for this user.
         this.refresh().subscribe()
@@ -188,7 +188,7 @@ export class AppraisalService {
     return iif(
       () => this.authService.isStudent,
       this.getAppraisalsModelForStudent(
-        this.authService.loggedUser.getValue().userid
+        this.authService.loggedUser$.getValue().userid
       ),
       this.getAppraisalModelForAppraiser()
     ).pipe(

@@ -1,3 +1,4 @@
+import { HttpAuthService } from './../../core/http-services/http-auth.service'
 /**
  * Login page
  *
@@ -16,6 +17,7 @@ import { finalize } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { EncryptService } from 'src/app/core/services/encrypt.service'
 import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
+import { IdpModel } from 'src/app/shared/models/idp.model'
 
 @Component({
   selector: 'app-login',
@@ -29,7 +31,7 @@ export class LoginPage implements OnInit {
   loader: HTMLIonLoadingElement
   isLoading = false
 
-  idpList = []
+  idpList: IdpModel[] = null
 
   formSubmitted = false
 
@@ -38,7 +40,8 @@ export class LoginPage implements OnInit {
     public authService: AuthService,
     private router: Router,
     private loadingController: LoadingController,
-    private encryptService: EncryptService
+    private encryptService: EncryptService,
+    private httpAuthService: HttpAuthService
   ) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -50,13 +53,14 @@ export class LoginPage implements OnInit {
     this.loadingController.create().then((res) => {
       this.loader = res
     })
-    this.authService
-      .getIdpList()
-      .subscribe((idplist) => (this.idpList = idplist))
   }
 
   ionViewDidEnter() {
     this.prefillLoginForm()
+
+    this.httpAuthService.getIdps().subscribe((idpList) => {
+      this.idpList = idpList
+    })
   }
 
   prefillLoginForm() {
@@ -129,7 +133,7 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/school-choice'])
   }
 
- launchIdp(idpURL) {
+  launchIdp(idpURL) {
     window.open(idpURL, '_system')
     if ((<any>navigator).app) {
       ;(<any>navigator).app.exitApp()

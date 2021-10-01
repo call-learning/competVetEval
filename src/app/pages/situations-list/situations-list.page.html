@@ -39,8 +39,8 @@
       </ion-col>
       <ion-col class="ion-align-self-center">
         <div class="situations-username">
-          <ng-container *ngIf="authService.loggedUser.getValue()">
-            {{authService.loggedUser.getValue().fullname}}
+          <ng-container *ngIf="authService.loggedUserValue">
+            {{authService.loggedUserValue?.fullname}}
           </ng-container>
         </div>
       </ion-col>

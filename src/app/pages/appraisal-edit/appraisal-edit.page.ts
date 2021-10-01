@@ -137,7 +137,7 @@ export class AppraisalEditPage extends BaseComponent implements OnInit {
 
   saveAndRedirect() {
     this.loader.present()
-    this.appraisal.appraiser = this.authService.loggedUser.getValue()
+    this.appraisal.appraiser = this.authService.loggedUser$.getValue()
     this.appraisalUIService.submitAppraisal(this.appraisal).subscribe(
       () => {
         this.loader.dismiss()

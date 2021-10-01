@@ -1,3 +1,4 @@
+import { filter, first } from 'rxjs/operators'
 /**
  * School choice page
  *
@@ -29,11 +30,7 @@ export class SchoolChoicePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.schoolProviderService.schoolList$.subscribe({
-      complete: () => {
-        this.schoolsList = this.schoolProviderService.schoolList$.getValue()
-      },
-    })
+    this.schoolsList = this.schoolProviderService.schoolsList
     LocaleKeys.cleanupAllLocalStorage()
   }
 

@@ -103,7 +103,7 @@ export class ModalScanAppraisalComponent implements OnInit {
                     toast.present()
                   })
               } else {
-                appraisal.appraiser = this.authService.loggedUser.getValue()
+                appraisal.appraiser = this.authService.loggedUser$.getValue()
 
                 this.appraisalUIService
                   .submitAppraisal(appraisal)
@@ -114,7 +114,7 @@ export class ModalScanAppraisalComponent implements OnInit {
             })
 
           setTimeout(() => {
-            console.log('Scan cancelled')
+            console.warn('Scan cancelled')
             if (!loaderDismissed) {
               this.loader.dismiss()
               this.toastController

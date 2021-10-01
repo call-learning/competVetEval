@@ -32,7 +32,7 @@ export class EvalPlanService {
     private authService: AuthService
   ) {
     // Subscribe for the the whole service lifetime
-    this.authService.loginState.subscribe((loginState) => {
+    this.authService.loginState$.subscribe((loginState) => {
       if (loginState === LOGIN_STATE.LOGGED) {
         this.refresh().subscribe()
       } else {

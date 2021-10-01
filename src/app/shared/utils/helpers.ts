@@ -95,7 +95,6 @@ export const getTokenFromLaunchURL = (launchURL, siteURL) => {
     const params = launchURL.split('://')
 
     if (params && params.length > 1) {
-      console.log('Token Params:' + params + ', Site URL:' + siteURL)
       const searchParams = new URLSearchParams(params[1])
       const tokenvalueb64 = searchParams.get('token')
       const tokenvalue = atob(tokenvalueb64)
@@ -108,7 +107,6 @@ export const getTokenFromLaunchURL = (launchURL, siteURL) => {
       if (tokenparts[0] != hashedSiteURL) {
         throw new Error("Le site d'origine ne correspond pas" + tokenparts[0])
       }
-      console.log('User Token:' + tokenparts[1])
       return tokenparts[1]
     }
   }

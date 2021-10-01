@@ -8,16 +8,27 @@
  */
 import { CommonModule } from '@angular/common'
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
-import { NgModule } from '@angular/core'
+import { APP_INITIALIZER, NgModule } from '@angular/core'
 
 import { AngularSvgIconModule } from 'angular-svg-icon'
 import { AddTokenInterceptor } from './interceptors/add-token.interceptor'
 import { FormatRequestInterceptor } from './interceptors/format-request.interceptor'
+import { StartupService } from './services/startup.service'
 
+function initApplication(startupService: StartupService) {
+  return () => startupService.load()
+}
 @NgModule({
   declarations: [],
   imports: [CommonModule, HttpClientModule, AngularSvgIconModule.forRoot()],
   providers: [
+    StartupService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initApplication,
+      multi: true,
+      deps: [StartupService],
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: FormatRequestInterceptor,
