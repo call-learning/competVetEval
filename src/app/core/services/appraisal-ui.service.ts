@@ -61,11 +61,6 @@ export class AppraisalUiService {
           const appraisalModels = appraisalsChanged.appraisals
           let appraisalCriteria = appraisalsChanged.appraisalCriterionModels
 
-          console.log(
-            'appraisal ui service',
-            appraisalModels,
-            appraisalCriteria
-          )
           if (this.authService.loginState$.getValue() !== LOGIN_STATE.LOGGED) {
             this.appraisalEntities$.next(null)
           } else {
@@ -75,7 +70,7 @@ export class AppraisalUiService {
             this.lazyConvertAppraisalModelToUI(
               appraisalModels,
               appraisalCriteria
-            ).subscribe()
+            )
           }
         })
       )
@@ -232,35 +227,37 @@ export class AppraisalUiService {
   private lazyConvertAppraisalModelToUI(
     appraisalModels: AppraisalModel[],
     appraisalCriteriaModels: AppraisalCriterionModel[]
-  ): Observable<AppraisalUI[]> {
-    return from(appraisalModels).pipe(
-      // Retrieve relevant appraisal models.
-      concatMap((appraisalModel: AppraisalModel) => {
-        return this.convertAppraisalCriterionModelsToTree(
-          appraisalCriteriaModels.filter(
-            (apc) => apc.appraisalid === appraisalModel.id
-          )
-        ).pipe(
-          concatMap((appraisalCriteriaUI) => {
-            return this.convertAppraisalModel(
-              appraisalModel,
-              appraisalCriteriaUI
+  ) {
+    from(appraisalModels)
+      .pipe(
+        // Retrieve relevant appraisal models.
+        concatMap((appraisalModel: AppraisalModel) => {
+          return this.convertAppraisalCriterionModelsToTree(
+            appraisalCriteriaModels.filter(
+              (apc) => apc.appraisalid === appraisalModel.id
             )
-          }),
-          first()
-        )
-        // }
-      }),
-      // Filter out unwanted appraisals.
-      filter((appraisalui) => appraisalui !== null),
-      // Back to array.
-      toArray(),
-      tap((appraisalsUI) => {
-        mergeExistingBehaviourSubject(this.appraisalEntities$, appraisalsUI, [
-          'id',
-        ])
-      })
-    )
+          ).pipe(
+            concatMap((appraisalCriteriaUI) => {
+              return this.convertAppraisalModel(
+                appraisalModel,
+                appraisalCriteriaUI
+              )
+            }),
+            first()
+          )
+          // }
+        }),
+        // Filter out unwanted appraisals.
+        filter((appraisalui) => appraisalui !== null),
+        // Back to array.
+        toArray(),
+        tap((appraisalsUI) => {
+          mergeExistingBehaviourSubject(this.appraisalEntities$, appraisalsUI, [
+            'id',
+          ])
+        })
+      )
+      .subscribe()
   }
 
   /**

@@ -81,6 +81,10 @@ export class AppraisalService {
   resetService() {
     this.appraisalCriterionModels$.next(null)
     this.appraisalModels$.next(null)
+    this.appraisalsChanged.emit({
+      appraisals: this.appraisalModels$.getValue(),
+      appraisalCriterionModels: this.appraisalCriterionModels$.getValue(),
+    })
   }
 
   /**
@@ -299,6 +303,7 @@ export class AppraisalService {
           [newAppraisalModel],
           ['id']
         )
+        // nnkitodo émettre changed
       })
     )
   }
@@ -323,6 +328,7 @@ export class AppraisalService {
               newAppraisaCriterionlModel,
               ['id']
             )
+            // nnkitodo émettre changed
           })
         )
     } else {
