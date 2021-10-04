@@ -137,6 +137,7 @@ export class AppraisalService {
    * Check first if there is more recent version on the server
    * @param appraisalId
    */
+  // nnkitodo [function]
   public appraisalsCriteriaForAppraisalId(
     appraisalId
   ): Observable<AppraisalCriterionModel[]> {
@@ -154,6 +155,7 @@ export class AppraisalService {
    *
    * @protected
    */
+  // nnkitodo [function]
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
     return forkJoin([
       this.baseDataService.situations$,
@@ -200,6 +202,7 @@ export class AppraisalService {
    * @param studentid
    * @protected
    */
+  // nnkitodo [function]
   protected getAppraisalsModelForStudent(
     studentid
   ): Observable<AppraisalModel[]> {
@@ -212,8 +215,8 @@ export class AppraisalService {
           ?.filter((app) => app.studentid === studentid)
       ) as Observable<AppraisalModel[]>
     ).pipe(
-      first(),
       tap((newAppraisals) => {
+        console.log(newAppraisals)
         // Merge existing values with new values
         mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
           'id',
