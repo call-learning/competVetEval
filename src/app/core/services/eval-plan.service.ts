@@ -1,3 +1,4 @@
+import { first } from 'rxjs/operators'
 /**
  * Load user evaluation plans
  *
@@ -14,7 +15,7 @@ import { filter, map } from 'rxjs/operators'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
-// nnkitodo[FILE]
+
 @Injectable({
   providedIn: 'root',
 })
@@ -44,16 +45,18 @@ export class EvalPlanService {
   /**
    * Retrieve appraisals for currently logged in user
    */
-  public get plans$(): Observable<EvalPlanModel[]> {
-    return this.planningEntities$.asObservable()
+  public get loadedPlans$(): Observable<EvalPlanModel[]> {
+    return this.planningEntities$
+      .asObservable()
+      .pipe(filter((plans) => plans !== null))
   }
 
   /**
    * Retrieve appraisal from its Id
    */
   public planFromId(evalplanId): Observable<EvalPlanModel> {
-    return this.plans$.pipe(
-      filter((res) => !!res),
+    return this.loadedPlans$.pipe(
+      first(),
       map((evalplans) => evalplans.find((plan) => plan.id === evalplanId))
     )
   }
@@ -74,6 +77,7 @@ export class EvalPlanService {
             (plan) => new EvalPlanModel(plan)
           )
           this.planningEntities$.next(evalplanmodels)
+          console.log('refresh eval plans', evalplanmodels)
           return evalplanmodels
         })
       )

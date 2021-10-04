@@ -11,7 +11,7 @@ import { BaseMoodleModel } from './base-moodle.model'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-// nnkitodo[FILE]
+
 // This is the replica of the local_cveteval_group_assign table.
 // We do not use lowerCamelCase for entities that are directly retrieved via API
 // as Moodle does not use this convention in usual APIs

@@ -62,6 +62,13 @@ export class BaseDataService {
     })
   }
 
+  public get loaded$(): Observable<boolean> {
+    return this.isLoaded$.asObservable().pipe(
+      filter((loaded) => loaded),
+      first()
+    )
+  }
+
   refreshAllEntities() {
     return forkJoin([
       this.refresh('clsituation'),
@@ -73,12 +80,17 @@ export class BaseDataService {
       tap(
         ([situations, criteria, criteriaEvalGrid, roles, groupAssignments]) => {
           this.entities = {
-            situations: situations as SituationModel[],
-            criteria: criteria as CriterionModel[],
-            criteriaEvalGrid: criteriaEvalGrid as CriterionEvalgridModel[],
-            roles: roles as RoleModel[],
-            groupAssignments: groupAssignments as GroupAssignmentModel[],
+            situations: situations.map((elt) => new SituationModel(elt)),
+            criteria: criteria.map((elt) => new CriterionModel(elt)),
+            criteriaEvalGrid: criteriaEvalGrid.map(
+              (elt) => new CriterionEvalgridModel(elt)
+            ),
+            roles: roles.map((elt) => new RoleModel(elt)),
+            groupAssignments: groupAssignments.map(
+              (elt) => new GroupAssignmentModel(elt)
+            ),
           }
+          console.log('refresh base data service', this.entities)
           this.isLoaded$.next(true)
         }
       )

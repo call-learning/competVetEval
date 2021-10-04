@@ -65,22 +65,20 @@ export class ScheduledSituationService {
       }
     })
 
-    this.baseDataService.isLoaded$
+    this.baseDataService.loaded$
       .pipe(
-        filter((isLoaded) => isLoaded),
         concatMap(() => {
           return combineLatest([
             this.authService.loginState$,
             this.appraisalUIService.appraisals$,
             this.scheduledSituationsEntities$,
-            this.evalPlanService.plans$,
+            this.evalPlanService.loadedPlans$,
           ]).pipe(
             filter(([loginState, appraisals, allsituations, evalplan]) => {
               return (
                 appraisals != null &&
                 allsituations != null &&
-                loginState === LOGIN_STATE.LOGGED &&
-                evalplan != null
+                loginState === LOGIN_STATE.LOGGED
               )
             }),
             tap(([loginState, appraisals, allsituations, evalplan]) => {
@@ -93,10 +91,7 @@ export class ScheduledSituationService {
                   appraisals,
                   this.authService.loggedUser$.getValue().userid
                 )
-              }
-            }),
-            tap(([loginState, appraisals, allsituations, evalplan]) => {
-              if (
+              } else if (
                 this.authService.isStillLoggedIn() &&
                 this.authService.isAppraiser &&
                 this.baseDataService.entities.groupAssignments
@@ -170,12 +165,8 @@ export class ScheduledSituationService {
    */
   public refresh(): Observable<ScheduledSituation[]> {
     if (this.authService.isStillLoggedIn()) {
-      return this.baseDataService.isLoaded$.pipe(
-        filter((isLoaded) => isLoaded),
-        first(),
-        concatMap(() => {
-          return this.evalPlanService.plans$.pipe(filter((obj) => obj != null))
-        }),
+      return this.baseDataService.loaded$.pipe(
+        concatMap(() => this.evalPlanService.loadedPlans$),
         first(),
         map((evalplans) => {
           if (this.authService.isStillLoggedIn()) {

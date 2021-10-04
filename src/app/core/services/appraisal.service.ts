@@ -103,15 +103,9 @@ export class AppraisalService {
    * @protected
    */
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
-    return this.baseDataService.isLoaded$.pipe(
-      filter((isLoaded) => isLoaded),
+    return this.baseDataService.loaded$.pipe(
+      concatMap(() => this.evalPlanService.loadedPlans$),
       first(),
-      concatMap(() => {
-        return this.evalPlanService.plans$.pipe(
-          filter((obj) => obj != null),
-          first()
-        )
-      }),
       concatMap((evalplans) => {
         // First check all situations involved.
         const mySituations = this.baseDataService.entities.situations.filter(

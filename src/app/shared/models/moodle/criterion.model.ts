@@ -10,7 +10,7 @@
  */
 import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
-// nnkitodo[FILE]
+
 // This is the replica of the local_cveteval_clsituation table.
 export class CriterionModel extends BaseMoodleModel {
   id: number
