@@ -12,7 +12,7 @@
 import { Injectable } from '@angular/core'
 
 import { of, BehaviorSubject, Observable, forkJoin } from 'rxjs'
-import { filter, first, tap } from 'rxjs/operators'
+import { filter, first, map, tap } from 'rxjs/operators'
 import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
@@ -32,7 +32,7 @@ import { AuthService, LOGIN_STATE } from './auth.service'
   providedIn: 'root',
 })
 export class BaseDataService {
-  entities: {
+  private entities: {
     situations: SituationModel[]
     criteria: CriterionModel[]
     criteriaEvalGrid: CriterionEvalgridModel[]
@@ -40,7 +40,8 @@ export class BaseDataService {
     groupAssignments: GroupAssignmentModel[]
   } = null
 
-  isLoaded$ = new BehaviorSubject<boolean>(false)
+  private isLoaded$ = new BehaviorSubject<boolean>(false)
+  private isLoading = false
 
   /**
    * Build the base data service
@@ -53,24 +54,66 @@ export class BaseDataService {
     private authService: AuthService
   ) {
     this.authService.loginState$.subscribe((loginState) => {
-      if (loginState === LOGIN_STATE.LOGGED) {
-        this.refreshAllEntities().subscribe()
-      } else {
-        this.isLoaded$.next(false)
-        this.entities = null
+      if (loginState !== LOGIN_STATE.LOGGED) {
+        this.resetService()
       }
     })
   }
 
-  public get loaded$(): Observable<boolean> {
-    return this.isLoaded$.asObservable().pipe(filter((loaded) => loaded))
+  resetService() {
+    this.entities = null
+    this.isLoaded$.next(false)
+    this.isLoading = false
   }
 
-  public get current$(): Observable<boolean> {
-    return this.loaded$.pipe(first())
+  public get situations$(): Observable<SituationModel[]> {
+    return this.getLoadedEntity('situations')
+  }
+
+  public get criteria$(): Observable<CriterionModel[]> {
+    return this.getLoadedEntity('criteria')
+  }
+
+  public get criteriaEvalGrid$(): Observable<CriterionEvalgridModel[]> {
+    return this.getLoadedEntity('criteriaEvalGrid')
+  }
+
+  public get roles$(): Observable<RoleModel[]> {
+    return this.getLoadedEntity('roles')
+  }
+
+  public get groupAssignments$(): Observable<GroupAssignmentModel[]> {
+    return this.getLoadedEntity('groupAssignments')
+  }
+
+  private getLoadedEntity(entityType) {
+    if (this.entities === null) {
+      if (!this.isLoading) {
+        return this.refreshAllEntities().pipe(
+          tap(() => {
+            this.isLoading = false
+            this.isLoaded$.next(true)
+          }),
+          map(() => {
+            return this.entities[entityType]
+          })
+        )
+      } else {
+        return this.isLoaded$.pipe(
+          filter((isLoaded) => !!isLoaded),
+          first(),
+          map(() => {
+            return this.entities[entityType]
+          })
+        )
+      }
+    } else {
+      return of(this.entities[entityType])
+    }
   }
 
   refreshAllEntities() {
+    this.isLoading = true
     return forkJoin([
       this.refresh('clsituation'),
       this.refresh('criterion'),

@@ -11,7 +11,7 @@ import { BaseMoodleModel } from './base-moodle.model'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-// nnkitodo[FILE]
+
 // This is the replica of the local_cveteval_evalgrid table, except for the evalgridid that
 // is used to get a direct match with the scheduledSituation.
 export class EvalgridModel extends BaseMoodleModel {

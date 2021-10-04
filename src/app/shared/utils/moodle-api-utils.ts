@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http'
 
 import { throwError, Observable } from 'rxjs'
 import { catchError } from 'rxjs/operators'
-// nnkitodo[FILE]
+
 export class MoodleApiUtils {
   static getServiceName(): string {
     return 'cveteval_app_service'

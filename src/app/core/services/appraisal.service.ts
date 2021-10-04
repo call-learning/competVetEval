@@ -1,3 +1,4 @@
+import { forkJoin } from 'rxjs'
 /**
  * Appraisal basic model retrieval and submission
  *
@@ -103,19 +104,16 @@ export class AppraisalService {
    * @protected
    */
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
-    return this.baseDataService.current$.pipe(
-      concatMap(() => this.evalPlanService.currentPlans$),
-      concatMap((evalplans) => {
+    return forkJoin([
+      this.baseDataService.situations$,
+      this.baseDataService.roles$,
+      this.evalPlanService.plans$,
+    ]).pipe(
+      concatMap(([situations, roles, evalplans]) => {
         // First check all situations involved.
-        const mySituations = this.baseDataService.entities.situations.filter(
-          (sit) => {
-            return (
-              this.baseDataService.entities.roles.find(
-                (r) => r.clsituationid === sit.id
-              ) !== undefined
-            )
-          }
-        )
+        const mySituations = situations.filter((sit) => {
+          return roles.find((r) => r.clsituationid === sit.id) !== undefined
+        })
         // Filter all eval plan depending on the current appraiser.
         return from(
           evalplans.filter((evalplan) => {

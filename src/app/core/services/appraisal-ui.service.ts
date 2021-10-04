@@ -278,7 +278,7 @@ export class AppraisalUiService {
       }
     }
 
-    return this.criteriaService.currentCriteriaTree$.pipe(
+    return this.criteriaService.criteriaTree$.pipe(
       map((criteriaTree) => {
         return criteriaTree
           .map((criteriontree) => recurseThroughCriteriaTree(criteriontree))

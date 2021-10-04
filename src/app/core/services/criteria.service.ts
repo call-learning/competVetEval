@@ -1,4 +1,5 @@
-import { filter } from 'rxjs/operators'
+import { AuthService, LOGIN_STATE } from './auth.service'
+import { filter, tap } from 'rxjs/operators'
 /**
  * Criteria based services
  *
@@ -12,7 +13,7 @@ import { filter } from 'rxjs/operators'
 
 import { Injectable } from '@angular/core'
 
-import { BehaviorSubject, Observable, of, zip } from 'rxjs'
+import { BehaviorSubject, forkJoin, Observable, of, zip } from 'rxjs'
 import { concatMap, first, map, withLatestFrom } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
@@ -26,9 +27,7 @@ import { BaseDataService } from './base-data.service'
   providedIn: 'root',
 })
 export class CriteriaService {
-  private criteriaTreeEntities$ = new BehaviorSubject<CriterionTreeModel[]>(
-    null
-  )
+  private criteriaTreeEntities: CriterionTreeModel[] = null
 
   /**
    * Build the base data service
@@ -36,24 +35,30 @@ export class CriteriaService {
    * @param baseDataService
    * @param authService
    */
-  constructor(private baseDataService: BaseDataService) {
-    this.baseDataService.isLoaded$.subscribe((loaded) => {
-      if (loaded) {
-        this.refreshCriteria(this.baseDataService.entities.criteria)
-      } else {
-        this.criteriaTreeEntities$.next(null)
+  constructor(
+    private baseDataService: BaseDataService,
+    private authService: AuthService
+  ) {
+    this.authService.loginState$.subscribe((loginState) => {
+      if (loginState !== LOGIN_STATE.LOGGED) {
+        this.resetService()
       }
     })
+  }
+
+  resetService() {
+    this.criteriaTreeEntities = null
   }
 
   /**
    * Get current criteria tree
    */
-  public get currentCriteriaTree$(): Observable<CriterionTreeModel[]> {
-    return this.criteriaTreeEntities$.asObservable().pipe(
-      filter((tree) => tree !== null),
-      first()
-    )
+  public get criteriaTree$(): Observable<CriterionTreeModel[]> {
+    if (this.criteriaTreeEntities === null) {
+      return this.refreshCriteria()
+    } else {
+      return of(this.criteriaTreeEntities)
+    }
   }
 
   /**
@@ -61,12 +66,16 @@ export class CriteriaService {
    *
    * @param newcriteria
    */
-  public refreshCriteria(newcriteria: CriterionModel[]): CriterionTreeModel[] {
-    const allHierarchicalCriteria =
-      CriterionTreeModel.convertToTree(newcriteria)
-    console.log('refresh criteria', allHierarchicalCriteria)
-    this.criteriaTreeEntities$.next(allHierarchicalCriteria)
-    return allHierarchicalCriteria
+  public refreshCriteria(): Observable<CriterionTreeModel[]> {
+    return this.baseDataService.criteria$.pipe(
+      map((newcriteria) => {
+        const allHierarchicalCriteria =
+          CriterionTreeModel.convertToTree(newcriteria)
+        this.criteriaTreeEntities = allHierarchicalCriteria
+        console.log('refresh criteria', allHierarchicalCriteria)
+        return allHierarchicalCriteria
+      })
+    )
   }
 
   // nnkitodo[FUNCTION]
@@ -77,13 +86,16 @@ export class CriteriaService {
   public getCriteriaFromEvalGrid(
     evalgridId: number
   ): Observable<CriterionModel[]> {
-    return this.baseDataService.current$.pipe(
-      map(() => {
-        return this.baseDataService.entities.criteriaEvalGrid
+    return forkJoin([
+      this.baseDataService.criteriaEvalGrid$,
+      this.baseDataService.criteria$,
+    ]).pipe(
+      map(([criteriaEvalGrid, criteria]) => {
+        return criteriaEvalGrid
           .filter((evalGridCrit) => evalGridCrit.evalgridid === evalgridId)
           .map((evalGridCrit) => {
-            return this.baseDataService.entities.criteria.find((criteria) => {
-              return criteria.id === evalGridCrit.id
+            return criteria.find((crit) => {
+              return crit.id === evalGridCrit.id
             })
           })
       })
