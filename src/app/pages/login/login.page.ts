@@ -63,6 +63,11 @@ export class LoginPage implements OnInit {
     })
   }
 
+  ionViewDidLeave() {
+    this.loginForm.markAsUntouched()
+    this.loginForm.reset()
+  }
+
   prefillLoginForm() {
     if (localStorage.getItem(LocaleKeys.rememberMeUsername)) {
       const rememberedUsername = localStorage.getItem(
@@ -107,8 +112,6 @@ export class LoginPage implements OnInit {
               this.saveLoginForm()
               this.router.navigate(['/situations-list'])
               this.loader.dismiss()
-              this.loginForm.reset()
-              this.loginForm.markAsUntouched()
             },
             (err: Error) => {
               if (err.message === 'invalidlogin') {

@@ -1,3 +1,4 @@
+import { BaseDataService } from './../../core/services/base-data.service'
 /**
  * SituationModel List page
  *
@@ -29,7 +30,7 @@ const MAX_INTERVAL = 4
   templateUrl: './situations-list.page.html',
   styleUrls: ['./situations-list.page.scss'],
 })
-export class SituationsListPage extends BaseComponent implements OnInit {
+export class SituationsListPage extends BaseComponent {
   situations: ScheduledSituation[]
   situationsDisplayed: ScheduledSituation[]
 
@@ -38,16 +39,25 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     public authService: AuthService,
     public scheduledSituationsService: ScheduledSituationService,
     private modalController: ModalController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private baseDataService: BaseDataService
   ) {
     super()
   }
 
-  ngOnInit() {
+  ionViewWillEnter() {
+    this.menuController.enable(true)
+
     this.loadData()
   }
 
+  initComponent() {
+    this.situations = null
+    this.situationsDisplayed = null
+  }
+
   loadData() {
+    this.initComponent()
     this.loadingController.create().then((loader) => {
       loader.present().then(() =>
         // nnkitodo[SL] : simplifier
@@ -63,10 +73,6 @@ export class SituationsListPage extends BaseComponent implements OnInit {
           })
       )
     })
-  }
-
-  ionViewDidEnter(): void {
-    this.menuController.enable(true)
   }
 
   ionViewDidLeave(): void {

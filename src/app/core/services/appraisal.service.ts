@@ -1,4 +1,4 @@
-import { forkJoin } from 'rxjs'
+import { forkJoin, zip } from 'rxjs'
 /**
  * Appraisal basic model retrieval and submission
  *
@@ -9,10 +9,18 @@ import { forkJoin } from 'rxjs'
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Injectable } from '@angular/core'
+import { Injectable, EventEmitter } from '@angular/core'
 
 import { combineLatest, from, of, BehaviorSubject, Observable, iif } from 'rxjs'
-import { concatMap, filter, first, map, mapTo, tap } from 'rxjs/operators'
+import {
+  concatMap,
+  filter,
+  first,
+  map,
+  mapTo,
+  tap,
+  toArray,
+} from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
@@ -38,6 +46,11 @@ export class AppraisalService {
   protected appraisalCriterionModels$ = new BehaviorSubject<
     AppraisalCriterionModel[]
   >(null)
+
+  appraisalsChanged = new EventEmitter<{
+    appraisals: AppraisalModel[]
+    appraisalCriterionModels: AppraisalCriterionModel[]
+  }>()
 
   /**
    * Start and retrieve appraisal and criteria for this user
@@ -71,38 +84,25 @@ export class AppraisalService {
   }
 
   /**
-   * Retrieve appraisals for currently logged in user
-   */
-  public get appraisals$(): Observable<AppraisalModel[]> {
-    return this.appraisalModels$.asObservable()
-  }
-
-  /**
-   * Retrieve appraisals criteria for currently logged in user
-   */
-  public get appraisalsCriteria$(): Observable<AppraisalCriterionModel[]> {
-    return this.appraisalCriterionModels$.asObservable()
-  }
-
-  /**
    * Refresh models and a return an observable to be subscribed to
    *
    * @protected
    */
-  public refresh(): Observable<AppraisalCriterionModel[]> {
-    return iif(
-      () => this.authService.isStudent,
-      this.getAppraisalsModelForStudent(
+  public refresh(): Observable<AppraisalCriterionModel[][]> {
+    let refreshObs: Observable<AppraisalModel[]>
+    if (this.authService.isStudent) {
+      refreshObs = this.getAppraisalsModelForStudent(
         this.authService.loggedUser$.getValue().userid
-      ),
-      this.getAppraisalModelForAppraiser()
-    ).pipe(
+      )
+    } else {
+      refreshObs = this.getAppraisalModelForAppraiser()
+    }
+
+    return refreshObs.pipe(
       concatMap((appraisalModels) => {
-        console.log(appraisalModels)
         return from(appraisalModels)
       }),
       concatMap((appraisal: AppraisalModel) => {
-        console.log(appraisal)
         return this.moodleApiService
           .fetchMoreRecentData(
             'appr_crit',
@@ -126,8 +126,14 @@ export class AppraisalService {
           appraisalsCriteria,
           ['id']
         )
-        console.log(appraisalsCriteria)
         return appraisalsCriteria as AppraisalCriterionModel[]
+      }),
+      toArray(),
+      tap(() => {
+        this.appraisalsChanged.emit({
+          appraisals: this.appraisalModels$.getValue(),
+          appraisalCriterionModels: this.appraisalCriterionModels$.getValue(),
+        })
       })
     )
   }
@@ -137,11 +143,9 @@ export class AppraisalService {
    * Check first if there is more recent version on the server
    * @param appraisalId
    */
-  // nnkitodo [function]
   public appraisalsCriteriaForAppraisalId(
     appraisalId
   ): Observable<AppraisalCriterionModel[]> {
-    // First check if it is not already loaded.
     return this.appraisalCriterionModels$.pipe(
       filter((obj) => obj != null),
       map((appraisals) =>
@@ -155,7 +159,6 @@ export class AppraisalService {
    *
    * @protected
    */
-  // nnkitodo [function]
   protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
     return forkJoin([
       this.baseDataService.situations$,
@@ -178,15 +181,15 @@ export class AppraisalService {
         )
       }),
       // Now fetch the matching appraisal.
-      concatMap((evalPlan) =>
-        this.moodleApiService.fetchMoreRecentData(
+      concatMap((evalPlan) => {
+        return this.moodleApiService.fetchMoreRecentData(
           'appraisal',
           { evalplanid: evalPlan.id },
           this.appraisalModels$
             .getValue()
             ?.filter((app) => app.evalplanid === evalPlan.id)
         )
-      ),
+      }),
       tap((newAppraisals: AppraisalModel[]) => {
         // Merge existing values with new values
         mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
@@ -202,7 +205,6 @@ export class AppraisalService {
    * @param studentid
    * @protected
    */
-  // nnkitodo [function]
   protected getAppraisalsModelForStudent(
     studentid
   ): Observable<AppraisalModel[]> {
@@ -216,7 +218,6 @@ export class AppraisalService {
       ) as Observable<AppraisalModel[]>
     ).pipe(
       tap((newAppraisals) => {
-        console.log(newAppraisals)
         // Merge existing values with new values
         mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
           'id',

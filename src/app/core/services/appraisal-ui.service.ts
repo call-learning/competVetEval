@@ -41,7 +41,7 @@ import { AuthService, LOGIN_STATE } from './auth.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
 import { UserDataService } from './user-data.service'
-// nnkitodo[FILE]
+
 @Injectable({
   providedIn: 'root',
 })
@@ -53,14 +53,19 @@ export class AppraisalUiService {
     private criteriaService: CriteriaService,
     private userDataService: UserDataService,
     private evalPlanService: EvalPlanService,
-    private appraisalServices: AppraisalService
+    private appraisalService: AppraisalService
   ) {
-    combineLatest([
-      this.appraisalServices.appraisals$.pipe(filter((res) => !!res)),
-      this.appraisalServices.appraisalsCriteria$,
-    ])
+    this.appraisalService.appraisalsChanged
       .pipe(
-        tap(([appraisalModels, appraisalCriteria]) => {
+        tap((appraisalsChanged) => {
+          const appraisalModels = appraisalsChanged.appraisals
+          let appraisalCriteria = appraisalsChanged.appraisalCriterionModels
+
+          console.log(
+            'appraisal ui service',
+            appraisalModels,
+            appraisalCriteria
+          )
           if (this.authService.loginState$.getValue() !== LOGIN_STATE.LOGGED) {
             this.appraisalEntities$.next(null)
           } else {
@@ -88,6 +93,7 @@ export class AppraisalUiService {
    * Retrieve an appraisal from its id.
    * Wait for it until is is retrieved
    */
+  // nnkitodo[FUNCTION]
   public waitForAppraisalId(
     appraisalId: number,
     forceRefresh?: boolean
@@ -107,14 +113,16 @@ export class AppraisalUiService {
   /**
    * Refresh appraisals and feed up the list
    */
+  // nnkitodo[FUNCTION]
   public refreshAppraisals(): Observable<any> {
-    return this.appraisalServices.refresh()
+    return this.appraisalService.refresh()
   }
   /**
    * Retrieve appraisals for given evaluation plan and given student id
    * @param evalPlanId
    * @param studentId
    */
+  // nnkitodo[FUNCTION]
   public fetchAppraisalsForEvalPlanStudentId(
     evalPlanId,
     studentId
@@ -139,6 +147,7 @@ export class AppraisalUiService {
    * @param appraisal
    *
    */
+  // nnkitodo[FUNCTION]
   public submitAppraisal(appraisal: AppraisalUI): Observable<number> {
     const appraisalModel = AppraisalModel.createBlank(
       appraisal.student.userid,
@@ -170,7 +179,7 @@ export class AppraisalUiService {
     }
 
     // Submit the appraisal, get the ID and then submit the criteria.
-    return this.appraisalServices.submitAppraisal(appraisalModel).pipe(
+    return this.appraisalService.submitAppraisal(appraisalModel).pipe(
       tap((resAppraisalModel) => {
         // Make sure we setup the appraisal id.
         const allcriteria = flatternAppraisalCriteria(appraisal.criteria)
@@ -179,7 +188,7 @@ export class AppraisalUiService {
             (appraisalCriteria.appraisalid = resAppraisalModel.id)
         )
 
-        this.appraisalServices.submitAppraisalCriteria(allcriteria).subscribe()
+        this.appraisalService.submitAppraisalCriteria(allcriteria).subscribe()
         return resAppraisalModel
       }),
       map((resAppraisalModel) => resAppraisalModel.id)
@@ -194,6 +203,7 @@ export class AppraisalUiService {
    * @param studentId
    * @param appraiserId
    */
+  // nnkitodo[FUNCTION]
   public createBlankAppraisal(
     evalPlanId: number,
     evalGridId: number,
@@ -202,7 +212,7 @@ export class AppraisalUiService {
     comment?: string,
     context?: string
   ): Observable<number> {
-    return this.appraisalServices
+    return this.appraisalService
       .createBlankAppraisal(
         evalPlanId,
         evalGridId,
@@ -218,6 +228,7 @@ export class AppraisalUiService {
       )
   }
 
+  // nnkitodo[FUNCTION]
   private lazyConvertAppraisalModelToUI(
     appraisalModels: AppraisalModel[],
     appraisalCriteriaModels: AppraisalCriterionModel[]
@@ -258,6 +269,7 @@ export class AppraisalUiService {
    * @param apprcriteria
    * @protected
    */
+  // nnkitodo[FUNCTION]
   private convertAppraisalCriterionModelsToTree(
     apprcriteria: AppraisalCriterionModel[]
   ): Observable<CriterionForAppraisalTreeModel[]> {
@@ -288,29 +300,13 @@ export class AppraisalUiService {
   }
 
   /**
-   * Get related criteria for appraisal
-   *
-   * @param appraisalId
-   */
-  // private getRelatedCriteriaAppraisals(
-  //   appraisalId
-  // ): Observable<CriterionForAppraisalTreeModel[]> {
-  //   return this.appraisalServices
-  //     .appraisalsCriteriaForAppraisalId(appraisalId)
-  //     .pipe(
-  //       map((apprcriteria: AppraisalCriterionModel[]) => {
-  //         return this.convertAppraisalCriterionModelsToTree(apprcriteria)
-  //       })
-  //     )
-  // }
-
-  /**
    * Convert to appraisal model and get subcriteria information
    *
    *
    * @param app
    * @protected
    */
+  // nnkitodo[FUNCTION]
   private convertAppraisalModel(
     app: AppraisalModel,
     criterionAppraisalUI: CriterionForAppraisalTreeModel[]

@@ -68,11 +68,11 @@ export class MoodleApiService {
     args: object,
     currentEntities: BaseMoodleModel[]
   ): Observable<BaseMoodleModel[]> {
-    return iif(
-      () => !!currentEntities,
-      this.fetchIfMoreRecent(entityType, args, currentEntities),
-      this.getEntities(entityType, args)
-    )
+    if (!!currentEntities) {
+      return this.fetchIfMoreRecent(entityType, args, currentEntities)
+    } else {
+      return this.getEntities(entityType, args)
+    }
   }
 
   fetchIfMoreRecent(

@@ -114,7 +114,6 @@ export class BaseDataService {
 
   refreshAllEntities() {
     this.isLoading = true
-    console.log('initiate refresh base data')
     return forkJoin([
       this.refresh('clsituation'),
       this.refresh('criterion'),
@@ -135,7 +134,6 @@ export class BaseDataService {
               (elt) => new GroupAssignmentModel(elt)
             ),
           }
-          console.log('refresh base data service', this.entities)
           this.isLoaded$.next(true)
         }
       )

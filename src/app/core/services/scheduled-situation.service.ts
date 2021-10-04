@@ -181,14 +181,13 @@ export class ScheduledSituationService {
    */
   public refresh(): Observable<ScheduledSituation[]> {
     if (this.authService.isStillLoggedIn()) {
-      return forkJoin([
+      return zip(
         this.baseDataService.situations$,
         this.baseDataService.groupAssignments$,
         this.baseDataService.roles$,
-        this.evalPlanService.plans$,
-      ]).pipe(
+        this.evalPlanService.plans$
+      ).pipe(
         map(([situations, groupAssignments, roles, evalplans]) => {
-          console.log('refresh situations')
           if (this.authService.isStillLoggedIn()) {
             if (this.authService.isStudent) {
               return this.buildScheduledSituationsForStudent(
