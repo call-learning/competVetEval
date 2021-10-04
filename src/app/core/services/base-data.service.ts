@@ -114,6 +114,7 @@ export class BaseDataService {
 
   refreshAllEntities() {
     this.isLoading = true
+    console.log('initiate refresh base data')
     return forkJoin([
       this.refresh('clsituation'),
       this.refresh('criterion'),

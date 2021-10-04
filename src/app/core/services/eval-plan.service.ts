@@ -93,6 +93,7 @@ export class EvalPlanService {
    */
   public refresh(): Observable<EvalPlanModel[]> {
     this.isLoading = true
+    console.log('initiate refresh eval plans')
     return this.moodleApiService
       .fetchMoreRecentData('evalplan', {}, this.planningEntities)
       .pipe(

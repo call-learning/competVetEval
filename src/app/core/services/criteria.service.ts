@@ -67,6 +67,7 @@ export class CriteriaService {
    * @param newcriteria
    */
   public refreshCriteria(): Observable<CriterionTreeModel[]> {
+    console.log('initiate refresh criteria')
     return this.baseDataService.criteria$.pipe(
       map((newcriteria) => {
         const allHierarchicalCriteria =

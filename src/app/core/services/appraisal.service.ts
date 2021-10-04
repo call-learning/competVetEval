@@ -21,7 +21,7 @@ import { AuthService, LOGIN_STATE } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { CriteriaService } from './criteria.service'
 import { EvalPlanService } from './eval-plan.service'
-// nnkitodo[FILE]
+
 @Injectable({
   providedIn: 'root',
 })
@@ -57,14 +57,17 @@ export class AppraisalService {
     private evalPlanService: EvalPlanService
   ) {
     this.authService.loginState$.subscribe((state) => {
-      if (state === LOGIN_STATE.LOGGED) {
-        // Get all appraisals and appraisal criteria for this user.
-        this.refresh().subscribe()
+      if (state !== LOGIN_STATE.LOGGED) {
+        this.resetService()
       } else {
-        this.appraisalCriterionModels$.next(null)
-        this.appraisalModels$.next(null)
+        this.refresh().subscribe()
       }
     })
+  }
+
+  resetService() {
+    this.appraisalCriterionModels$.next(null)
+    this.appraisalModels$.next(null)
   }
 
   /**
@@ -79,6 +82,54 @@ export class AppraisalService {
    */
   public get appraisalsCriteria$(): Observable<AppraisalCriterionModel[]> {
     return this.appraisalCriterionModels$.asObservable()
+  }
+
+  /**
+   * Refresh models and a return an observable to be subscribed to
+   *
+   * @protected
+   */
+  public refresh(): Observable<AppraisalCriterionModel[]> {
+    return iif(
+      () => this.authService.isStudent,
+      this.getAppraisalsModelForStudent(
+        this.authService.loggedUser$.getValue().userid
+      ),
+      this.getAppraisalModelForAppraiser()
+    ).pipe(
+      concatMap((appraisalModels) => {
+        console.log(appraisalModels)
+        return from(appraisalModels)
+      }),
+      concatMap((appraisal: AppraisalModel) => {
+        console.log(appraisal)
+        return this.moodleApiService
+          .fetchMoreRecentData(
+            'appr_crit',
+            { appraisalid: appraisal.id },
+            this.appraisalCriterionModels$
+              .getValue()
+              ?.filter((appc) => appc.appraisalid === appraisal.id)
+          )
+          .pipe(
+            map((appraisalCriteriaModels) => {
+              return appraisalCriteriaModels.map(
+                (model) => new AppraisalCriterionModel(model)
+              )
+            })
+          )
+      }),
+      map((appraisalsCriteria) => {
+        // Make sure we store them so we can retrieve them later.
+        mergeExistingBehaviourSubject(
+          this.appraisalCriterionModels$,
+          appraisalsCriteria,
+          ['id']
+        )
+        console.log(appraisalsCriteria)
+        return appraisalsCriteria as AppraisalCriterionModel[]
+      })
+    )
   }
 
   /**
@@ -172,55 +223,13 @@ export class AppraisalService {
   }
 
   /**
-   * Refresh models and a return an observable to be subscribed to
-   *
-   * @protected
-   */
-  public refresh(): Observable<AppraisalCriterionModel[]> {
-    return iif(
-      () => this.authService.isStudent,
-      this.getAppraisalsModelForStudent(
-        this.authService.loggedUser$.getValue().userid
-      ),
-      this.getAppraisalModelForAppraiser()
-    ).pipe(
-      concatMap((appraisalModels) => from(appraisalModels)),
-      concatMap((appraisal: AppraisalModel) => {
-        return this.moodleApiService
-          .fetchMoreRecentData(
-            'appr_crit',
-            { appraisalid: appraisal.id },
-            this.appraisalCriterionModels$
-              .getValue()
-              ?.filter((appc) => appc.appraisalid === appraisal.id)
-          )
-          .pipe(
-            map((appraisalCriteriaModels) => {
-              return appraisalCriteriaModels.map(
-                (model) => new AppraisalCriterionModel(model)
-              )
-            })
-          )
-      }),
-      map((appraisalsCriteria) => {
-        // Make sure we store them so we can retrieve them later.
-        mergeExistingBehaviourSubject(
-          this.appraisalCriterionModels$,
-          appraisalsCriteria,
-          ['id']
-        )
-        return appraisalsCriteria as AppraisalCriterionModel[]
-      })
-    )
-  }
-
-  /**
    * Create a new appraisal and return the newly created appraisal
    *
    * Note that this means that there is now an id in appraisal and appraisal criteria
    * @param appraisalModel
    * @param appraisalCriteriaModel
    */
+  // nnkitodo [FUNCTION]
   public createBlankAppraisal(
     evalPlanId: number,
     evalGridId: number,
@@ -274,6 +283,7 @@ export class AppraisalService {
    *
    * @param appraisalModel
    */
+  // nnkitodo [FUNCTION]
   public submitAppraisal(
     appraisalModel: AppraisalModel
   ): Observable<AppraisalModel> {
@@ -294,6 +304,7 @@ export class AppraisalService {
    *
    * @param appraisalModel
    */
+  // nnkitodo [FUNCTION]
   public submitAppraisalCriteria(
     appraisalCriterionModels: AppraisalCriterionModel[]
   ): Observable<AppraisalCriterionModel[]> {
