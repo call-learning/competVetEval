@@ -51,11 +51,15 @@ export class EvalPlanService {
       .pipe(filter((plans) => plans !== null))
   }
 
+  public get currentPlans$(): Observable<EvalPlanModel[]> {
+    return this.loadedPlans$.pipe(first())
+  }
+
   /**
    * Retrieve appraisal from its Id
    */
   public planFromId(evalplanId): Observable<EvalPlanModel> {
-    return this.loadedPlans$.pipe(
+    return this.currentPlans$.pipe(
       first(),
       map((evalplans) => evalplans.find((plan) => plan.id === evalplanId))
     )

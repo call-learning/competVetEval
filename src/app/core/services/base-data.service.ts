@@ -63,10 +63,11 @@ export class BaseDataService {
   }
 
   public get loaded$(): Observable<boolean> {
-    return this.isLoaded$.asObservable().pipe(
-      filter((loaded) => loaded),
-      first()
-    )
+    return this.isLoaded$.asObservable().pipe(filter((loaded) => loaded))
+  }
+
+  public get current$(): Observable<boolean> {
+    return this.loaded$.pipe(first())
   }
 
   refreshAllEntities() {

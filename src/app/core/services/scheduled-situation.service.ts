@@ -65,6 +65,7 @@ export class ScheduledSituationService {
       }
     })
 
+    // nnkitodo : loaded ou current ?
     this.baseDataService.loaded$
       .pipe(
         concatMap(() => {
@@ -165,9 +166,8 @@ export class ScheduledSituationService {
    */
   public refresh(): Observable<ScheduledSituation[]> {
     if (this.authService.isStillLoggedIn()) {
-      return this.baseDataService.loaded$.pipe(
-        concatMap(() => this.evalPlanService.loadedPlans$),
-        first(),
+      return this.baseDataService.current$.pipe(
+        concatMap(() => this.evalPlanService.currentPlans$),
         map((evalplans) => {
           if (this.authService.isStillLoggedIn()) {
             if (this.authService.isStudent) {

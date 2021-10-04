@@ -10,7 +10,7 @@
  * @copyright  2021 SAS CALL Learning
  */
 import { CriterionModel } from '../moodle/criterion.model'
-// nnkitodo[FILE]
+
 export class CriterionTreeModel {
   criterion: CriterionModel // Moodle internal model for criterion.
   subcriteria?: CriterionTreeModel[]

@@ -17,7 +17,7 @@ import { concatMap, first, map, withLatestFrom } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { BaseDataService } from './base-data.service'
-// nnkitodo[FILE]
+
 /**
  * Manage criteria hierarchical view
  * - criteria / evaluation grid
@@ -37,16 +37,23 @@ export class CriteriaService {
    * @param authService
    */
   constructor(private baseDataService: BaseDataService) {
-    this.baseDataService.loaded$.subscribe(() => {
-      this.refreshCriteria(this.baseDataService.entities.criteria)
+    this.baseDataService.isLoaded$.subscribe((loaded) => {
+      if (loaded) {
+        this.refreshCriteria(this.baseDataService.entities.criteria)
+      } else {
+        this.criteriaTreeEntities$.next(null)
+      }
     })
   }
 
   /**
    * Get current criteria tree
    */
-  public get criteriaTree$(): Observable<CriterionTreeModel[]> {
-    return this.criteriaTreeEntities$.asObservable()
+  public get currentCriteriaTree$(): Observable<CriterionTreeModel[]> {
+    return this.criteriaTreeEntities$.asObservable().pipe(
+      filter((tree) => tree !== null),
+      first()
+    )
   }
 
   /**
@@ -57,10 +64,12 @@ export class CriteriaService {
   public refreshCriteria(newcriteria: CriterionModel[]): CriterionTreeModel[] {
     const allHierarchicalCriteria =
       CriterionTreeModel.convertToTree(newcriteria)
+    console.log('refresh criteria', allHierarchicalCriteria)
     this.criteriaTreeEntities$.next(allHierarchicalCriteria)
     return allHierarchicalCriteria
   }
 
+  // nnkitodo[FUNCTION]
   /**
    * Get criteria from eval Grid
    * @param evalgridId
@@ -68,7 +77,7 @@ export class CriteriaService {
   public getCriteriaFromEvalGrid(
     evalgridId: number
   ): Observable<CriterionModel[]> {
-    return this.baseDataService.loaded$.pipe(
+    return this.baseDataService.current$.pipe(
       map(() => {
         return this.baseDataService.entities.criteriaEvalGrid
           .filter((evalGridCrit) => evalGridCrit.evalgridid === evalgridId)
