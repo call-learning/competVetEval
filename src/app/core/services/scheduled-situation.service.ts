@@ -307,14 +307,14 @@ export class ScheduledSituationService {
    *
    * @param evalPlanId
    */
-  // nnkitodo [FUNCTION]
   public getMyScheduledSituationStats(
     evalPlanId
   ): Observable<StudentSituationStatsModel> {
     return this.studentSituationStats$.pipe(
       filter((obj) => obj != null),
-      concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id === evalPlanId)
+      map((allstats) => {
+        return allstats.find((stat) => stat.id === evalPlanId)
+      })
     )
   }
 
@@ -327,15 +327,17 @@ export class ScheduledSituationService {
    * @param evalPlanId
    * @param studentId
    */
-  // nnkitodo [FUNCTION]
   public getAppraiserScheduledSituationStats(
     evalPlanId,
     studentId
   ): Observable<AppraiserSituationStatsModel> {
     return this.appraiserSituationStats$.pipe(
       filter((obj) => obj != null),
-      concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id === evalPlanId && stat.studentId === studentId)
+      map((allstats) => {
+        return allstats.find(
+          (stat) => stat.id === evalPlanId && stat.studentId === studentId
+        )
+      })
     )
   }
 

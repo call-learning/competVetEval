@@ -9,28 +9,34 @@
 
 import { Component, Input, OnInit } from '@angular/core'
 
-import { first } from 'rxjs/operators'
+import { first, takeUntil } from 'rxjs/operators'
 import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
 import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
 import { StudentSituationStatsModel } from '../../models/ui/student-situation-stats.model'
+import { BaseComponent } from '../base/base.component'
 
 @Component({
   selector: 'app-student-situation-card',
   templateUrl: './student-situation-card.component.html',
   styleUrls: ['./student-situation-card.component.scss'],
 })
-export class StudentSituationCardComponent implements OnInit {
+export class StudentSituationCardComponent
+  extends BaseComponent
+  implements OnInit
+{
   @Input() scheduledSituation?: ScheduledSituation
   @Input() showHeader = true
   public studentSituationStats: StudentSituationStatsModel = null
 
-  constructor(private scheduledSituationService: ScheduledSituationService) {}
+  constructor(private scheduledSituationService: ScheduledSituationService) {
+    super()
+  }
 
   ngOnInit() {
-    // nnkitodo[SL] : simplifier
     const evalPlanId = this.scheduledSituation.evalPlan.id
     this.scheduledSituationService
       .getMyScheduledSituationStats(evalPlanId)
+      .pipe(takeUntil(this.alive$))
       .subscribe((stats) => {
         this.studentSituationStats = stats
       })

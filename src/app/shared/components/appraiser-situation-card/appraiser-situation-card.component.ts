@@ -1,3 +1,4 @@
+import { BaseComponent } from './../base/base.component'
 /**
  * Scheduled situation card for student
  *
@@ -9,7 +10,7 @@
 
 import { Component, Input, OnInit } from '@angular/core'
 
-import { first } from 'rxjs/operators'
+import { first, takeUntil } from 'rxjs/operators'
 import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
 import { UserDataService } from '../../../core/services/user-data.service'
 import { CevUser } from '../../models/cev-user.model'
@@ -21,7 +22,10 @@ import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
   templateUrl: './appraiser-situation-card.component.html',
   styleUrls: ['./appraiser-situation-card.component.scss'],
 })
-export class AppraiserSituationCardComponent implements OnInit {
+export class AppraiserSituationCardComponent
+  extends BaseComponent
+  implements OnInit
+{
   @Input() scheduledSituation?: ScheduledSituation
   @Input() studentId?: number
   @Input() showHeader = true
@@ -31,14 +35,17 @@ export class AppraiserSituationCardComponent implements OnInit {
   constructor(
     private scheduledSituationService: ScheduledSituationService,
     private userDataService: UserDataService
-  ) {}
+  ) {
+    super()
+  }
 
   ngOnInit() {
-    // nnkitodo[SL] : simplifier
     const evalPlanId = this.scheduledSituation.evalPlan.id
     this.scheduledSituationService
       .getAppraiserScheduledSituationStats(evalPlanId, this.studentId)
+      .pipe(takeUntil(this.alive$))
       .subscribe((stats) => (this.appraiserSituationStats = stats))
+
     this.userDataService
       .getUserProfileInfo(this.studentId)
       .subscribe((userInfo) => (this.studentInfo = userInfo))
