@@ -1,4 +1,4 @@
-import { filter } from 'rxjs/operators'
+import { filter, takeUntil } from 'rxjs/operators'
 /**
  * Appraisal details page
  *
@@ -27,7 +27,7 @@ import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.m
   templateUrl: './appraisal-detail.page.html',
   styleUrls: ['./appraisal-detail.page.scss'],
 })
-export class AppraisalDetailPage extends BaseComponent implements OnInit {
+export class AppraisalDetailPage extends BaseComponent {
   answerAppraisalForm: FormGroup
   errorMsg = ''
   formSubmitted = false
@@ -53,11 +53,14 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
     })
   }
 
-  ngOnInit() {
+  ionViewWillEnter() {
     this.appraisalId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('appraisalId'),
       10
     )
+
+    this.appraisal = null
+    this.scheduledSituation = null
 
     this.loadingController.create().then((res) => {
       this.loader = res
@@ -65,17 +68,17 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
 
       this.appraisalUIService
         .waitForAppraisalId(this.appraisalId)
-        .pipe(filter((app) => !!app))
         .subscribe((appraisal) => {
           this.appraisal = appraisal
-          this.scheduledSituationService.situations$.subscribe((situations) => {
-            if (situations) {
+
+          this.scheduledSituationService.situations$
+            .pipe(takeUntil(this.alive$))
+            .subscribe((situations) => {
               this.scheduledSituation = situations.find(
                 (sit) => sit.evalPlanId === this.appraisal.evalPlan.id
               )
-            }
-          })
-          if (this.loader.present) {
+            })
+          if (this.loader.animated) {
             this.loader.dismiss()
           }
         })
