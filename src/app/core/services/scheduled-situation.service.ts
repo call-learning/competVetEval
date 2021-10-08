@@ -85,7 +85,7 @@ export class ScheduledSituationService {
               this.buildStudentStatistics(
                 allsituations,
                 appraisals,
-                this.authService.loggedUser$.getValue().userid
+                this.authService.loggedUserValue.userid
               )
             } else if (this.authService.isAppraiser && groupAssignments) {
               this.buildAppraiserStatistics(appraisals, allsituations)
@@ -130,7 +130,7 @@ export class ScheduledSituationService {
               situations,
               roles,
               groupAssignments,
-              this.authService.loggedUser$.getValue().userid
+              this.authService.loggedUserValue.userid
             )
           }
         } else {
@@ -339,13 +339,5 @@ export class ScheduledSituationService {
         )
       })
     )
-  }
-
-  /**
-   * Refresh stats data for currently logged in user
-   */
-  public refreshStats(): Observable<any> {
-    // Pull all appraisals.
-    return this.appraisalUIService.refreshAppraisals()
   }
 }

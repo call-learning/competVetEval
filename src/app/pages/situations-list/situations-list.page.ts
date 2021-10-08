@@ -1,3 +1,4 @@
+import { AppraisalUiService } from './../../core/services/appraisal-ui.service'
 import { BaseDataService } from './../../core/services/base-data.service'
 /**
  * SituationModel List page
@@ -39,7 +40,8 @@ export class SituationsListPage extends BaseComponent {
     public authService: AuthService,
     public scheduledSituationsService: ScheduledSituationService,
     private modalController: ModalController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private appraisalUIService: AppraisalUiService
   ) {
     super()
   }
@@ -131,8 +133,8 @@ export class SituationsListPage extends BaseComponent {
   }
 
   doRefresh(event) {
-    this.scheduledSituationsService
-      .refreshStats()
+    this.appraisalUIService
+      .refreshAppraisals()
       .pipe(takeUntil(this.alive$))
       .subscribe(() => {
         event.target.complete()

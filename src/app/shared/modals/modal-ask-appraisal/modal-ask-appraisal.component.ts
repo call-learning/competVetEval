@@ -76,7 +76,7 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
         .createBlankAppraisal(
           this.scheduledSituation.evalPlanId,
           this.scheduledSituation.situation.evalgridid,
-          this.authService.loggedUser$.getValue().userid,
+          this.authService.loggedUserValue.userid,
           0, // For now we don't know the appraiser.
           '',
           this.contextInput.value

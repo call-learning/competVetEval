@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
+import { take } from 'lodash'
 
-import { zip } from 'rxjs'
-import { filter, first, map } from 'rxjs/operators'
+import { forkJoin, zip } from 'rxjs'
+import { filter, first, map, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
@@ -22,16 +23,13 @@ import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
   templateUrl: './situation-detail.page.html',
   styleUrls: ['./situation-detail.page.scss'],
 })
-export class SituationDetailPage extends BaseComponent implements OnInit {
+export class SituationDetailPage extends BaseComponent {
   evalPlanId: number = null
   studentId: number = null
-  currentUserId: number = null
   studentInfo: CevUser = null
 
   scheduledSituation: ScheduledSituation
   appraisals = null
-
-  appraisalsloaded = false
 
   loader: HTMLIonLoadingElement
 
@@ -48,11 +46,12 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
     super()
   }
 
-  ngOnInit() {
+  ionViewDidEnter() {
     this.evalPlanId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('evalPlanId'),
       10
     )
+
     if (this.activatedRoute.snapshot.paramMap.has('studentId')) {
       this.studentId = parseInt(
         this.activatedRoute.snapshot.paramMap.get('studentId'),
@@ -62,22 +61,32 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
       this.studentId = null
     }
 
-    this.currentUserId = this.authService.loggedUser$.getValue().userid
+    this.initAppraisals()
+    this.getSituation()
+  }
+
+  initAppraisals() {
+    this.appraisals = null
     // Refresh when we change the appraisals.
     this.appraisalUIService
       .fetchAppraisalsForEvalPlanStudentId(this.evalPlanId, this.studentId)
+      .pipe(takeUntil(this.alive$))
       .subscribe((appraisals) => {
         this.appraisals = appraisals
-        this.appraisalsloaded = true
       })
+  }
+
+  getSituation() {
+    this.scheduledSituation = null
 
     this.loadingController.create().then((res) => {
       this.loader = res
       this.loader.present()
-      zip(
+
+      forkJoin([
         this.situationService.situations$.pipe(filter((sit) => !!sit)),
-        this.userDataService.getUserProfileInfo(this.studentId)
-      )
+        this.userDataService.getUserProfileInfo(this.studentId),
+      ])
         .pipe(
           map(([situations, userProfile]) => {
             if (situations) {
@@ -144,14 +153,11 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
           modal.present()
         })
     } else {
+      this.loader.present()
       this.appraisalUIService
         .waitForAppraisalId(appraisalId)
-        .pipe(
-          filter((appraisal) => appraisal !== null),
-          first()
-        )
         .subscribe((appraisal: AppraisalUI) => {
-          appraisal.appraiser = this.authService.loggedUser$.getValue()
+          appraisal.appraiser = this.authService.loggedUserValue
           if (this.loader.animated) {
             this.loader.dismiss()
           }
@@ -170,18 +176,8 @@ export class SituationDetailPage extends BaseComponent implements OnInit {
    * @param event
    */
   doRefresh(event) {
-    const REFRESH_TIMEOUT = 10000 // If after 10 sec we have no refresh even
-    // we stop the spinner. This happens when there is no appraisal at all but
-    // this is a temporary solution that has to be dealt with differently.
-    const refresh = this.appraisalUIService
-      .refreshAppraisals()
-      .subscribe((allsituations) => {
-        event.target.complete()
-      })
-    setTimeout(() => {
-      console.warn('Situation list: refresh event cancelled')
+    this.appraisalUIService.refreshAppraisals().subscribe(() => {
       event.target.complete()
-      refresh.unsubscribe()
-    }, REFRESH_TIMEOUT)
+    })
   }
 }

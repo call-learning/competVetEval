@@ -93,7 +93,7 @@ export class AppraisalService {
     let refreshObs: Observable<AppraisalModel[]>
     if (this.authService.isStudent) {
       refreshObs = this.getAppraisalsModelForStudent(
-        this.authService.loggedUser$.getValue().userid
+        this.authService.loggedUserValue.userid
       )
     } else {
       refreshObs = this.getAppraisalModelForAppraiser()

@@ -149,7 +149,7 @@ export class BaseDataService {
     if (this.authService.isStillLoggedIn()) {
       let query = {}
       if (entityType === 'role') {
-        query = { userid: this.authService.loggedUser$.getValue().userid }
+        query = { userid: this.authService.loggedUserValue.userid }
       }
       return this.doRefreshData(entityType, query)
     } else {

@@ -84,8 +84,8 @@ describe('AuthService', () => {
         expect(
           service.loginState$.getValue() === LOGIN_STATE.LOGGED
         ).toBeTruthy()
-        expect(service.loggedUser$.getValue().username).toEqual('username')
-        expect(service.loggedUser$.getValue().userid).toEqual(12345)
+        expect(service.loggedUserValue.username).toEqual('username')
+        expect(service.loggedUserValue.userid).toEqual(12345)
       })
     }
   ))
@@ -137,8 +137,8 @@ describe('AuthService', () => {
         expect(
           service.loginState$.getValue() === LOGIN_STATE.LOGGED
         ).toBeTruthy()
-        expect(service.loggedUser$.getValue().username).toEqual('username')
-        expect(service.loggedUser$.getValue().userid).toEqual(12345)
+        expect(service.loggedUserValue.username).toEqual('username')
+        expect(service.loggedUserValue.userid).toEqual(12345)
       })
       expect(service.isStillLoggedIn()).toBeTrue()
       service.logout()

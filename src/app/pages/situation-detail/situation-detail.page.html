@@ -57,18 +57,18 @@
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
       <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
-    <div *ngIf="!appraisalsloaded">
+    <div *ngIf="!appraisals">
       <ion-skeleton-text animated></ion-skeleton-text>
     </div>
-    <div *ngIf="appraisalsloaded">
-      <div class="situation-detail__no-appraisals" *ngIf="!appraisals?.length">
+    <div *ngIf="appraisals">
+      <div class="situation-detail__no-appraisals" *ngIf="!appraisals.length">
         Cette situation n’a pas encore été évaluée
       </div>
-      <div class="ion-margin-vertical" *ngIf="appraisals?.length">
+      <div class="ion-margin-vertical" *ngIf="appraisals.length">
         <ion-list *ngFor="let appraisal of appraisals">
           <a
             class="list-item"
-            [routerLink]="(appraisal.appraiser?.userid === currentUserId) ? ['/appraisal-edit', appraisal.id]
+            [routerLink]="(appraisal.appraiser?.userid === authService.loggedUserValue?.userid) ? ['/appraisal-edit', appraisal.id]
         : ['/appraisal-detail', appraisal.id]"
             routerDirection="forward"
             *ngIf="appraisal.appraiser"
@@ -136,7 +136,7 @@
       <ion-button
         class="btn btn-primary btn-full nnki-mb4"
         (click)="openModalAskAppraisal()"
-        [disabled]="!appraisalsloaded"
+        [disabled]="!appraisals"
       >
         Demander une observation
       </ion-button>
@@ -144,7 +144,7 @@
     <ion-button
       class="btn-full"
       [routerLink]="['/evaluate', evalPlanId, studentId]"
-      [disabled]="!appraisalsloaded"
+      [disabled]="!appraisals"
       *ngIf="authService.isAppraiser"
     >
       <ion-icon name="chevron-forward"></ion-icon>

@@ -103,7 +103,7 @@ export class ModalScanAppraisalComponent implements OnInit {
                     toast.present()
                   })
               } else {
-                appraisal.appraiser = this.authService.loggedUser$.getValue()
+                appraisal.appraiser = this.authService.loggedUserValue
 
                 this.appraisalUIService
                   .submitAppraisal(appraisal)

@@ -199,7 +199,6 @@ export class AppraisalUiService {
    * Retrieve an appraisal from its id.
    * Wait for it until is is retrieved
    */
-  // nnkitodo[FUNCTION]
   public waitForAppraisalId(
     appraisalId: number,
     forceRefresh?: boolean
@@ -210,7 +209,8 @@ export class AppraisalUiService {
           filter((obj) => obj != null),
           map((appraisals) =>
             appraisals.find((appraisal) => appraisal.id === appraisalId)
-          )
+          ),
+          first()
         )
       })
     )
@@ -221,7 +221,6 @@ export class AppraisalUiService {
    * @param evalPlanId
    * @param studentId
    */
-  // nnkitodo[FUNCTION]
   public fetchAppraisalsForEvalPlanStudentId(
     evalPlanId,
     studentId

@@ -94,7 +94,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
                 this.scheduledSituation.evalPlanId,
                 this.scheduledSituation.situation.evalgridid,
                 this.studentId,
-                this.authService.loggedUser$.getValue().userid
+                this.authService.loggedUserValue.userid
               )
               .subscribe((appraisalId) => {
                 this.appraisalUIService
@@ -150,7 +150,7 @@ export class EvaluatePage extends BaseComponent implements OnInit {
 
   saveAndRedirect() {
     this.loader.present()
-    this.appraisal.appraiser = this.authService.loggedUser$.getValue()
+    this.appraisal.appraiser = this.authService.loggedUserValue
     // this.appraisal.student = this.userDataService.getUserProfile(this.studentId)
     // See how we can build this without await
     this.appraisalUIService.submitAppraisal(this.appraisal).subscribe(
