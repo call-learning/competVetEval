@@ -39,8 +39,7 @@ export class SituationsListPage extends BaseComponent {
     public authService: AuthService,
     public scheduledSituationsService: ScheduledSituationService,
     private modalController: ModalController,
-    private loadingController: LoadingController,
-    private baseDataService: BaseDataService
+    private loadingController: LoadingController
   ) {
     super()
   }
@@ -60,7 +59,6 @@ export class SituationsListPage extends BaseComponent {
     this.initComponent()
     this.loadingController.create().then((loader) => {
       loader.present().then(() =>
-        // nnkitodo[SL] : simplifier
         this.scheduledSituationsService.situations$
           .pipe(
             takeUntil(this.alive$),
@@ -88,39 +86,35 @@ export class SituationsListPage extends BaseComponent {
   }
 
   filterSituations(status: 'today' | 'all') {
-    // nnkitodo[SL] : simplifier
-    this.situationsDisplayed = this.situations
     if (status === 'today') {
-      this.situationsDisplayed = this.filterSituationAroundCurrentTime()
-      this.situationsDisplayed.sort(
+      this.situationsDisplayed = this.filterSituationAroundCurrentTime().sort(
         (sit1, sit2) => sit1.evalPlan.endtime - sit2.evalPlan.endtime
       )
     } else {
-      this.situationsDisplayed.sort(
+      this.situationsDisplayed = this.situations.sort(
         (sit1, sit2) => sit1.evalPlan.starttime - sit2.evalPlan.starttime
       )
     }
   }
 
-  // nnkitodo[SL] : simplifier
   protected filterSituationAroundCurrentTime() {
-    let filteredSituations = []
     const now = new Date()
     let maxts = now.getTime() / 1000 + DAY_SECONDS
     let mints = now.getTime() / 1000 - DAY_SECONDS
-    const filter = (sit) => {
+
+    const filterFn = (sit) => {
       const endtimeIn =
         sit.evalPlan.endtime < maxts && sit.evalPlan.endtime > mints
       const startTimeIn =
         sit.evalPlan.starttime < maxts && sit.evalPlan.starttime > mints
       return endtimeIn || startTimeIn
     }
-    filteredSituations = this.situations.filter(filter)
+    let filteredSituations = this.situations.filter(filterFn)
     let interval = 3
     while (!filteredSituations?.length) {
       maxts = now.getTime() / 1000 + DAY_SECONDS * interval
       mints = now.getTime() / 1000 - DAY_SECONDS * interval
-      filteredSituations = this.situations.filter(filter)
+      filteredSituations = this.situations.filter(filterFn)
       if (interval++ > MAX_INTERVAL) break
     }
     return filteredSituations
@@ -136,20 +130,12 @@ export class SituationsListPage extends BaseComponent {
       })
   }
 
-  // nnkitodo[SL] : marche pas
   doRefresh(event) {
-    const REFRESH_TIMEOUT = 10000 // If after 10 sec we have no refresh even
-    // we stop the spinner. This happens when there is no appraisal at all but
-    // this is a temporary solution that has to be dealt with differently.
-    const refresh = this.scheduledSituationsService
+    this.scheduledSituationsService
       .refreshStats()
-      .subscribe((allsituations) => {
+      .pipe(takeUntil(this.alive$))
+      .subscribe(() => {
         event.target.complete()
       })
-    setTimeout(() => {
-      console.warn('Situation list: refresh event cancelled')
-      event.target.complete()
-      refresh.unsubscribe()
-    }, REFRESH_TIMEOUT)
   }
 }

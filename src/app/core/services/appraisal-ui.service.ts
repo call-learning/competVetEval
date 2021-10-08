@@ -191,7 +191,6 @@ export class AppraisalUiService {
   /**
    * Refresh appraisals and feed up the list
    */
-  // nnkitodo[FUNCTION]
   public refreshAppraisals(): Observable<any> {
     return this.appraisalService.refresh()
   }

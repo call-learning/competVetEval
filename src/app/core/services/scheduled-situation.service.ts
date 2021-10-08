@@ -342,7 +342,6 @@ export class ScheduledSituationService {
   /**
    * Refresh stats data for currently logged in user
    */
-  // nnkitodo [FUNCTION]
   public refreshStats(): Observable<any> {
     // Pull all appraisals.
     return this.appraisalUIService.refreshAppraisals()
