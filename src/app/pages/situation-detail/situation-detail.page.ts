@@ -46,7 +46,7 @@ export class SituationDetailPage extends BaseComponent {
     super()
   }
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     this.evalPlanId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('evalPlanId'),
       10
@@ -84,7 +84,10 @@ export class SituationDetailPage extends BaseComponent {
       this.loader.present()
 
       forkJoin([
-        this.situationService.situations$.pipe(filter((sit) => !!sit)),
+        this.situationService.situations$.pipe(
+          filter((sit) => !!sit),
+          first()
+        ),
         this.userDataService.getUserProfileInfo(this.studentId),
       ])
         .pipe(

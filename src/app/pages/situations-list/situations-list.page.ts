@@ -35,6 +35,8 @@ export class SituationsListPage extends BaseComponent {
   situations: ScheduledSituation[]
   situationsDisplayed: ScheduledSituation[]
 
+  situationsStatus: 'today' | 'all' = 'today'
+
   constructor(
     private menuController: MenuController,
     public authService: AuthService,
@@ -68,7 +70,7 @@ export class SituationsListPage extends BaseComponent {
           )
           .subscribe((situations) => {
             this.situations = situations
-            this.filterSituations('today')
+            this.filterSituations(this.situationsStatus)
             loader.dismiss()
           })
       )
@@ -84,7 +86,7 @@ export class SituationsListPage extends BaseComponent {
   }
 
   segmentChanged(event) {
-    this.filterSituations(event.detail.value)
+    this.filterSituations(this.situationsStatus)
   }
 
   filterSituations(status: 'today' | 'all') {

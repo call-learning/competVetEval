@@ -18,6 +18,7 @@
           </div>
           <div class="situations-list__bottom-toolbar">
             <ion-segment
+              [(ngModel)]="situationsStatus"
               (ionChange)="segmentChanged($event)"
               value="today"
               mode="ios"
