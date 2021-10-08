@@ -75,7 +75,7 @@ export class ScheduledSituationService {
           return forkJoin([
             of(appraisals),
             of(allsituations),
-            this.authService.loginState$,
+            this.authService.loginState$.pipe(first()),
             this.baseDataService.groupAssignments$,
           ])
         }),
