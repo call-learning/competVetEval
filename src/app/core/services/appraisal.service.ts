@@ -238,7 +238,6 @@ export class AppraisalService {
    * @param appraisalModel
    * @param appraisalCriteriaModel
    */
-  // nnkitodo [FUNCTION]
   public createBlankAppraisal(
     evalPlanId: number,
     evalGridId: number,

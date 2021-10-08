@@ -77,7 +77,6 @@ export class CriteriaService {
     )
   }
 
-  // nnkitodo[FUNCTION]
   /**
    * Get criteria from eval Grid
    * @param evalgridId

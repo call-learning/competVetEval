@@ -14,12 +14,12 @@ import { ModalAskAppraisalComponent } from './modals/modal-ask-appraisal/modal-a
 import { ModalCriterionDetailComponent } from './modals/modal-criterion-detail/modal-criterion-detail.component'
 import { ModalScanAppraisalComponent } from './modals/modal-scan-appraisal/modal-scan-appraisal.component'
 import { ModalSituationChartComponent } from './modals/modal-situation-chart/modal-situation-chart.component'
-import { ShowAppraisalBarcodeComponent } from './modals/show-appraisal-barcode/show-appraisal-barcode.component'
+import { ModalShowAppraisalBarcodeComponent } from './modals/modal-show-appraisal-barcode/modal-show-appraisal-barcode.component'
 
 @NgModule({
   declarations: [
     ModalAskAppraisalComponent,
-    ShowAppraisalBarcodeComponent,
+    ModalShowAppraisalBarcodeComponent,
     ModalCriterionDetailComponent,
     ModalSituationChartComponent,
     ModalScanAppraisalComponent,

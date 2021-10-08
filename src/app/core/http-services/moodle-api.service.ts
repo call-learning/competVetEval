@@ -100,7 +100,6 @@ export class MoodleApiService {
     )
   }
 
-  // nnkitodo[FUNCTION]
   public submitUserAppraisal(appraisal: AppraisalUI) {
     const formatCriterionForApi = (criteria) => {
       const apiCrit: any = {
@@ -225,7 +224,6 @@ export class MoodleApiService {
    * @param appraisalModel
    * @param appraisalCriteriaModel
    */
-  // nnkitodo[FUNCTION]
   public submitAppraisalCriteria(
     appraisalCriteriaModels: AppraisalCriterionModel[]
   ): Observable<AppraisalCriterionModel[]> {

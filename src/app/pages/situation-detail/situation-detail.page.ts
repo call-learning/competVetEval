@@ -14,7 +14,7 @@ import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
 import { UserDataService } from '../../core/services/user-data.service'
 import { BaseComponent } from '../../shared/components/base/base.component'
-import { ShowAppraisalBarcodeComponent } from '../../shared/modals/show-appraisal-barcode/show-appraisal-barcode.component'
+import { ModalShowAppraisalBarcodeComponent } from '../../shared/modals/modal-show-appraisal-barcode/modal-show-appraisal-barcode.component'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 
@@ -139,7 +139,7 @@ export class SituationDetailPage extends BaseComponent {
     if (this.authService.isStudent) {
       this.modalController
         .create({
-          component: ShowAppraisalBarcodeComponent,
+          component: ModalShowAppraisalBarcodeComponent,
           componentProps: {
             appraisalId,
           },
