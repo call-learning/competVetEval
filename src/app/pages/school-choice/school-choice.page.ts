@@ -20,7 +20,7 @@ import { AuthService } from './../../core/services/auth.service'
   templateUrl: './school-choice.page.html',
   styleUrls: ['./school-choice.page.scss'],
 })
-export class SchoolChoicePage implements OnInit {
+export class SchoolChoicePage {
   schoolsList: School[]
 
   constructor(
@@ -29,7 +29,7 @@ export class SchoolChoicePage implements OnInit {
     private schoolProviderService: SchoolsProviderService
   ) {}
 
-  ngOnInit() {
+  ionViewWillEnter() {
     this.schoolsList = this.schoolProviderService.schoolsList
     LocaleKeys.cleanupAllLocalStorage()
   }
