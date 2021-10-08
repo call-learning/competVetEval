@@ -31,8 +31,6 @@ export class SituationDetailPage extends BaseComponent {
   scheduledSituation: ScheduledSituation
   appraisals = null
 
-  loader: HTMLIonLoadingElement
-
   constructor(
     public authService: AuthService,
     private modalController: ModalController,
@@ -79,9 +77,8 @@ export class SituationDetailPage extends BaseComponent {
   getSituation() {
     this.scheduledSituation = null
 
-    this.loadingController.create().then((res) => {
-      this.loader = res
-      this.loader.present()
+    this.loadingController.create().then((loader) => {
+      loader.present()
 
       forkJoin([
         this.situationService.situations$,
@@ -98,9 +95,7 @@ export class SituationDetailPage extends BaseComponent {
               if (userProfile) {
                 this.studentInfo = userProfile
               }
-              if (this.loader.animated) {
-                this.loader.dismiss()
-              }
+              loader.dismiss()
             }
           })
         )
@@ -153,20 +148,20 @@ export class SituationDetailPage extends BaseComponent {
           modal.present()
         })
     } else {
-      this.loader.present()
-      this.appraisalUIService
-        .waitForAppraisalId(appraisalId)
-        .subscribe((appraisal: AppraisalUI) => {
-          appraisal.appraiser = this.authService.loggedUserValue
-          if (this.loader.animated) {
-            this.loader.dismiss()
-          }
-          this.appraisalUIService
-            .submitAppraisal(appraisal)
-            .subscribe((thisAppraisalId) => {
-              this.router.navigate(['appraisal-edit', thisAppraisalId])
-            })
-        })
+      this.loadingController.create().then((loader) => {
+        loader.present()
+        this.appraisalUIService
+          .waitForAppraisalId(appraisalId)
+          .subscribe((appraisal: AppraisalUI) => {
+            appraisal.appraiser = this.authService.loggedUserValue
+            loader.dismiss()
+            this.appraisalUIService
+              .submitAppraisal(appraisal)
+              .subscribe((thisAppraisalId) => {
+                this.router.navigate(['appraisal-edit', thisAppraisalId])
+              })
+          })
+      })
     }
   }
 

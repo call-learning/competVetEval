@@ -28,8 +28,6 @@ import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
   providers: [BarcodeScanner],
 })
 export class ModalScanAppraisalComponent implements OnInit {
-  loader: HTMLIonLoadingElement
-
   constructor(
     private modalController: ModalController,
     private toastController: ToastController,
@@ -72,7 +70,9 @@ export class ModalScanAppraisalComponent implements OnInit {
         this.dismissModal()
         const appraisalId = Number.parseInt(barcodeData.text, 10)
 
-        this.loadingController.create().then((res) => {
+        this.loadingController.create().then((loader) => {
+          loader.present()
+
           const REFRESH_TIMEOUT = 30000 // If after 30 sec we have no refresh even
           // we stop the spinner. This happens mostly when the appraiser is not linked
           // to the student.
@@ -86,11 +86,10 @@ export class ModalScanAppraisalComponent implements OnInit {
               first()
             )
             .subscribe((appraisal: AppraisalUI) => {
-              if (this.loader.animated) {
-                this.loader.dismiss().then(() => {
-                  loaderDismissed = true
-                })
-              }
+              loader.dismiss().then(() => {
+                loaderDismissed = true
+              })
+
               if (appraisal.appraiser !== null) {
                 this.toastController
                   .create({
@@ -116,7 +115,7 @@ export class ModalScanAppraisalComponent implements OnInit {
           setTimeout(() => {
             console.warn('Scan cancelled')
             if (!loaderDismissed) {
-              this.loader.dismiss()
+              loader.dismiss()
               this.toastController
                 .create({
                   message:
@@ -131,9 +130,6 @@ export class ModalScanAppraisalComponent implements OnInit {
               refresh.unsubscribe()
             }
           }, REFRESH_TIMEOUT)
-
-          this.loader = res
-          this.loader.present()
         })
       })
       .catch((err) => {

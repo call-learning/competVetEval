@@ -24,11 +24,10 @@ import { IdpModel } from 'src/app/shared/models/idp.model'
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   loginForm: FormGroup
 
   errorMsg = ''
-  loader: HTMLIonLoadingElement
   isLoading = false
 
   idpList: IdpModel[] = null
@@ -46,12 +45,6 @@ export class LoginPage implements OnInit {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]],
-    })
-  }
-
-  ngOnInit() {
-    this.loadingController.create().then((res) => {
-      this.loader = res
     })
   }
 
@@ -97,36 +90,34 @@ export class LoginPage implements OnInit {
       this.formSubmitted = true
 
       if (this.loginForm.valid) {
-        this.loader.present()
-        this.isLoading = true
+        this.loadingController.create().then((loader) => {
+          loader.present()
+          this.isLoading = true
 
-        this.authService
-          .login(this.loginForm.value.username, this.loginForm.value.password)
-          .pipe(
-            finalize(() => {
-              this.isLoading = false
-            })
-          )
-          .subscribe(
-            () => {
-              this.saveLoginForm()
-              this.router.navigate(['/situations-list'])
-              this.loader.dismiss()
-            },
-            (err: Error) => {
-              if (err.message === 'invalidlogin') {
-                this.errorMsg = 'Identifiants invalides'
-              } else {
-                this.errorMsg = `Une erreur s'est produite (${err.name})`
+          this.authService
+            .login(this.loginForm.value.username, this.loginForm.value.password)
+            .pipe(
+              finalize(() => {
+                this.isLoading = false
+                loader.dismiss()
+              })
+            )
+            .subscribe(
+              () => {
+                this.saveLoginForm()
+                this.router.navigate(['/situations-list'])
+              },
+              (err: Error) => {
+                if (err.message === 'invalidlogin') {
+                  this.errorMsg = 'Identifiants invalides'
+                } else {
+                  this.errorMsg = `Une erreur s'est produite (${err.name})`
+                }
               }
-
-              this.loader.dismiss()
-            }
-          )
+            )
+        })
       } else {
         this.errorMsg = 'Le formulaire est invalide'
-        this.loader.dismiss()
-        this.isLoading = false
       }
     }
   }

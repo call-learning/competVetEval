@@ -1,3 +1,4 @@
+import { finalize } from 'rxjs/operators'
 /**
  * Evaluate page
  *
@@ -40,8 +41,7 @@ export class EvaluatePage implements OnInit {
   contextForm: FormGroup
   commentForm: FormGroup
 
-  loader: HTMLIonLoadingElement
-  public scheduledSituation: ScheduledSituation = null
+  scheduledSituation: ScheduledSituation = null
 
   constructor(
     private formBuilder: FormBuilder,
@@ -76,9 +76,8 @@ export class EvaluatePage implements OnInit {
       10
     )
     if (this.authService.isAppraiser) {
-      this.loadingController.create().then((res) => {
-        this.loader = res
-        this.loader.present()
+      this.loadingController.create().then((loader) => {
+        loader.present()
         this.situationService.situations$.subscribe((situations) => {
           this.scheduledSituation = situations.find(
             (sit) =>
@@ -100,7 +99,7 @@ export class EvaluatePage implements OnInit {
                 .subscribe((appraisal) => {
                   this.appraisal = appraisal
                 })
-              this.loader.dismiss()
+              loader.dismiss()
             })
         })
       })
@@ -146,41 +145,48 @@ export class EvaluatePage implements OnInit {
   }
 
   saveAndRedirect() {
-    this.loader.present()
-    this.appraisal.appraiser = this.authService.loggedUserValue
-    // this.appraisal.student = this.userDataService.getUserProfile(this.studentId)
-    // See how we can build this without await
-    this.appraisalUIService.submitAppraisal(this.appraisal).subscribe(
-      () => {
-        this.loader.dismiss()
-        this.toastController
-          .create({
-            message: 'Enregistré !',
-            duration: 2000,
-            color: 'success',
+    this.loadingController.create().then((loader) => {
+      loader.present()
+      this.appraisal.appraiser = this.authService.loggedUserValue
+      // this.appraisal.student = this.userDataService.getUserProfile(this.studentId)
+      // See how we can build this without await
+      this.appraisalUIService
+        .submitAppraisal(this.appraisal)
+        .pipe(
+          finalize(() => {
+            loader.dismiss()
           })
-          .then((toast) => {
-            toast.present()
-          })
-        this.router.navigate([
-          '/scheduled-situation-detail',
-          this.evalPlanId,
-          this.studentId,
-        ])
-      },
-      () => {
-        this.toastController
-          .create({
-            message: `Une erreur s'est produite !`,
-            duration: 2000,
-            color: 'danger',
-          })
-          .then((toast) => {
-            toast.present()
-          })
-        this.loader.dismiss()
-      }
-    )
+        )
+        .subscribe(
+          () => {
+            this.toastController
+              .create({
+                message: 'Enregistré !',
+                duration: 2000,
+                color: 'success',
+              })
+              .then((toast) => {
+                toast.present()
+              })
+            this.router.navigate([
+              '/scheduled-situation-detail',
+              this.evalPlanId,
+              this.studentId,
+            ])
+          },
+          () => {
+            this.toastController
+              .create({
+                message: `Une erreur s'est produite !`,
+                duration: 2000,
+                color: 'danger',
+              })
+              .then((toast) => {
+                toast.present()
+              })
+          }
+        )
+    })
   }
 
   getSubcriteriaGradedNumber(criterion: CriterionForAppraisalTreeModel) {
