@@ -1,4 +1,4 @@
-import { finalize } from 'rxjs/operators'
+import { concatMap, finalize } from 'rxjs/operators'
 /**
  * Evaluate page
  *
@@ -33,15 +33,14 @@ import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.m
   templateUrl: './evaluate.page.html',
   styleUrls: ['./evaluate.page.scss'],
 })
-export class EvaluatePage implements OnInit {
-  appraisal: AppraisalUI
+export class EvaluatePage {
   evalPlanId: number
   studentId: number
+  appraisal: AppraisalUI
+  scheduledSituation: ScheduledSituation = null
 
   contextForm: FormGroup
   commentForm: FormGroup
-
-  scheduledSituation: ScheduledSituation = null
 
   constructor(
     private formBuilder: FormBuilder,
@@ -63,9 +62,9 @@ export class EvaluatePage implements OnInit {
     })
   }
 
-  ngOnInit() {
-    // Create a new evaluation/appraisal.
-    // TODO : add a workflow so to enable edition of an existing appraisal.
+  ionViewWillEnter() {
+    this.contextForm.reset()
+    this.commentForm.reset()
 
     this.evalPlanId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('evalPlanId'),
@@ -75,6 +74,10 @@ export class EvaluatePage implements OnInit {
       this.activatedRoute.snapshot.paramMap.get('studentId'),
       10
     )
+
+    this.appraisal = null
+    this.scheduledSituation = null
+
     if (this.authService.isAppraiser) {
       this.loadingController.create().then((loader) => {
         loader.present()
@@ -92,13 +95,16 @@ export class EvaluatePage implements OnInit {
               this.studentId,
               this.authService.loggedUserValue.userid
             )
-            .subscribe((appraisalId) => {
-              this.appraisalUIService
-                .waitForAppraisalId(appraisalId, true)
-                .pipe(filter((res) => !!res))
-                .subscribe((appraisal) => {
-                  this.appraisal = appraisal
-                })
+            .pipe(
+              concatMap((appraisalId) => {
+                return this.appraisalUIService.waitForAppraisalId(
+                  appraisalId,
+                  true
+                )
+              })
+            )
+            .subscribe((appraisal) => {
+              this.appraisal = appraisal
               loader.dismiss()
             })
         })
@@ -147,9 +153,12 @@ export class EvaluatePage implements OnInit {
   saveAndRedirect() {
     this.loadingController.create().then((loader) => {
       loader.present()
+
       this.appraisal.appraiser = this.authService.loggedUserValue
-      // this.appraisal.student = this.userDataService.getUserProfile(this.studentId)
-      // See how we can build this without await
+
+      this.appraisal.context = this.contextForm.value.context
+      this.appraisal.comment = this.commentForm.value.comment
+
       this.appraisalUIService
         .submitAppraisal(this.appraisal)
         .pipe(
@@ -193,13 +202,5 @@ export class EvaluatePage implements OnInit {
     return criterion.subcriteria.filter((sc) => {
       return !!sc.grade
     }).length
-  }
-
-  updateContext() {
-    this.appraisal.context = this.contextForm.get('context').value
-  }
-
-  updateComment() {
-    this.appraisal.comment = this.commentForm.get('comment').value
   }
 }

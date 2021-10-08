@@ -61,9 +61,6 @@ export class AppraisalEditPage {
   }
 
   ionViewWillEnter() {
-    // Create a new evaluation/appraisal.
-    // TODO : add a workflow so to enable edition of an existing evaluation.
-
     this.appraisalId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('appraisalId'),
       10

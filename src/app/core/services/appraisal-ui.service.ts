@@ -291,7 +291,6 @@ export class AppraisalUiService {
    * @param studentId
    * @param appraiserId
    */
-  // nnkitodo[FUNCTION]
   public createBlankAppraisal(
     evalPlanId: number,
     evalGridId: number,
