@@ -26,9 +26,8 @@ import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
   templateUrl: './modal-ask-appraisal.component.html',
   styleUrls: ['./modal-ask-appraisal.component.scss'],
 })
-export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
+export class ModalAskAppraisalComponent implements AfterViewInit {
   @Input() scheduledSituation: ScheduledSituation
-  @Input() studentId: number // TODO: Check if there is no better way to do it (scheduledSituation has got a student Id ?)
 
   qrCodeData: string
 
@@ -52,8 +51,6 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
       context: ['', [Validators.required]],
     })
   }
-
-  ngOnInit() {}
 
   ngAfterViewInit() {
     setTimeout(() => {
