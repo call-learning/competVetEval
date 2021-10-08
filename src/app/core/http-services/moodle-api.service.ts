@@ -198,7 +198,6 @@ export class MoodleApiService {
    * @param appraisalModel
    * @param appraisalCriteriaModel
    */
-  // nnkitodo[FUNCTION]
   public submitAppraisal(
     appraisalModel: AppraisalModel
   ): Observable<AppraisalModel> {

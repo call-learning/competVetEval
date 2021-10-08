@@ -245,7 +245,6 @@ export class AppraisalUiService {
    * @param appraisal
    *
    */
-  // nnkitodo[FUNCTION]
   public submitAppraisal(appraisal: AppraisalUI): Observable<number> {
     const appraisalModel = AppraisalModel.createBlank(
       appraisal.student.userid,
@@ -276,21 +275,12 @@ export class AppraisalUiService {
       return transformedCriteria
     }
 
-    // Submit the appraisal, get the ID and then submit the criteria.
-    return this.appraisalService.submitAppraisal(appraisalModel).pipe(
-      tap((resAppraisalModel) => {
-        // Make sure we setup the appraisal id.
-        const allcriteria = flatternAppraisalCriteria(appraisal.criteria)
-        allcriteria.forEach(
-          (appraisalCriteria) =>
-            (appraisalCriteria.appraisalid = resAppraisalModel.id)
-        )
+    const allcriteria = flatternAppraisalCriteria(appraisal.criteria)
 
-        this.appraisalService.submitAppraisalCriteria(allcriteria).subscribe()
-        return resAppraisalModel
-      }),
-      map((resAppraisalModel) => resAppraisalModel.id)
-    )
+    // Submit the appraisal, get the ID and then submit the criteria.
+    return this.appraisalService
+      .submitAppraisalAndCriteria(appraisalModel, allcriteria)
+      .pipe(map((resAppraisalModel) => resAppraisalModel.id))
   }
 
   /**

@@ -63,16 +63,11 @@ export class SituationsListPage extends BaseComponent {
     this.initComponent()
     this.loadingController.create().then((loader) => {
       loader.present().then(() =>
-        this.scheduledSituationsService.situations$
-          .pipe(
-            takeUntil(this.alive$),
-            filter((res) => !!res)
-          )
-          .subscribe((situations) => {
-            this.situations = situations
-            this.filterSituations(this.situationsStatus)
-            loader.dismiss()
-          })
+        this.scheduledSituationsService.situations$.subscribe((situations) => {
+          this.situations = situations
+          this.filterSituations(this.situationsStatus)
+          loader.dismiss()
+        })
       )
     })
   }

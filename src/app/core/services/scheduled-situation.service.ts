@@ -103,7 +103,10 @@ export class ScheduledSituationService {
   }
 
   public get situations$(): Observable<ScheduledSituation[]> {
-    return this.scheduledSituationsEntities$.asObservable()
+    return this.scheduledSituationsEntities$.asObservable().pipe(
+      filter((situations) => !!situations),
+      first()
+    )
   }
 
   /**

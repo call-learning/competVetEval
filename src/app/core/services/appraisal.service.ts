@@ -261,28 +261,33 @@ export class AppraisalService {
           AppraisalCriterionModel.createFromCriterionModel(criterionmodel)
         )
 
-        // Submit the appraisal, get the ID and then submit the criteria.
-        const newAppraisalModel = this.submitAppraisal(appraisalModel)
-        // Then create the appraisal criterion
-        return newAppraisalModel.pipe(
-          concatMap((resAppraisalModel) => {
-            appraisalCriteriaModel.forEach(
-              (apc) => (apc.appraisalid = resAppraisalModel.id)
-            )
-            return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
-              mapTo(appraisalModel),
-              tap((newAppraisal) => {
-                appraisalModel.id = resAppraisalModel.id
-                mergeExistingBehaviourSubject(
-                  this.appraisalModels$,
-                  [newAppraisal],
-                  ['id']
-                )
-              })
-            )
-          })
+        return this.submitAppraisalAndCriteria(
+          appraisalModel,
+          appraisalCriteriaModel
         )
-        // See: https://medium.com/@snorredanielsen/rxjs-accessing-a-previous-value-further-down-the-pipe-chain-b881026701c1
+      })
+    )
+  }
+
+  public submitAppraisalAndCriteria(
+    appraisalModel: AppraisalModel,
+    appraisalCriteriaModel: AppraisalCriterionModel[]
+  ) {
+    // Submit the appraisal, get the ID and then submit the criteria.
+    return this.submitAppraisal(appraisalModel).pipe(
+      // Then create the appraisal criterion
+      concatMap((resAppraisalModel) => {
+        appraisalCriteriaModel.forEach(
+          (apc) => (apc.appraisalid = resAppraisalModel.id)
+        )
+        return forkJoin([
+          of(resAppraisalModel),
+          this.submitAppraisalCriteria(appraisalCriteriaModel),
+        ])
+      }),
+      map(([resAppraisalModel, resAppraisalCriteria]) => resAppraisalModel),
+      tap(() => {
+        this.emitAppraisalsChanged()
       })
     )
   }
@@ -292,8 +297,7 @@ export class AppraisalService {
    *
    * @param appraisalModel
    */
-  // nnkitodo [FUNCTION]
-  public submitAppraisal(
+  private submitAppraisal(
     appraisalModel: AppraisalModel
   ): Observable<AppraisalModel> {
     return this.moodleApiService.submitAppraisal(appraisalModel).pipe(
@@ -304,7 +308,6 @@ export class AppraisalService {
           [newAppraisalModel],
           ['id']
         )
-        // nnkitodo émettre changed
       })
     )
   }
@@ -314,8 +317,7 @@ export class AppraisalService {
    *
    * @param appraisalModel
    */
-  // nnkitodo [FUNCTION]
-  public submitAppraisalCriteria(
+  private submitAppraisalCriteria(
     appraisalCriterionModels: AppraisalCriterionModel[]
   ): Observable<AppraisalCriterionModel[]> {
     if (appraisalCriterionModels?.length) {
@@ -329,7 +331,6 @@ export class AppraisalService {
               newAppraisaCriterionlModel,
               ['id']
             )
-            // nnkitodo émettre changed
           })
         )
     } else {

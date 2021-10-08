@@ -32,7 +32,7 @@ import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.m
   templateUrl: './evaluate.page.html',
   styleUrls: ['./evaluate.page.scss'],
 })
-export class EvaluatePage extends BaseComponent implements OnInit {
+export class EvaluatePage implements OnInit {
   appraisal: AppraisalUI
   evalPlanId: number
   studentId: number
@@ -54,7 +54,6 @@ export class EvaluatePage extends BaseComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private loadingController: LoadingController
   ) {
-    super()
     this.contextForm = this.formBuilder.group({
       context: ['', [Validators.required]],
     })
@@ -80,32 +79,30 @@ export class EvaluatePage extends BaseComponent implements OnInit {
       this.loadingController.create().then((res) => {
         this.loader = res
         this.loader.present()
-        this.situationService.situations$
-          .pipe(filter((res) => !!res))
-          .subscribe((situations) => {
-            this.scheduledSituation = situations.find(
-              (sit) =>
-                sit.evalPlanId === this.evalPlanId &&
-                (this.studentId == null || this.studentId === sit.studentId)
-            )
+        this.situationService.situations$.subscribe((situations) => {
+          this.scheduledSituation = situations.find(
+            (sit) =>
+              sit.evalPlanId === this.evalPlanId &&
+              (this.studentId == null || this.studentId === sit.studentId)
+          )
 
-            this.appraisalUIService
-              .createBlankAppraisal(
-                this.scheduledSituation.evalPlanId,
-                this.scheduledSituation.situation.evalgridid,
-                this.studentId,
-                this.authService.loggedUserValue.userid
-              )
-              .subscribe((appraisalId) => {
-                this.appraisalUIService
-                  .waitForAppraisalId(appraisalId, true)
-                  .pipe(filter((res) => !!res))
-                  .subscribe((appraisal) => {
-                    this.appraisal = appraisal
-                  })
-                this.loader.dismiss()
-              })
-          })
+          this.appraisalUIService
+            .createBlankAppraisal(
+              this.scheduledSituation.evalPlanId,
+              this.scheduledSituation.situation.evalgridid,
+              this.studentId,
+              this.authService.loggedUserValue.userid
+            )
+            .subscribe((appraisalId) => {
+              this.appraisalUIService
+                .waitForAppraisalId(appraisalId, true)
+                .pipe(filter((res) => !!res))
+                .subscribe((appraisal) => {
+                  this.appraisal = appraisal
+                })
+              this.loader.dismiss()
+            })
+        })
       })
     } else {
       this.router.navigate(['/scheduled-situation-detail', this.evalPlanId])

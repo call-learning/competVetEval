@@ -27,7 +27,7 @@ import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.m
   templateUrl: './appraisal-detail.page.html',
   styleUrls: ['./appraisal-detail.page.scss'],
 })
-export class AppraisalDetailPage extends BaseComponent {
+export class AppraisalDetailPage {
   answerAppraisalForm: FormGroup
   errorMsg = ''
   formSubmitted = false
@@ -35,8 +35,6 @@ export class AppraisalDetailPage extends BaseComponent {
   appraisalId: number
   appraisal: AppraisalUI
   scheduledSituation: ScheduledSituation
-
-  loader: HTMLIonLoadingElement
 
   constructor(
     private formBuilder: FormBuilder,
@@ -47,7 +45,6 @@ export class AppraisalDetailPage extends BaseComponent {
     private loadingController: LoadingController,
     private scheduledSituationService: ScheduledSituationService
   ) {
-    super()
     this.answerAppraisalForm = this.formBuilder.group({
       answer: ['', [Validators.required]],
     })
@@ -62,25 +59,21 @@ export class AppraisalDetailPage extends BaseComponent {
     this.appraisal = null
     this.scheduledSituation = null
 
-    this.loadingController.create().then((res) => {
-      this.loader = res
-      this.loader.present()
+    this.loadingController.create().then((loader) => {
+      loader.present()
 
       this.appraisalUIService
         .waitForAppraisalId(this.appraisalId)
         .subscribe((appraisal) => {
           this.appraisal = appraisal
 
-          this.scheduledSituationService.situations$
-            .pipe(takeUntil(this.alive$))
-            .subscribe((situations) => {
-              this.scheduledSituation = situations.find(
-                (sit) => sit.evalPlanId === this.appraisal.evalPlan.id
-              )
-            })
-          if (this.loader.animated) {
-            this.loader.dismiss()
-          }
+          this.scheduledSituationService.situations$.subscribe((situations) => {
+            this.scheduledSituation = situations.find(
+              (sit) => sit.evalPlanId === this.appraisal.evalPlan.id
+            )
+          })
+
+          loader.dismiss()
         })
     })
   }

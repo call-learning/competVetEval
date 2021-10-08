@@ -84,10 +84,7 @@ export class SituationDetailPage extends BaseComponent {
       this.loader.present()
 
       forkJoin([
-        this.situationService.situations$.pipe(
-          filter((sit) => !!sit),
-          first()
-        ),
+        this.situationService.situations$,
         this.userDataService.getUserProfileInfo(this.studentId),
       ])
         .pipe(

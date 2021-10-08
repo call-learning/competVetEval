@@ -36,7 +36,6 @@ export class AppraisalModel extends BaseMoodleModel {
     super(input)
   }
 
-  // nnkitodo[FUNCTION]
   public static createBlank(
     studentid: number,
     appraiserid: number,

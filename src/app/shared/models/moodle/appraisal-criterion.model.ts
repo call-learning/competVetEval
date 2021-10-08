@@ -31,7 +31,6 @@ export class AppraisalCriterionModel extends BaseMoodleModel {
     super(input)
   }
 
-  // nnkitodo[FUNCTION]
   public static createFromCriterionModel(criterionModel: CriterionModel) {
     return new AppraisalCriterionModel({
       criterionid: criterionModel.id,
