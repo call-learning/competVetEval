@@ -11,7 +11,7 @@
 import { parseIntMember } from '../../utils/parse-functions'
 import { BaseMoodleModel } from './base-moodle.model'
 import { CriterionModel } from './criterion.model'
-// nnkitodo[FILE]
+
 // This is the replica of the local_cveteval_appr_crit table.
 export class AppraisalCriterionModel extends BaseMoodleModel {
   id?: number
@@ -31,6 +31,7 @@ export class AppraisalCriterionModel extends BaseMoodleModel {
     super(input)
   }
 
+  // nnkitodo[FUNCTION]
   public static createFromCriterionModel(criterionModel: CriterionModel) {
     return new AppraisalCriterionModel({
       criterionid: criterionModel.id,

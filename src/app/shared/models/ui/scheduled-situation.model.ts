@@ -5,7 +5,7 @@ import { EvalPlanModel } from '../moodle/eval-plan.model'
 import { SituationModel } from '../moodle/situation.model'
 
 // This entity is deduced from several API calls to Moodle and compiled in the App
-// nnkitodo[FILE]
+
 // We do not use lowerCamelCase for entities that are directly retrieved via API
 // as Moodle does not use this convention in usual APIs
 // We might use lowerCamelCase for attributes that are used internally in the APP though.

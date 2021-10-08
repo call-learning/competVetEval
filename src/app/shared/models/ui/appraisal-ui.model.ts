@@ -8,7 +8,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning
  */
-// nnkitodo[FILE]
+
 import { parseIntMember } from '../../utils/parse-functions'
 import { CevUser } from '../cev-user.model'
 import { EvalPlanModel } from '../moodle/eval-plan.model'

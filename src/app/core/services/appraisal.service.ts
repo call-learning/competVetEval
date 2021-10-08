@@ -81,10 +81,7 @@ export class AppraisalService {
   resetService() {
     this.appraisalCriterionModels$.next(null)
     this.appraisalModels$.next(null)
-    this.appraisalsChanged.emit({
-      appraisals: this.appraisalModels$.getValue(),
-      appraisalCriterionModels: this.appraisalCriterionModels$.getValue(),
-    })
+    this.emitAppraisalsChanged()
   }
 
   /**
@@ -134,12 +131,16 @@ export class AppraisalService {
       }),
       toArray(),
       tap(() => {
-        this.appraisalsChanged.emit({
-          appraisals: this.appraisalModels$.getValue(),
-          appraisalCriterionModels: this.appraisalCriterionModels$.getValue(),
-        })
+        this.emitAppraisalsChanged()
       })
     )
+  }
+
+  private emitAppraisalsChanged() {
+    this.appraisalsChanged.emit({
+      appraisals: this.appraisalModels$.getValue(),
+      appraisalCriterionModels: this.appraisalCriterionModels$.getValue(),
+    })
   }
 
   /**

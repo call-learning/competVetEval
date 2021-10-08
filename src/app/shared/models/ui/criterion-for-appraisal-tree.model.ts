@@ -12,7 +12,7 @@
 import { parseBooleanMember, parseIntMember } from '../../utils/parse-functions'
 import { AppraisalCriterionModel } from '../moodle/appraisal-criterion.model'
 import { CriterionModel } from '../moodle/criterion.model'
-// nnkitodo[FILE]
+
 export class CriterionForAppraisalTreeModel {
   id?: number
   criterion: CriterionModel // Moodle internal model for criterion.
