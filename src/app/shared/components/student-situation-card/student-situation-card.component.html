@@ -13,8 +13,21 @@
     <div class="list-item-infos">
       <div class="list-item-content">
         <div *ngIf="studentSituationStats">
-          {{ studentSituationStats.appraisalsCompleted }} observation(s) sur
-          {{ studentSituationStats.appraisalsRequired }} réalisée(s)
+          {{ studentSituationStats.appraisalsCompleted }}
+          <ng-container *ngIf="studentSituationStats.appraisalsCompleted > 1"
+            >observations réalisées</ng-container
+          >
+          <ng-container *ngIf="studentSituationStats.appraisalsCompleted <= 1"
+            >observation réalisée</ng-container
+          >
+          sur
+          {{ studentSituationStats.appraisalsRequired }}
+          <ng-container *ngIf="studentSituationStats.appraisalsRequired > 1"
+            >demandées</ng-container
+          >
+          <ng-container *ngIf="studentSituationStats.appraisalsRequired <= 1"
+            >demandée</ng-container
+          >
         </div>
         <div *ngIf="!studentSituationStats">
           <ion-spinner name="dots"></ion-spinner>

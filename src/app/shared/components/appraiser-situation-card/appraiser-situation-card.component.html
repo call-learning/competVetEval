@@ -31,8 +31,24 @@
       <div class="list-item-content">
         <div class="list-item-content">
           <div *ngIf="appraiserSituationStats">
-            {{ appraiserSituationStats.appraisalsCompleted }} observation(s) sur
-            {{ appraiserSituationStats.appraisalsRequired }} réalisée(s)
+            {{ appraiserSituationStats.appraisalsCompleted }}
+            <ng-container
+              *ngIf="appraiserSituationStats.appraisalsCompleted > 1"
+              >observations réalisées</ng-container
+            >
+            <ng-container
+              *ngIf="appraiserSituationStats.appraisalsCompleted <= 1"
+              >observation réalisée</ng-container
+            >
+            sur
+            {{ appraiserSituationStats.appraisalsRequired }}
+            <ng-container *ngIf="appraiserSituationStats.appraisalsRequired > 1"
+              >demandées</ng-container
+            >
+            <ng-container
+              *ngIf="appraiserSituationStats.appraisalsRequired <= 1"
+              >demandée</ng-container
+            >
           </div>
           <div *ngIf="!appraiserSituationStats">
             <ion-spinner name="dots"></ion-spinner>
