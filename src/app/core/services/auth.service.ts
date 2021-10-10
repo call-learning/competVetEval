@@ -167,9 +167,6 @@ export class AuthService {
       }),
       tap((role: 'student' | 'appraiser') => {
         this.setUserRole(role)
-      }),
-      catchError((err) => {
-        return throwError(err)
       })
     )
   }

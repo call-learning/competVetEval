@@ -9,8 +9,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { throwError, Observable } from 'rxjs'
-import { catchError, map } from 'rxjs/operators'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { IdpModel } from '../../shared/models/idp.model'
@@ -46,13 +46,6 @@ export class HttpAuthService {
           return idps.data.map((modeldef) => new IdpModel(modeldef))
         }
         return []
-      }),
-      catchError((err) => {
-        const endpoint = this.endPointService.login()
-        console.error(
-          `Erreur de connexion: (${err.name}:${err.message}) - ${endpoint}`
-        )
-        return throwError(err)
       })
     )
   }
@@ -73,13 +66,6 @@ export class HttpAuthService {
     return this.http.post(this.endPointService.login(), formData).pipe(
       map((res: any) => {
         return new LoginResult(res)
-      }),
-      catchError((err) => {
-        const endpoint = this.endPointService.login()
-        console.error(
-          `Erreur de connexion: (${err.name}:${err.message}) - ${endpoint}`
-        )
-        return throwError(err)
       })
     )
   }
@@ -93,9 +79,6 @@ export class HttpAuthService {
     ).pipe(
       map((res) => {
         return new CevUser(res)
-      }),
-      catchError((err) => {
-        return throwError(err)
       })
     )
   }
@@ -110,10 +93,6 @@ export class HttpAuthService {
       map((res): 'student' | 'appraiser' => {
         const userType = new UserType(res)
         return userType.type === 'student' ? 'student' : 'appraiser'
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }

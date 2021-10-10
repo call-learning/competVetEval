@@ -9,8 +9,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { of, throwError, Observable } from 'rxjs'
-import { catchError, concatMap, map } from 'rxjs/operators'
+import { of, Observable } from 'rxjs'
+import { concatMap, map } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
@@ -48,11 +48,6 @@ export class MoodleApiService {
         : {},
       this.http,
       this.endPointService.server()
-    ).pipe(
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
-      })
     )
   }
 
@@ -92,10 +87,6 @@ export class MoodleApiService {
         } else {
           return this.getEntities(entityType, args)
         }
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -127,10 +118,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return res
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -183,10 +170,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return new CevUser(res)
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -210,10 +193,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return new AppraisalModel(res)
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -237,10 +216,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return res.map((apprcrit) => new AppraisalCriterionModel(apprcrit))
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }

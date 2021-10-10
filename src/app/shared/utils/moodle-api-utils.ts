@@ -8,8 +8,7 @@
  */
 import { HttpClient } from '@angular/common/http'
 
-import { throwError, Observable } from 'rxjs'
-import { catchError } from 'rxjs/operators'
+import { Observable } from 'rxjs'
 
 export class MoodleApiUtils {
   static getServiceName(): string {
@@ -27,18 +26,11 @@ export class MoodleApiUtils {
     formData.append('moodlewssettingfileurl', 'true')
     formData.append('wsfunction', functionName)
     MoodleApiUtils.convertArguments(formData, null, args)
-    return http
-      .post(baseURL, formData, {
-        params: {
-          moodlewsrestformat: 'json',
-        },
-      })
-      .pipe(
-        catchError((err) => {
-          console.error(err)
-          return throwError(err)
-        })
-      )
+    return http.post(baseURL, formData, {
+      params: {
+        moodlewsrestformat: 'json',
+      },
+    })
   }
 
   static convertArguments(formData, argumentName, value) {
