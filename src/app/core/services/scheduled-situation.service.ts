@@ -1,24 +1,7 @@
-import { forkJoin } from 'rxjs'
-/**
- * Scheduled SituationModel
- *
- * @author Marjory Gaillot <marjory.gaillot@gmail.com>
- * @author Laurent David <laurent@call-learning.fr>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @copyright  2021 SAS CALL Learning <call-learning.fr>
- */
-
 import { Injectable } from '@angular/core'
 
-import {
-  combineLatest,
-  from,
-  of,
-  zip,
-  BehaviorSubject,
-  Observable,
-  Subscription,
-} from 'rxjs'
+import { forkJoin } from 'rxjs'
+import { combineLatest, of, BehaviorSubject, Observable } from 'rxjs'
 import { concatMap, filter, first, map, tap } from 'rxjs/operators'
 // import evalplan from '../../../mock/fixtures/evalplan'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
@@ -28,11 +11,19 @@ import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { AppraiserSituationStatsModel } from '../../shared/models/ui/appraiser-situation-stats.model'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 import { StudentSituationStatsModel } from '../../shared/models/ui/student-situation-stats.model'
-import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
 import { AppraisalUiService } from './appraisal-ui.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { EvalPlanService } from './eval-plan.service'
+/**
+ * Scheduled SituationModel
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
+
 @Injectable({
   providedIn: 'any',
 })

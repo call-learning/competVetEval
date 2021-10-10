@@ -1,3 +1,11 @@
+import { Component, Input, OnInit } from '@angular/core'
+
+import { takeUntil } from 'rxjs/operators'
+import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
+import { UserDataService } from '../../../core/services/user-data.service'
+import { CevUser } from '../../models/cev-user.model'
+import { AppraiserSituationStatsModel } from '../../models/ui/appraiser-situation-stats.model'
+import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
 import { BaseComponent } from './../base/base.component'
 /**
  * Scheduled situation card for student
@@ -7,15 +15,6 @@ import { BaseComponent } from './../base/base.component'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-
-import { Component, Input, OnInit } from '@angular/core'
-
-import { first, takeUntil } from 'rxjs/operators'
-import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
-import { UserDataService } from '../../../core/services/user-data.service'
-import { CevUser } from '../../models/cev-user.model'
-import { AppraiserSituationStatsModel } from '../../models/ui/appraiser-situation-stats.model'
-import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
 
 @Component({
   selector: 'app-appraiser-situation-card',

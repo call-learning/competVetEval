@@ -1,7 +1,8 @@
-import { AuthService } from 'src/app/core/services/auth.service'
 import { Injectable, Injector } from '@angular/core'
-import { SchoolsProviderService } from '../providers/schools-provider.service'
+
 import { concatMap } from 'rxjs/operators'
+import { AuthService } from 'src/app/core/services/auth.service'
+import { SchoolsProviderService } from '../providers/schools-provider.service'
 
 @Injectable({
   providedIn: 'root',

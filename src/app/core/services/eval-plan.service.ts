@@ -1,4 +1,11 @@
-import { concatMap, exhaustMap, finalize, first, tap } from 'rxjs/operators'
+import { Injectable } from '@angular/core'
+
+import { of, BehaviorSubject, Observable } from 'rxjs'
+import { first, tap } from 'rxjs/operators'
+import { filter, map } from 'rxjs/operators'
+import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
+import { MoodleApiService } from '../http-services/moodle-api.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
 /**
  * Load user evaluation plans
  *
@@ -7,14 +14,6 @@ import { concatMap, exhaustMap, finalize, first, tap } from 'rxjs/operators'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-
-import { Injectable } from '@angular/core'
-
-import { BehaviorSubject, Observable, of } from 'rxjs'
-import { filter, map } from 'rxjs/operators'
-import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService, LOGIN_STATE } from './auth.service'
 
 @Injectable({
   providedIn: 'root',

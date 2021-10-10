@@ -1,4 +1,3 @@
-import { filter, first } from 'rxjs/operators'
 /**
  * School choice page
  *
@@ -7,7 +6,7 @@ import { filter, first } from 'rxjs/operators'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { SchoolsProviderService } from 'src/app/core/providers/schools-provider.service'

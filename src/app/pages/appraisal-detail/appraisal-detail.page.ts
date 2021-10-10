@@ -1,4 +1,3 @@
-import { filter, takeUntil } from 'rxjs/operators'
 /**
  * Appraisal details page
  *
@@ -7,7 +6,7 @@ import { filter, takeUntil } from 'rxjs/operators'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 
@@ -17,7 +16,6 @@ import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
 import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
-import { BaseComponent } from '../../shared/components/base/base.component'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'

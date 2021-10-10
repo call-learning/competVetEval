@@ -9,18 +9,15 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Injectable } from '@angular/core'
+import { HttpBackend, HttpClient } from '@angular/common/http'
 
+import { uniqBy } from 'lodash'
+import { iif, of } from 'rxjs'
+import { catchError, map, tap } from 'rxjs/operators'
 import { School } from 'src/app/shared/models/school.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { EnvironmentService } from '../services/environment.service'
-import { BehaviorSubject, iif, Observable, of, throwError } from 'rxjs'
-import { catchError, map, tap } from 'rxjs/operators'
-import { HttpClient, HttpBackend } from '@angular/common/http'
-import { uniqBy } from 'lodash'
-@Injectable({
-  providedIn: 'root',
-})
+
 export class SchoolsProviderService {
   public schoolsList: School[] = null
 

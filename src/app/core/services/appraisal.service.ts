@@ -1,4 +1,16 @@
-import { forkJoin, zip } from 'rxjs'
+import { EventEmitter, Injectable } from '@angular/core'
+
+import { forkJoin } from 'rxjs'
+import { from, of, BehaviorSubject, Observable } from 'rxjs'
+import { concatMap, filter, map, tap, toArray } from 'rxjs/operators'
+import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
+import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
+import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
+import { MoodleApiService } from '../http-services/moodle-api.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
+import { BaseDataService } from './base-data.service'
+import { CriteriaService } from './criteria.service'
+import { EvalPlanService } from './eval-plan.service'
 /**
  * Appraisal basic model retrieval and submission
  *
@@ -8,27 +20,6 @@ import { forkJoin, zip } from 'rxjs'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-
-import { Injectable, EventEmitter } from '@angular/core'
-
-import { combineLatest, from, of, BehaviorSubject, Observable, iif } from 'rxjs'
-import {
-  concatMap,
-  filter,
-  first,
-  map,
-  mapTo,
-  tap,
-  toArray,
-} from 'rxjs/operators'
-import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
-import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
-import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService, LOGIN_STATE } from './auth.service'
-import { BaseDataService } from './base-data.service'
-import { CriteriaService } from './criteria.service'
-import { EvalPlanService } from './eval-plan.service'
 
 @Injectable({
   providedIn: 'root',

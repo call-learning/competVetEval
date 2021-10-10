@@ -13,10 +13,10 @@ import { throwError, Observable } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
+import { IdpModel } from '../../shared/models/idp.model'
 import { UserType } from '../../shared/models/user-type.model'
 import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
 import { EndpointsServices } from './endpoints.services'
-import { IdpModel } from '../../shared/models/idp.model'
 
 @Injectable({
   providedIn: 'root',

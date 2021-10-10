@@ -1,4 +1,3 @@
-import { HttpAuthService } from './../../core/http-services/http-auth.service'
 /**
  * Login page
  *
@@ -7,7 +6,7 @@ import { HttpAuthService } from './../../core/http-services/http-auth.service'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 
@@ -16,8 +15,9 @@ import { LoadingController } from '@ionic/angular'
 import { finalize } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { EncryptService } from 'src/app/core/services/encrypt.service'
-import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
 import { IdpModel } from 'src/app/shared/models/idp.model'
+import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
+import { HttpAuthService } from './../../core/http-services/http-auth.service'
 
 @Component({
   selector: 'app-login',
@@ -129,8 +129,8 @@ export class LoginPage {
 
   launchIdp(idpURL) {
     window.open(idpURL, '_system')
-    if ((<any>navigator).app) {
-      ;(<any>navigator).app.exitApp()
+    if ((navigator as any).app) {
+      ;(navigator as any).app.exitApp()
     }
   }
 

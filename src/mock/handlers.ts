@@ -1,4 +1,5 @@
 import { rest } from 'msw'
+import { isNumeric } from 'rxjs/internal-compatibility'
 import appr from './fixtures/appr'
 import apprcrit from './fixtures/apprcrit'
 import cevalgrid from './fixtures/cevalgrid'
@@ -9,7 +10,6 @@ import groups from './fixtures/groups'
 import role from './fixtures/role'
 import situations from './fixtures/situations'
 import allUsers from './fixtures/users'
-import { isNumeric } from 'rxjs/internal-compatibility'
 
 const parseFormDataVariable = (currentObj, key, val) => {
   const keyValue = [...key.matchAll(/(\w+)(?=\[(\w+)\])*/g)]
@@ -108,7 +108,7 @@ const restServerCallback = {
   },
   local_cveteval_get_user_profile: (req, res, ctx) => {
     let { userid } = req.body as any
-    userid = parseInt(userid)
+    userid = parseInt(userid, 10)
     if (!userid) {
       userid = currentUserId
     }
@@ -170,26 +170,26 @@ const restServerCallback = {
       timecreated,
     } = req.body as any
     if (id) {
-      id = parseInt(id)
+      id = parseInt(id, 10)
     }
     if (!usermodified) {
       usermodified = 1
     } else {
-      usermodified = parseInt(usermodified)
+      usermodified = parseInt(usermodified, 10)
     }
     if (!timecreated) {
       timecreated = Math.ceil(Date.now() / 1000)
     } else {
-      timecreated = parseInt(timecreated)
+      timecreated = parseInt(timecreated, 10)
     }
     if (!timemodified) {
       timemodified = Math.ceil(Date.now() / 1000)
     } else {
-      timemodified = parseInt(timemodified)
+      timemodified = parseInt(timemodified, 10)
     }
-    studentid = parseInt(studentid)
-    appraiserid = parseInt(appraiserid)
-    evalplanid = parseInt(evalplanid)
+    studentid = parseInt(studentid, 10)
+    appraiserid = parseInt(appraiserid, 10)
+    evalplanid = parseInt(evalplanid, 10)
 
     const appraisalmodel = {
       id,
@@ -206,7 +206,7 @@ const restServerCallback = {
     }
     if (appraisalmodel.id) {
       const previousmodelIndex = entities.appraisal.findIndex(
-        (app) => app.id == appraisalmodel.id
+        (app) => app.id === appraisalmodel.id
       )
       appraisalmodel.timemodified = Math.ceil(Date.now() / 1000)
       if (previousmodelIndex !== -1) {

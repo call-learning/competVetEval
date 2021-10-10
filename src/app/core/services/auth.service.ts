@@ -13,23 +13,14 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { of, throwError, BehaviorSubject, Observable } from 'rxjs'
-import {
-  catchError,
-  concatMap,
-  filter,
-  first,
-  last,
-  map,
-  switchAll,
-  tap,
-} from 'rxjs/operators'
+import { catchError, concatMap, map, tap } from 'rxjs/operators'
 import { School } from 'src/app/shared/models/school.model'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
+import { IdpModel } from '../../shared/models/idp.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { HttpAuthService } from '../http-services/http-auth.service'
 import { SchoolsProviderService } from '../providers/schools-provider.service'
-import { IdpModel } from '../../shared/models/idp.model'
 
 export const LOGIN_STATE = {
   ATTEMPT_TO_RECOVER: 'ATTEMPT_TO_RECOVER',

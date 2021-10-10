@@ -11,26 +11,8 @@
  */
 import { Injectable } from '@angular/core'
 
-import {
-  combineLatest,
-  from,
-  of,
-  zip,
-  BehaviorSubject,
-  Observable,
-  iif,
-  forkJoin,
-} from 'rxjs'
-import {
-  concatMap,
-  debounceTime,
-  filter,
-  first,
-  map,
-  skip,
-  tap,
-  toArray,
-} from 'rxjs/operators'
+import { forkJoin, from, iif, of, BehaviorSubject, Observable } from 'rxjs'
+import { concatMap, filter, first, map, tap, toArray } from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'

@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
-import { take } from 'lodash'
 
-import { forkJoin, zip } from 'rxjs'
-import { filter, first, map, takeUntil } from 'rxjs/operators'
+import { forkJoin } from 'rxjs'
+import { map, takeUntil } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'

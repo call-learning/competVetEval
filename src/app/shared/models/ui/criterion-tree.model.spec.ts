@@ -7,20 +7,8 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { CriterionTreeModel } from './criterion-tree.model'
 import { CriterionModel } from '../moodle/criterion.model'
-
-describe('Criterion Tree Model', () => {
-  it('Build a set criterion tree from a flat list', (done) => {
-    const criteriaModel = CRITERIA_LIST.map((crit) => new CriterionModel(crit))
-    const hierarchisedCrit = CriterionTreeModel.convertToTree(criteriaModel)
-    expect(hierarchisedCrit.length).toEqual('2')
-    expect(hierarchisedCrit[0]).toEqual(EXPECTED_TREE[0])
-    expect(hierarchisedCrit[1]).toEqual(EXPECTED_TREE[1])
-
-    done()
-  })
-})
+import { CriterionTreeModel } from './criterion-tree.model'
 
 const CRITERIA_LIST = [
   {
@@ -267,3 +255,15 @@ const EXPECTED_TREE = [
     ],
   },
 ]
+
+describe('Criterion Tree Model', () => {
+  it('Build a set criterion tree from a flat list', (done) => {
+    const criteriaModel = CRITERIA_LIST.map((crit) => new CriterionModel(crit))
+    const hierarchisedCrit = CriterionTreeModel.convertToTree(criteriaModel)
+    expect(hierarchisedCrit.length).toEqual('2')
+    expect(hierarchisedCrit[0]).toEqual(EXPECTED_TREE[0])
+    expect(hierarchisedCrit[1]).toEqual(EXPECTED_TREE[1])
+
+    done()
+  })
+})

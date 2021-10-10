@@ -16,7 +16,6 @@ import {
   ToastController,
 } from '@ionic/angular'
 
-import { filter, first } from 'rxjs/operators'
 import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
 import { AuthService } from '../../../core/services/auth.service'
 import { AppraisalUI } from '../../models/ui/appraisal-ui.model'

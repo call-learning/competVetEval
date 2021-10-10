@@ -9,8 +9,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { of, throwError, Observable, iif } from 'rxjs'
-import { catchError, concatMap, map, mergeMap, tap } from 'rxjs/operators'
+import { of, throwError, Observable } from 'rxjs'
+import { catchError, concatMap, map } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'

@@ -1,17 +1,14 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
 
 import { Platform, ToastController } from '@ionic/angular'
 
 import { Browser, Capacitor, Plugins } from '@capacitor/core'
 import { worker } from '../mock/browser'
+import { SchoolsProviderService } from './core/providers/schools-provider.service'
 import { AuthService } from './core/services/auth.service'
 import { EnvironmentService } from './core/services/environment.service'
-import { AppState } from '@capacitor/core'
-import { URLSearchParams } from 'url'
 import { getTokenFromLaunchURL } from './shared/utils/helpers'
-import { SchoolsProviderService } from './core/providers/schools-provider.service'
-import { Router } from '@angular/router'
-import { filter, first } from 'rxjs/operators'
 
 const { App } = Plugins
 

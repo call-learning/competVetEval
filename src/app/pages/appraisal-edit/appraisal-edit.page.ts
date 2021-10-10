@@ -1,4 +1,3 @@
-import { finalize } from 'rxjs/operators'
 /**
  * Appraisal edit page
  *
@@ -7,7 +6,7 @@ import { finalize } from 'rxjs/operators'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 
@@ -16,12 +15,11 @@ import {
   ModalController,
   ToastController,
 } from '@ionic/angular'
-import { filter, takeUntil } from 'rxjs/operators'
 
+import { finalize } from 'rxjs/operators'
 import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { AuthService } from '../../core/services/auth.service'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
-import { BaseComponent } from '../../shared/components/base/base.component'
 import { ModalAppraisalCriterionComponent } from '../../shared/modals/modal-appraisal-criterion/modal-appraisal-criterion.component'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'

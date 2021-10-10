@@ -1,5 +1,18 @@
+import { Component } from '@angular/core'
+
+import {
+  LoadingController,
+  MenuController,
+  ModalController,
+} from '@ionic/angular'
+
+import { takeUntil } from 'rxjs/operators'
+import { AuthService } from 'src/app/core/services/auth.service'
+import { BaseComponent } from 'src/app/shared/components/base/base.component'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
+import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appraisal/modal-scan-appraisal.component'
+import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 import { AppraisalUiService } from './../../core/services/appraisal-ui.service'
-import { BaseDataService } from './../../core/services/base-data.service'
 /**
  * SituationModel List page
  *
@@ -8,21 +21,6 @@ import { BaseDataService } from './../../core/services/base-data.service'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-
-import { Component, OnInit } from '@angular/core'
-
-import {
-  LoadingController,
-  MenuController,
-  ModalController,
-} from '@ionic/angular'
-
-import { filter, takeUntil } from 'rxjs/operators'
-import { AuthService } from 'src/app/core/services/auth.service'
-import { BaseComponent } from 'src/app/shared/components/base/base.component'
-import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
-import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appraisal/modal-scan-appraisal.component'
-import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 
 const DAY_SECONDS = 3600 * 24
 const MAX_INTERVAL = 4

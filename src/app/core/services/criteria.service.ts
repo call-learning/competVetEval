@@ -1,5 +1,11 @@
+import { Injectable } from '@angular/core'
+
+import { forkJoin, of, Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { CriterionModel } from '../../shared/models/moodle/criterion.model'
+import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { AuthService, LOGIN_STATE } from './auth.service'
-import { filter, tap } from 'rxjs/operators'
+import { BaseDataService } from './base-data.service'
 /**
  * Criteria based services
  *
@@ -10,14 +16,6 @@ import { filter, tap } from 'rxjs/operators'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-
-import { Injectable } from '@angular/core'
-
-import { BehaviorSubject, forkJoin, Observable, of, zip } from 'rxjs'
-import { concatMap, first, map, withLatestFrom } from 'rxjs/operators'
-import { CriterionModel } from '../../shared/models/moodle/criterion.model'
-import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
-import { BaseDataService } from './base-data.service'
 
 /**
  * Manage criteria hierarchical view
