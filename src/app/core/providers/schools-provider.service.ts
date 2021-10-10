@@ -10,6 +10,7 @@
  */
 
 import { HttpBackend, HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
 
 import { uniqBy } from 'lodash'
 import { iif, of } from 'rxjs'
@@ -18,6 +19,9 @@ import { School } from 'src/app/shared/models/school.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { EnvironmentService } from '../services/environment.service'
 
+@Injectable({
+  providedIn: 'root',
+})
 export class SchoolsProviderService {
   public schoolsList: School[] = null
 

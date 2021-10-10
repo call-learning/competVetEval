@@ -35,6 +35,8 @@ export class SituationsListPage extends BaseComponent {
 
   situationsStatus: 'today' | 'all' = 'today'
 
+  emptyMessage = ''
+
   constructor(
     private menuController: MenuController,
     public authService: AuthService,
@@ -92,6 +94,10 @@ export class SituationsListPage extends BaseComponent {
         (sit1, sit2) => sit1.evalPlan.starttime - sit2.evalPlan.starttime
       )
     }
+
+    if (!this.situationsDisplayed.length) {
+      this.computeEmptyMessage()
+    }
   }
 
   protected filterSituationAroundCurrentTime() {
@@ -115,6 +121,39 @@ export class SituationsListPage extends BaseComponent {
       if (interval++ > MAX_INTERVAL) break
     }
     return filteredSituations
+  }
+
+  computeEmptyMessage() {
+    this.emptyMessage = ''
+    if (this.situations.length && !this.situationsDisplayed.length) {
+      if (this.authService.isStudent) {
+        this.emptyMessage = `Vous n'êtes lié à aucune situation sur cette période.`
+      } else {
+        this.emptyMessage = `Vous n'avez pas de situations à évaluer sur cette période.`
+      }
+    } else {
+      if (this.authService.isStudent) {
+        this.scheduledSituationsService
+          .getStudentGroupAssignments(this.authService.loggedUserValue)
+          .subscribe((groups) => {
+            if (!groups.length) {
+              this.emptyMessage = `Vous n'appartenez à aucun groupe d'évaluation.`
+            } else {
+              this.emptyMessage = `Vous n'êtes lié à aucune situation.`
+            }
+          })
+      } else {
+        this.scheduledSituationsService
+          .getAppraiserRoles(this.authService.loggedUserValue)
+          .subscribe((roles) => {
+            if (!roles.length) {
+              this.emptyMessage = `Vous n'avez pas de rôle défini.`
+            } else {
+              this.emptyMessage = `Vous n'avez pas de situations à évaluer.`
+            }
+          })
+      }
+    }
   }
 
   openModalScanAppraisal() {

@@ -1,3 +1,4 @@
+import { CevUser } from './../../shared/models/cev-user.model'
 import { Injectable } from '@angular/core'
 
 import { forkJoin } from 'rxjs'
@@ -331,6 +332,26 @@ export class ScheduledSituationService {
         return allstats.find(
           (stat) => stat.id === evalPlanId && stat.studentId === studentId
         )
+      })
+    )
+  }
+
+  public getStudentGroupAssignments(user: CevUser) {
+    return this.baseDataService.groupAssignments$.pipe(
+      map((groups) => {
+        return groups.filter((group) => {
+          return group.studentid === user.userid
+        })
+      })
+    )
+  }
+
+  public getAppraiserRoles(user: CevUser) {
+    return this.baseDataService.roles$.pipe(
+      map((roles) => {
+        return roles.filter((role) => {
+          return role.userid === user.userid
+        })
       })
     )
   }

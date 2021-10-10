@@ -74,6 +74,10 @@
         </app-appraiser-situation-card>
       </div>
     </div>
+
+    <div *ngIf="situationsDisplayed && !situationsDisplayed.length">
+      {{ emptyMessage }}
+    </div>
   </div>
 
   <ion-fab
