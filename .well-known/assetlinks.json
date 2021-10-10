@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "fr.calllearning.competveteval",
+      "sha256_cert_fingerprints": [
+        "40:9D:25:6B:5C:A7:EB:BB:BE:B3:2F:60:25:92:65:04:47:6D:57:51:56:8B:2F:EE:18:03:BD:42:1C:A9:9D:7C"
+      ]
+    }
+  }
+]
