@@ -1,0 +1,55 @@
+<ion-list>
+  <ion-item lines="full">
+    <ion-label position="floating">Titre situation</ion-label>
+    <ion-input
+      placeholder="Titre"
+      (ionChange)="filtersChanged()"
+      [(ngModel)]="situationsFilters.title"
+    ></ion-input>
+  </ion-item>
+  <ion-item lines="full">
+    <ion-label>Non évaluées</ion-label>
+    <ion-toggle
+      slot="end"
+      (ionChange)="filtersChanged()"
+      [(ngModel)]="situationsFilters.withoutObservations"
+    ></ion-toggle>
+  </ion-item>
+  <ion-item lines="full">
+    <ion-label>Observations</ion-label>
+    <ion-range
+      color="primary"
+      pin="true"
+      dualKnobs="true"
+      (ionChange)="filtersChanged()"
+      min="0"
+      max="10"
+      [(ngModel)]="situationsFilters.observationsNumber"
+      [disabled]="situationsFilters.withoutObservations"
+    ></ion-range>
+  </ion-item>
+  <ion-item lines="full">
+    <ion-label position="floating">Trier par</ion-label>
+    <ion-select
+      interface="action-sheet"
+      cancelText="Annuler"
+      (ionChange)="filtersChanged()"
+      [(ngModel)]="situationsFilters.sortBy"
+    >
+      <ion-select-option value="startTimeASC">
+        Date de début ↑
+      </ion-select-option>
+      <ion-select-option value="startTimeDESC">
+        Date de début ↓
+      </ion-select-option>
+      <ion-select-option value="endTimeASC"> Date de fin ↑ </ion-select-option>
+      <ion-select-option value="endTimeDESC"> Date de fin ↓ </ion-select-option>
+      <ion-select-option value="observationsASC">
+        Nombre d'observations ↑
+      </ion-select-option>
+      <ion-select-option value="observationssDESC">
+        Nombre d'observations ↓
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+</ion-list>

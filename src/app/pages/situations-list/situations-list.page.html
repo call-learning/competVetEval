@@ -16,25 +16,19 @@
               </ng-container>
             </div>
           </div>
-          <div class="situations-list__bottom-toolbar">
+          <div
+            class="situations-list__bottom-toolbar"
+            *ngIf="situationsFilters"
+          >
             <ion-segment
-              [(ngModel)]="situationsStatus"
-              (ionChange)="segmentChanged($event)"
+              [(ngModel)]="situationsFilters.status"
+              (ionChange)="filtersChanged($event)"
               value="today"
               mode="ios"
             >
               <ion-segment-button value="today">Maintenant</ion-segment-button>
               <ion-segment-button value="all">Toutes</ion-segment-button>
             </ion-segment>
-
-            <!-- todo : implement -->
-            <!-- <button
-              class="btn btn-primary btn-icon-left btn-light"
-              (click)="filterSituations()"
-            >
-              <ion-icon name="filter"></ion-icon>
-              Filtrer
-            </button> -->
           </div>
         </div>
       </ion-col>
@@ -43,6 +37,16 @@
           <ng-container *ngIf="authService.loggedUserValue">
             {{authService.loggedUserValue?.fullname}}
           </ng-container>
+        </div>
+
+        <div class="situations-filter">
+          <button
+            class="btn btn-primary btn-icon-left btn-light"
+            (click)="showFilteringOptions($event)"
+          >
+            <ion-icon name="filter"></ion-icon>
+            Filtrer
+          </button>
         </div>
       </ion-col>
     </ion-row>

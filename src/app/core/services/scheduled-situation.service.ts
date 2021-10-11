@@ -33,12 +33,8 @@ export class ScheduledSituationService {
     ScheduledSituation[]
   >(null)
 
-  private studentSituationStats$ = new BehaviorSubject<
-    StudentSituationStatsModel[]
-  >(null)
-
-  private appraiserSituationStats$ = new BehaviorSubject<
-    AppraiserSituationStatsModel[]
+  public situationStats$ = new BehaviorSubject<
+    StudentSituationStatsModel[] | AppraiserSituationStatsModel[]
   >(null)
 
   constructor(
@@ -90,8 +86,7 @@ export class ScheduledSituationService {
 
   resetService() {
     this.scheduledSituationsEntities$.next(null)
-    this.studentSituationStats$.next(null)
-    this.appraiserSituationStats$.next(null)
+    this.situationStats$.next(null)
   }
 
   public get situations$(): Observable<ScheduledSituation[]> {
@@ -254,7 +249,7 @@ export class ScheduledSituationService {
           allStudentStats.push(studentStats)
         }
       })
-      this.studentSituationStats$.next(allStudentStats)
+      this.situationStats$.next(allStudentStats)
     }
   }
 
@@ -290,7 +285,7 @@ export class ScheduledSituationService {
           })
         )
       })
-      this.appraiserSituationStats$.next(appraiserStats)
+      this.situationStats$.next(appraiserStats)
     }
   }
 
@@ -305,7 +300,7 @@ export class ScheduledSituationService {
   public getMyScheduledSituationStats(
     evalPlanId
   ): Observable<StudentSituationStatsModel> {
-    return this.studentSituationStats$.pipe(
+    return this.situationStats$.pipe(
       filter((obj) => obj != null),
       map((allstats) => {
         return allstats.find((stat) => stat.id === evalPlanId)
@@ -326,9 +321,10 @@ export class ScheduledSituationService {
     evalPlanId,
     studentId
   ): Observable<AppraiserSituationStatsModel> {
-    return this.appraiserSituationStats$.pipe(
+    return this.situationStats$.pipe(
       filter((obj) => obj != null),
-      map((allstats) => {
+      map((allstats) => allstats as AppraiserSituationStatsModel[]),
+      map((allstats: AppraiserSituationStatsModel[]) => {
         return allstats.find(
           (stat) => stat.id === evalPlanId && stat.studentId === studentId
         )

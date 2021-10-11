@@ -28,7 +28,6 @@ export class AppraiserSituationCardComponent
   @Input() scheduledSituation?: ScheduledSituation
   @Input() studentId?: number
   @Input() showHeader = true
-  public appraiserSituationStats: AppraiserSituationStatsModel = null
   public studentInfo: CevUser = null
 
   constructor(
@@ -39,12 +38,6 @@ export class AppraiserSituationCardComponent
   }
 
   ngOnInit() {
-    const evalPlanId = this.scheduledSituation.evalPlan.id
-    this.scheduledSituationService
-      .getAppraiserScheduledSituationStats(evalPlanId, this.studentId)
-      .pipe(takeUntil(this.alive$))
-      .subscribe((stats) => (this.appraiserSituationStats = stats))
-
     this.userDataService
       .getUserProfileInfo(this.studentId)
       .subscribe((userInfo) => (this.studentInfo = userInfo))

@@ -15,6 +15,7 @@ import { ModalCriterionDetailComponent } from './modals/modal-criterion-detail/m
 import { ModalScanAppraisalComponent } from './modals/modal-scan-appraisal/modal-scan-appraisal.component'
 import { ModalShowAppraisalBarcodeComponent } from './modals/modal-show-appraisal-barcode/modal-show-appraisal-barcode.component'
 import { ModalSituationChartComponent } from './modals/modal-situation-chart/modal-situation-chart.component'
+import { PopoverSituationsListFiltersComponent } from './popovers/popover-situations-list-filters/popover-situations-list-filters.component'
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { ModalSituationChartComponent } from './modals/modal-situation-chart/mod
     SituationStatusIconComponent,
     StudentSituationCardComponent,
     AppraiserSituationCardComponent,
+    PopoverSituationsListFiltersComponent,
   ],
   imports: [
     CommonModule,

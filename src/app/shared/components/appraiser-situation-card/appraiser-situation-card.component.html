@@ -30,27 +30,28 @@
     <div class="list-item-infos">
       <div class="list-item-content">
         <div class="list-item-content">
-          <div *ngIf="appraiserSituationStats">
-            {{ appraiserSituationStats.appraisalsCompleted }}
+          <div *ngIf="scheduledSituation.stats">
+            {{ scheduledSituation.stats.appraisalsCompleted }}
             <ng-container
-              *ngIf="appraiserSituationStats.appraisalsCompleted > 1"
+              *ngIf="scheduledSituation.stats.appraisalsCompleted > 1"
               >observations réalisées</ng-container
             >
             <ng-container
-              *ngIf="appraiserSituationStats.appraisalsCompleted <= 1"
+              *ngIf="scheduledSituation.stats.appraisalsCompleted <= 1"
               >observation réalisée</ng-container
             >
             sur
-            {{ appraiserSituationStats.appraisalsRequired }}
-            <ng-container *ngIf="appraiserSituationStats.appraisalsRequired > 1"
+            {{ scheduledSituation.stats.appraisalsRequired }}
+            <ng-container
+              *ngIf="scheduledSituation.stats.appraisalsRequired > 1"
               >demandées</ng-container
             >
             <ng-container
-              *ngIf="appraiserSituationStats.appraisalsRequired <= 1"
+              *ngIf="scheduledSituation.stats.appraisalsRequired <= 1"
               >demandée</ng-container
             >
           </div>
-          <div *ngIf="!appraiserSituationStats">
+          <div *ngIf="!scheduledSituation.stats">
             <ion-spinner name="dots"></ion-spinner>
           </div>
         </div>
@@ -59,11 +60,11 @@
   </div>
   <div class="appraiser-situation-card_additional_info">
     <div
-      *ngIf="appraiserSituationStats"
+      *ngIf="scheduledSituation.stats"
       class="appraiser-situation-card_additional_info_items"
     >
       <div class="list-item-icon">
-        <div [ngSwitch]="appraiserSituationStats.appraisalAverage">
+        <div [ngSwitch]="scheduledSituation.stats.appraisalAverage">
           <svg-icon
             *ngSwitchCase="0"
             src="assets/images/svg-icons/icon-smile.svg"
@@ -101,14 +102,14 @@
           ></svg-icon>
         </div>
         <div class="appraiser-situation-card_number_top">
-          {{ appraiserSituationStats.appraisalAverage }}
+          {{ scheduledSituation.stats.appraisalAverage }}
         </div>
       </div>
       <app-situation-status-icon
-        [status]="appraiserSituationStats.status"
+        [status]="scheduledSituation.stats.status"
       ></app-situation-status-icon>
       <div
-        *ngIf="!appraiserSituationStats"
+        *ngIf="!scheduledSituation.stats"
         class="appraiser-situation-card_additional_info_items"
       >
         <ion-spinner name="lines"></ion-spinner>

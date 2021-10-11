@@ -20,25 +20,11 @@ import { BaseComponent } from '../base/base.component'
   templateUrl: './student-situation-card.component.html',
   styleUrls: ['./student-situation-card.component.scss'],
 })
-export class StudentSituationCardComponent
-  extends BaseComponent
-  implements OnInit
-{
+export class StudentSituationCardComponent extends BaseComponent {
   @Input() scheduledSituation?: ScheduledSituation
   @Input() showHeader = true
-  public studentSituationStats: StudentSituationStatsModel = null
 
   constructor(private scheduledSituationService: ScheduledSituationService) {
     super()
-  }
-
-  ngOnInit() {
-    const evalPlanId = this.scheduledSituation.evalPlan.id
-    this.scheduledSituationService
-      .getMyScheduledSituationStats(evalPlanId)
-      .pipe(takeUntil(this.alive$))
-      .subscribe((stats) => {
-        this.studentSituationStats = stats
-      })
   }
 }
