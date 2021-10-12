@@ -6,7 +6,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 
@@ -15,21 +15,22 @@ import { LoadingController } from '@ionic/angular'
 import { finalize } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { EncryptService } from 'src/app/core/services/encrypt.service'
+import { IdpModel } from 'src/app/shared/models/idp.model'
 import { LocaleKeys } from 'src/app/shared/utils/locale-keys'
+import { HttpAuthService } from './../../core/http-services/http-auth.service'
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   loginForm: FormGroup
 
   errorMsg = ''
-  loader: HTMLIonLoadingElement
   isLoading = false
 
-  idpList = []
+  idpList: IdpModel[] = null
 
   formSubmitted = false
 
@@ -38,7 +39,8 @@ export class LoginPage implements OnInit {
     public authService: AuthService,
     private router: Router,
     private loadingController: LoadingController,
-    private encryptService: EncryptService
+    private encryptService: EncryptService,
+    private httpAuthService: HttpAuthService
   ) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -46,17 +48,17 @@ export class LoginPage implements OnInit {
     })
   }
 
-  ngOnInit() {
-    this.loadingController.create().then((res) => {
-      this.loader = res
-    })
-    this.authService
-      .getIdpList()
-      .subscribe((idplist) => (this.idpList = idplist))
-  }
-
   ionViewDidEnter() {
     this.prefillLoginForm()
+
+    this.httpAuthService.getIdps().subscribe((idpList) => {
+      this.idpList = idpList
+    })
+  }
+
+  ionViewDidLeave() {
+    this.loginForm.markAsUntouched()
+    this.loginForm.reset()
   }
 
   prefillLoginForm() {
@@ -88,38 +90,34 @@ export class LoginPage implements OnInit {
       this.formSubmitted = true
 
       if (this.loginForm.valid) {
-        this.loader.present()
-        this.isLoading = true
+        this.loadingController.create().then((loader) => {
+          loader.present()
+          this.isLoading = true
 
-        this.authService
-          .login(this.loginForm.value.username, this.loginForm.value.password)
-          .pipe(
-            finalize(() => {
-              this.isLoading = false
-            })
-          )
-          .subscribe(
-            () => {
-              this.saveLoginForm()
-              this.router.navigate(['/situations-list'])
-              this.loader.dismiss()
-              this.loginForm.reset()
-              this.loginForm.markAsUntouched()
-            },
-            (err: Error) => {
-              if (err.message === 'invalidlogin') {
-                this.errorMsg = 'Identifiants invalides'
-              } else {
-                this.errorMsg = `Une erreur s'est produite (${err.name})`
+          this.authService
+            .login(this.loginForm.value.username, this.loginForm.value.password)
+            .pipe(
+              finalize(() => {
+                this.isLoading = false
+                loader.dismiss()
+              })
+            )
+            .subscribe(
+              () => {
+                this.saveLoginForm()
+                this.router.navigate(['/situations-list'])
+              },
+              (err: Error) => {
+                if (err.message === 'invalidlogin') {
+                  this.errorMsg = 'Identifiants invalides'
+                } else {
+                  this.errorMsg = `Une erreur s'est produite (${err.name})`
+                }
               }
-
-              this.loader.dismiss()
-            }
-          )
+            )
+        })
       } else {
         this.errorMsg = 'Le formulaire est invalide'
-        this.loader.dismiss()
-        this.isLoading = false
       }
     }
   }
@@ -129,10 +127,10 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/school-choice'])
   }
 
- launchIdp(idpURL) {
+  launchIdp(idpURL) {
     window.open(idpURL, '_system')
-    if ((<any>navigator).app) {
-      ;(<any>navigator).app.exitApp()
+    if ((navigator as any).app) {
+      ;(navigator as any).app.exitApp()
     }
   }
 

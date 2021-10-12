@@ -6,13 +6,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import {
-  AfterViewInit,
-  Component,
-  Input,
-  OnInit,
-  ViewChild,
-} from '@angular/core'
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 import { IonTextarea, ModalController } from '@ionic/angular'
@@ -26,9 +20,8 @@ import { ScheduledSituation } from './../../models/ui/scheduled-situation.model'
   templateUrl: './modal-ask-appraisal.component.html',
   styleUrls: ['./modal-ask-appraisal.component.scss'],
 })
-export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
+export class ModalAskAppraisalComponent implements AfterViewInit {
   @Input() scheduledSituation: ScheduledSituation
-  @Input() studentId: number // TODO: Check if there is no better way to do it (scheduledSituation has got a student Id ?)
 
   qrCodeData: string
 
@@ -53,8 +46,6 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
     })
   }
 
-  ngOnInit() {}
-
   ngAfterViewInit() {
     setTimeout(() => {
       this.contextInput.setFocus()
@@ -76,7 +67,7 @@ export class ModalAskAppraisalComponent implements OnInit, AfterViewInit {
         .createBlankAppraisal(
           this.scheduledSituation.evalPlanId,
           this.scheduledSituation.situation.evalgridid,
-          this.authService.loggedUser.getValue().userid,
+          this.authService.loggedUserValue.userid,
           0, // For now we don't know the appraiser.
           '',
           this.contextInput.value

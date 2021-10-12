@@ -7,78 +7,9 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { getTokenFromLaunchURL, mergeExistingBehaviourSubject } from './helpers'
 import { BehaviorSubject } from 'rxjs'
-import { AppraisalModel } from '../models/moodle/appraisal.model'
-import { AppraisalCriterionModel } from '../models/moodle/appraisal-criterion.model'
-import { AppraisalUI } from '../models/ui/appraisal-ui.model'
 import { Md5 } from 'ts-md5'
-
-describe('Helpers', () => {
-  it('I merge two array with objects', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(SIMPLE_VALUES)
-    mergeExistingBehaviourSubject(currentvalues, SIMPLE_VALUES_MERGE, ['id'])
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toEqual(SIMPLE_VALUES_RESULT)
-      done()
-    })
-  })
-  it('I merge an existing behavioursubject array with a new value', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
-    mergeExistingBehaviourSubject(currentvalues, NEXT_VALUES_ADD_NEW, ['id'])
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toContain(NEXT_VALUES_ADD_NEW[0])
-      done()
-    })
-  })
-
-  it('I merge an existing behavioursubject array with a modified value', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
-    mergeExistingBehaviourSubject(currentvalues, NEXT_VALUES_CHANGE, ['id'])
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toContain(NEXT_VALUES_CHANGE[0])
-      done()
-    })
-  })
-
-  it('I merge two arrays array with a modified value', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
-    mergeExistingBehaviourSubject(
-      currentvalues,
-      [...NEXT_VALUES_CHANGE, ...NEXT_VALUES_ADD_NEW],
-      ['id']
-    )
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toContain(NEXT_VALUES_CHANGE[0])
-      expect(newValue).toContain(NEXT_VALUES_ADD_NEW[0])
-      done()
-    })
-  })
-
-  it('I parse the token from WRONG url', () => {
-    expect(getTokenFromLaunchURL('fakelaunchurl:/aa', '')).toBeNull()
-  })
-
-  it('When I parse a token, the origin site must match', () => {
-    const siteUrl = 'http://localhost'
-    const wrongsiteUrl =
-      'fr.calllearning.competveteval://token=' +
-      btoa(Md5.hashAsciiStr(siteUrl + '.com') + ':::abcdefg')
-    expect(() => getTokenFromLaunchURL(wrongsiteUrl, siteUrl)).toThrowError()
-  })
-
-  it('When I parse a launchURL I must return the right token', () => {
-    const siteUrl = 'http://localhost'
-    const wrongsiteUrl =
-      'fr.calllearning.competveteval://token=' +
-      btoa(Md5.hashAsciiStr(siteUrl) + ':::abcdefg')
-    expect(getTokenFromLaunchURL(wrongsiteUrl, siteUrl)).toBe('abcdefg')
-  })
-})
+import { getTokenFromLaunchURL, mergeExistingBehaviourSubject } from './helpers'
 
 const SIMPLE_VALUES = [
   { id: 1, subarray: [] },
@@ -299,3 +230,69 @@ const NEXT_VALUES_CHANGE = [
     timeModified: 1621264154,
   },
 ]
+
+describe('Helpers', () => {
+  it('I merge two array with objects', (done) => {
+    let currentvalues: BehaviorSubject<any>
+    currentvalues = new BehaviorSubject<Array<object>>(SIMPLE_VALUES)
+    mergeExistingBehaviourSubject(currentvalues, SIMPLE_VALUES_MERGE, ['id'])
+    currentvalues.subscribe((newValue) => {
+      expect(newValue).toEqual(SIMPLE_VALUES_RESULT)
+      done()
+    })
+  })
+  it('I merge an existing behavioursubject array with a new value', (done) => {
+    let currentvalues: BehaviorSubject<any>
+    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
+    mergeExistingBehaviourSubject(currentvalues, NEXT_VALUES_ADD_NEW, ['id'])
+    currentvalues.subscribe((newValue) => {
+      expect(newValue).toContain(NEXT_VALUES_ADD_NEW[0])
+      done()
+    })
+  })
+
+  it('I merge an existing behavioursubject array with a modified value', (done) => {
+    let currentvalues: BehaviorSubject<any>
+    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
+    mergeExistingBehaviourSubject(currentvalues, NEXT_VALUES_CHANGE, ['id'])
+    currentvalues.subscribe((newValue) => {
+      expect(newValue).toContain(NEXT_VALUES_CHANGE[0])
+      done()
+    })
+  })
+
+  it('I merge two arrays array with a modified value', (done) => {
+    let currentvalues: BehaviorSubject<any>
+    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
+    mergeExistingBehaviourSubject(
+      currentvalues,
+      [...NEXT_VALUES_CHANGE, ...NEXT_VALUES_ADD_NEW],
+      ['id']
+    )
+    currentvalues.subscribe((newValue) => {
+      expect(newValue).toContain(NEXT_VALUES_CHANGE[0])
+      expect(newValue).toContain(NEXT_VALUES_ADD_NEW[0])
+      done()
+    })
+  })
+
+  it('I parse the token from WRONG url', () => {
+    expect(getTokenFromLaunchURL('fakelaunchurl:/aa', '')).toBeNull()
+  })
+
+  it('When I parse a token, the origin site must match', () => {
+    const siteUrl = 'http://localhost'
+    const wrongsiteUrl =
+      'fr.calllearning.competveteval://token=' +
+      btoa(Md5.hashAsciiStr(siteUrl + '.com') + ':::abcdefg')
+    expect(() => getTokenFromLaunchURL(wrongsiteUrl, siteUrl)).toThrowError()
+  })
+
+  it('When I parse a launchURL I must return the right token', () => {
+    const siteUrl = 'http://localhost'
+    const wrongsiteUrl =
+      'fr.calllearning.competveteval://token=' +
+      btoa(Md5.hashAsciiStr(siteUrl) + ':::abcdefg')
+    expect(getTokenFromLaunchURL(wrongsiteUrl, siteUrl)).toBe('abcdefg')
+  })
+})

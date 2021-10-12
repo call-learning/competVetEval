@@ -7,12 +7,6 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { getTokenFromLaunchURL, mergeExistingBehaviourSubject } from './helpers'
-import { BehaviorSubject } from 'rxjs'
-import { AppraisalModel } from '../models/moodle/appraisal.model'
-import { AppraisalCriterionModel } from '../models/moodle/appraisal-criterion.model'
-import { AppraisalUI } from '../models/ui/appraisal-ui.model'
-import { Md5 } from 'ts-md5'
 import { MoodleApiUtils } from './moodle-api-utils'
 
 describe('Moodle API Utils', () => {
@@ -20,7 +14,7 @@ describe('Moodle API Utils', () => {
     const formData: FormData = new FormData()
     MoodleApiUtils.convertArguments(formData, 'testarg', 5)
     MoodleApiUtils.convertArguments(formData, 'testsecondarg', 'b')
-    let realFormData = {}
+    const realFormData = {}
     formData.forEach((value, key) => {
       realFormData[key] = value
     })
@@ -30,7 +24,7 @@ describe('Moodle API Utils', () => {
   it('I can build a form Data with Array', (done) => {
     const formData: FormData = new FormData()
     MoodleApiUtils.convertArguments(formData, 'testarg', ['a', 'b', 'c'])
-    let realFormData = {}
+    const realFormData = {}
     formData.forEach((value, key) => {
       realFormData[key] = value
     })
@@ -48,7 +42,7 @@ describe('Moodle API Utils', () => {
       attr1: 'a',
       attr2: 'b',
     })
-    let realFormData = {}
+    const realFormData = {}
     formData.forEach((value, key) => {
       realFormData[key] = value
     })
@@ -64,7 +58,7 @@ describe('Moodle API Utils', () => {
       attr1: { a: 1, b: 1 },
       attr2: [1, 2, 3],
     })
-    let realFormData = {}
+    const realFormData = {}
     formData.forEach((value, key) => {
       realFormData[key] = value
     })

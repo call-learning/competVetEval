@@ -1,23 +1,8 @@
-/**
- * Scheduled SituationModel
- *
- * @author Marjory Gaillot <marjory.gaillot@gmail.com>
- * @author Laurent David <laurent@call-learning.fr>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @copyright  2021 SAS CALL Learning <call-learning.fr>
- */
-
+import { CevUser } from './../../shared/models/cev-user.model'
 import { Injectable } from '@angular/core'
 
-import {
-  combineLatest,
-  from,
-  of,
-  zip,
-  BehaviorSubject,
-  Observable,
-  Subscription,
-} from 'rxjs'
+import { forkJoin } from 'rxjs'
+import { combineLatest, of, BehaviorSubject, Observable } from 'rxjs'
 import { concatMap, filter, first, map, tap } from 'rxjs/operators'
 // import evalplan from '../../../mock/fixtures/evalplan'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
@@ -27,11 +12,18 @@ import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { AppraiserSituationStatsModel } from '../../shared/models/ui/appraiser-situation-stats.model'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 import { StudentSituationStatsModel } from '../../shared/models/ui/student-situation-stats.model'
-import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
 import { AppraisalUiService } from './appraisal-ui.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
 import { BaseDataService } from './base-data.service'
 import { EvalPlanService } from './eval-plan.service'
+/**
+ * Scheduled SituationModel
+ *
+ * @author Marjory Gaillot <marjory.gaillot@gmail.com>
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 SAS CALL Learning <call-learning.fr>
+ */
 
 @Injectable({
   providedIn: 'any',
@@ -41,12 +33,8 @@ export class ScheduledSituationService {
     ScheduledSituation[]
   >(null)
 
-  private studentSituationStats$ = new BehaviorSubject<
-    StudentSituationStatsModel[]
-  >(null)
-
-  private appraiserSituationStats$ = new BehaviorSubject<
-    AppraiserSituationStatsModel[]
+  public situationStats$ = new BehaviorSubject<
+    StudentSituationStatsModel[] | AppraiserSituationStatsModel[]
   >(null)
 
   constructor(
@@ -55,170 +43,94 @@ export class ScheduledSituationService {
     private appraisalUIService: AppraisalUiService,
     private evalPlanService: EvalPlanService
   ) {
-    this.authService.loginState.subscribe((loginState) => {
+    this.authService.loginState$.subscribe((loginState) => {
       if (loginState !== LOGIN_STATE.LOGGED) {
-        this.scheduledSituationsEntities$.next(null)
-        this.studentSituationStats$.next(null)
-        this.appraiserSituationStats$.next(null)
+        this.resetService()
       } else {
-        this.refresh().subscribe()
+        this.refreshSituations().subscribe()
       }
     })
 
     combineLatest([
-      this.authService.loginState,
       this.appraisalUIService.appraisals$,
       this.scheduledSituationsEntities$,
-      this.baseDataService.groupAssignment$,
-      this.evalPlanService.plans$,
     ])
       .pipe(
-        filter(
-          ([
-            loginState,
-            appraisals,
-            allsituations,
-            groupAssignments,
-            evalplan,
-          ]) =>
-            appraisals != null &&
-            allsituations != null &&
-            loginState === LOGIN_STATE.LOGGED &&
-            evalplan != null
-        ),
-        tap(
-          ([
-            loginState,
-            appraisals,
-            allsituations,
-            groupAssignments,
-            evalplan,
-          ]) => {
-            if (
-              this.authService.isStillLoggedIn() &&
-              this.authService.isStudent
-            ) {
+        filter(([appraisals, allsituations]) => {
+          return appraisals !== null && allsituations !== null
+        }),
+        concatMap(([appraisals, allsituations]) => {
+          return forkJoin([
+            of(appraisals),
+            of(allsituations),
+            this.authService.loginState$.pipe(first()),
+            this.baseDataService.groupAssignments$,
+          ])
+        }),
+        tap(([appraisals, allsituations, loginState, groupAssignments]) => {
+          if (loginState === LOGIN_STATE.LOGGED) {
+            if (this.authService.isStudent) {
               this.buildStudentStatistics(
                 allsituations,
                 appraisals,
-                this.authService.loggedUser.getValue().userid
+                this.authService.loggedUserValue.userid
               )
+            } else if (this.authService.isAppraiser && groupAssignments) {
+              this.buildAppraiserStatistics(appraisals, allsituations)
             }
           }
-        ),
-        tap(
-          ([
-            loginState,
-            appraisals,
-            allsituations,
-            groupAssignments,
-            evalplan,
-          ]) => {
-            if (
-              this.authService.isStillLoggedIn() &&
-              this.authService.isAppraiser &&
-              groupAssignments
-            ) {
-              this.buildAppraiserStatistics(
-                appraisals,
-                allsituations,
-                groupAssignments,
-                evalplan
-              )
-            }
-          }
-        )
+        })
       )
       .subscribe()
   }
 
+  resetService() {
+    this.scheduledSituationsEntities$.next(null)
+    this.situationStats$.next(null)
+  }
+
   public get situations$(): Observable<ScheduledSituation[]> {
-    return this.scheduledSituationsEntities$.asObservable()
-  }
-
-  /**
-   * Get stats for scheduled situation (student version)
-   *
-   *  - appraisal left
-   *  - appraisal done
-   *
-   * @param evalPlanId
-   */
-  public getMyScheduledSituationStats(
-    evalPlanId
-  ): Observable<StudentSituationStatsModel> {
-    return this.studentSituationStats$.pipe(
-      filter((obj) => obj != null),
-      concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id === evalPlanId)
+    return this.scheduledSituationsEntities$.asObservable().pipe(
+      filter((situations) => !!situations),
+      first()
     )
-  }
-
-  /**
-   * Get stats for scheduled situation (appraiser version)
-   *
-   *  - appraisal left
-   *  - appraisal done
-   *
-   * @param evalPlanId
-   * @param studentId
-   */
-  public getAppraiserScheduledSituationStats(
-    evalPlanId,
-    studentId
-  ): Observable<AppraiserSituationStatsModel> {
-    return this.appraiserSituationStats$.pipe(
-      filter((obj) => obj != null),
-      concatMap((allstats) => from(allstats)),
-      filter((stat) => stat.id === evalPlanId && stat.studentId === studentId)
-    )
-  }
-
-  /**
-   * Refresh stats data for currently logged in user
-   */
-  public refreshStats(): Observable<any> {
-    // Pull all appraisals.
-    return this.appraisalUIService.refreshAppraisals()
   }
 
   /**
    * Refresh data for currently logged in user
    */
-  public refresh(): Observable<ScheduledSituation[]> {
-    if (this.authService.isStillLoggedIn()) {
-      return zip(
-        this.evalPlanService.plans$.pipe(filter((obj) => obj != null)),
-        this.baseDataService.situations$.pipe(filter((obj) => obj != null)),
-        this.baseDataService.groupAssignment$.pipe(
-          filter((obj) => obj != null)
-        ),
-        this.baseDataService.roles$.pipe(filter((obj) => obj != null))
-      ).pipe(
-        first(),
-        map(([evalplans, situations, groupAssignments, roles]) => {
-          if (this.authService.isStillLoggedIn()) {
-            if (this.authService.isStudent) {
-              return this.buildScheduledSituationsForStudent(
-                evalplans as EvalPlanModel[],
-                situations as SituationModel[],
-                groupAssignments as GroupAssignmentModel[]
-              )
-            } else {
-              return this.buildScheduledSituationsForAppraiser(
-                evalplans as EvalPlanModel[],
-                situations as SituationModel[],
-                roles as RoleModel[],
-                groupAssignments as GroupAssignmentModel[],
-                this.authService.loggedUser.getValue().userid
-              )
-            }
+  public refreshSituations(): Observable<ScheduledSituation[]> {
+    return forkJoin([
+      this.baseDataService.situations$,
+      this.baseDataService.groupAssignments$,
+      this.baseDataService.roles$,
+      this.evalPlanService.plans$,
+    ]).pipe(
+      map(([situations, groupAssignments, roles, evalplans]) => {
+        if (this.authService.isStillLoggedIn()) {
+          if (this.authService.isStudent) {
+            return this.buildScheduledSituationsForStudent(
+              evalplans,
+              situations,
+              groupAssignments
+            )
+          } else {
+            return this.buildScheduledSituationsForAppraiser(
+              evalplans,
+              situations,
+              roles,
+              groupAssignments,
+              this.authService.loggedUserValue.userid
+            )
           }
-        })
-      )
-    } else {
-      return of([])
-    }
+        } else {
+          return []
+        }
+      }),
+      tap((scheduledSituations) => {
+        this.scheduledSituationsEntities$.next(scheduledSituations)
+      })
+    )
   }
 
   /**
@@ -247,7 +159,6 @@ export class ScheduledSituationService {
         scheduledSituations.push(scheduledSituation)
       }
     })
-    this.scheduledSituationsEntities$.next(scheduledSituations)
     return scheduledSituations
   }
 
@@ -291,7 +202,6 @@ export class ScheduledSituationService {
         }
       }
     })
-    this.scheduledSituationsEntities$.next(scheduledSituations)
     return scheduledSituations
   }
 
@@ -339,20 +249,11 @@ export class ScheduledSituationService {
           allStudentStats.push(studentStats)
         }
       })
-      mergeExistingBehaviourSubject(
-        this.studentSituationStats$,
-        allStudentStats,
-        ['id']
-      )
+      this.situationStats$.next(allStudentStats)
     }
   }
 
-  private buildAppraiserStatistics(
-    appraisals,
-    allsituations,
-    groupAssignments,
-    evalplan
-  ) {
+  private buildAppraiserStatistics(appraisals, allsituations) {
     if (allsituations) {
       const appraiserStats = []
       allsituations.forEach((situation) => {
@@ -384,11 +285,70 @@ export class ScheduledSituationService {
           })
         )
       })
-      mergeExistingBehaviourSubject(
-        this.appraiserSituationStats$,
-        appraiserStats,
-        ['id', 'studentId']
-      )
+      this.situationStats$.next(appraiserStats)
     }
+  }
+
+  /**
+   * Get stats for scheduled situation (student version)
+   *
+   *  - appraisal left
+   *  - appraisal done
+   *
+   * @param evalPlanId
+   */
+  public getMyScheduledSituationStats(
+    evalPlanId
+  ): Observable<StudentSituationStatsModel> {
+    return this.situationStats$.pipe(
+      filter((obj) => obj != null),
+      map((allstats) => {
+        return allstats.find((stat) => stat.id === evalPlanId)
+      })
+    )
+  }
+
+  /**
+   * Get stats for scheduled situation (appraiser version)
+   *
+   *  - appraisal left
+   *  - appraisal done
+   *
+   * @param evalPlanId
+   * @param studentId
+   */
+  public getAppraiserScheduledSituationStats(
+    evalPlanId,
+    studentId
+  ): Observable<AppraiserSituationStatsModel> {
+    return this.situationStats$.pipe(
+      filter((obj) => obj != null),
+      map((allstats) => allstats as AppraiserSituationStatsModel[]),
+      map((allstats: AppraiserSituationStatsModel[]) => {
+        return allstats.find(
+          (stat) => stat.id === evalPlanId && stat.studentId === studentId
+        )
+      })
+    )
+  }
+
+  public getStudentGroupAssignments(user: CevUser) {
+    return this.baseDataService.groupAssignments$.pipe(
+      map((groups) => {
+        return groups.filter((group) => {
+          return group.studentid === user.userid
+        })
+      })
+    )
+  }
+
+  public getAppraiserRoles(user: CevUser) {
+    return this.baseDataService.roles$.pipe(
+      map((roles) => {
+        return roles.filter((role) => {
+          return role.userid === user.userid
+        })
+      })
+    )
   }
 }

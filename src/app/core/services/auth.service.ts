@@ -13,22 +13,14 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 
 import { of, throwError, BehaviorSubject, Observable } from 'rxjs'
-import {
-  catchError,
-  concatMap,
-  filter,
-  last,
-  map,
-  switchAll,
-  tap,
-} from 'rxjs/operators'
+import { catchError, concatMap, map, tap } from 'rxjs/operators'
 import { School } from 'src/app/shared/models/school.model'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
+import { IdpModel } from '../../shared/models/idp.model'
 import { LocaleKeys } from '../../shared/utils/locale-keys'
 import { HttpAuthService } from '../http-services/http-auth.service'
 import { SchoolsProviderService } from '../providers/schools-provider.service'
-import { IdpModel } from '../../shared/models/idp.model'
 
 export const LOGIN_STATE = {
   ATTEMPT_TO_RECOVER: 'ATTEMPT_TO_RECOVER',
@@ -41,12 +33,12 @@ export const LOGIN_STATE = {
 })
 export class AuthService {
   chosenSchool: School
-  loggedUser = new BehaviorSubject<CevUser>(null)
-  loginState = new BehaviorSubject<string>(LOGIN_STATE.ATTEMPT_TO_RECOVER)
+  loggedUser$ = new BehaviorSubject<CevUser>(null)
+  loginState$ = new BehaviorSubject<string>(LOGIN_STATE.ATTEMPT_TO_RECOVER)
   accessToken: string
-  currentUserRole = new BehaviorSubject<'student' | 'appraiser'>(null)
+  currentUserRole$ = new BehaviorSubject<'student' | 'appraiser'>(null)
 
-  idpList = new BehaviorSubject<IdpModel[]>(null)
+  idpList$ = new BehaviorSubject<IdpModel[]>(null)
 
   constructor(
     private router: Router,
@@ -73,7 +65,7 @@ export class AuthService {
         return this.loadUserProfile()
       }),
       tap(() => {
-        this.loginState.next(LOGIN_STATE.LOGGED)
+        this.loginState$.next(LOGIN_STATE.LOGGED)
       })
     )
   }
@@ -82,8 +74,7 @@ export class AuthService {
     this.setSession(tokenString)
     return this.loadUserProfile().pipe(
       tap(() => {
-        console.log('User logged in with Token')
-        this.loginState.next(LOGIN_STATE.LOGGED)
+        this.loginState$.next(LOGIN_STATE.LOGGED)
       })
     )
   }
@@ -93,19 +84,16 @@ export class AuthService {
 
     this.cleanUp()
 
-    this.loginState.next(LOGIN_STATE.IDLE)
-    this.loggedUser.next(null)
+    this.loginState$.next(LOGIN_STATE.IDLE)
+    this.loggedUser$.next(null)
 
     this.accessToken = null
-    this.currentUserRole.next(null)
+    this.currentUserRole$.next(null)
   }
 
   setChosenSchool(school: School) {
     if (school) {
       this.schoolsProviderService.setSelectedSchoolId(school.id)
-      this.httpAuthService
-        .getIdps()
-        .subscribe((newlist) => this.idpList.next(newlist))
     } else {
       this.schoolsProviderService.setSelectedSchoolId(null)
     }
@@ -114,39 +102,32 @@ export class AuthService {
   }
 
   recoverSession(): Observable<boolean> {
-    return this.schoolsProviderService.schoolList$.pipe(
-      filter((res) => !!res),
-      map(() => {
-        if (this.schoolsProviderService.getSelectedSchoolId()) {
-          this.chosenSchool = this.schoolsProviderService.getSchoolFromId(
-            this.schoolsProviderService.getSelectedSchoolId()
-          )
-          if (!this.chosenSchool) {
-            LocaleKeys.cleanupAllLocalStorage()
-            this.loginState.next(LOGIN_STATE.IDLE)
-            return of(true)
-          }
-          this.httpAuthService
-            .getIdps()
-            .subscribe((newlist) => this.idpList.next(newlist))
-        }
-        if (this.variablesInSessionExists()) {
-          return this.recoverStorageVariables().pipe(
-            tap((res) => {
-              this.loginState.next(LOGIN_STATE.LOGGED)
-            }),
-            catchError((err) => {
-              this.logout()
-              return throwError(err)
-            })
-          )
-        } else {
-          this.loginState.next(LOGIN_STATE.IDLE)
-          return of(true)
-        }
-      }),
-      switchAll()
-    )
+    if (this.schoolsProviderService.getSelectedSchoolId()) {
+      this.setChosenSchool(
+        this.schoolsProviderService.getSchoolFromId(
+          this.schoolsProviderService.getSelectedSchoolId()
+        )
+      )
+      if (!this.chosenSchool) {
+        LocaleKeys.cleanupAllLocalStorage()
+        this.loginState$.next(LOGIN_STATE.IDLE)
+        return of(true)
+      }
+    }
+    if (this.variablesInSessionExists()) {
+      return this.recoverStorageVariables().pipe(
+        tap(() => {
+          this.loginState$.next(LOGIN_STATE.LOGGED)
+        }),
+        catchError((err) => {
+          this.logout()
+          return throwError(err)
+        })
+      )
+    } else {
+      this.loginState$.next(LOGIN_STATE.IDLE)
+      return of(true)
+    }
   }
 
   setSession(token: string) {
@@ -186,20 +167,17 @@ export class AuthService {
       }),
       tap((role: 'student' | 'appraiser') => {
         this.setUserRole(role)
-      }),
-      catchError((err) => {
-        return throwError(err)
       })
     )
   }
 
   private setUserProfile(userProfile: CevUser) {
-    this.loggedUser.next(userProfile)
+    this.loggedUser$.next(userProfile)
     localStorage.setItem(LocaleKeys.authProfile, JSON.stringify(userProfile))
   }
 
   private setUserRole(role: 'student' | 'appraiser') {
-    this.currentUserRole.next(role)
+    this.currentUserRole$.next(role)
   }
 
   private cleanUp() {
@@ -208,18 +186,14 @@ export class AuthService {
   }
 
   get loggedUserValue() {
-    return this.loggedUser.getValue()
+    return this.loggedUser$.getValue()
   }
 
   get isStudent() {
-    return this.currentUserRole.getValue() === 'student'
+    return this.currentUserRole$.getValue() === 'student'
   }
 
   get isAppraiser() {
-    return this.currentUserRole.getValue() !== 'student'
-  }
-
-  getIdpList(): Observable<IdpModel[]> {
-    return this.idpList.asObservable()
+    return this.currentUserRole$.getValue() !== 'student'
   }
 }

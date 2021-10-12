@@ -1,16 +1,14 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
 
 import { Platform, ToastController } from '@ionic/angular'
 
 import { Browser, Capacitor, Plugins } from '@capacitor/core'
 import { worker } from '../mock/browser'
+import { SchoolsProviderService } from './core/providers/schools-provider.service'
 import { AuthService } from './core/services/auth.service'
 import { EnvironmentService } from './core/services/environment.service'
-import { AppState } from '@capacitor/core'
-import { URLSearchParams } from 'url'
 import { getTokenFromLaunchURL } from './shared/utils/helpers'
-import { SchoolsProviderService } from './core/providers/schools-provider.service'
-import { Router } from '@angular/router'
 
 const { App } = Plugins
 
@@ -63,37 +61,32 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   protected openWithURL(url) {
-    console.log('App opened with URL: ' + url)
-    this.schoolService.schoolList$.subscribe({
-      complete: () => {
-        try {
-          if (this.schoolService.getSelectedSchoolId()) {
-            const token = getTokenFromLaunchURL(
-              url,
-              this.schoolService.getSelectedSchoolUrl()
-            )
-            if (token) {
-              this.authService.loginWithToken(token).subscribe((loggedin) => {
-                if (loggedin) {
-                  this.router.navigate(['/situations-list'])
-                }
-              })
+    try {
+      if (this.schoolService.getSelectedSchoolId()) {
+        const token = getTokenFromLaunchURL(
+          url,
+          this.schoolService.getSelectedSchoolUrl()
+        )
+        if (token) {
+          this.authService.loginWithToken(token).subscribe((loggedin) => {
+            if (loggedin) {
+              this.router.navigate(['/situations-list'])
             }
-          } else {
-            this.router.navigate(['/school-choice'])
-          }
-        } catch (e) {
-          this.toastController
-            .create({
-              message: 'Erreur de login SSO:' + e.message,
-              duration: 2000,
-              color: 'failure',
-            })
-            .then((toast) => {
-              toast.present()
-            })
+          })
         }
-      },
-    })
+      } else {
+        this.router.navigate(['/school-choice'])
+      }
+    } catch (e) {
+      this.toastController
+        .create({
+          message: 'Erreur de login SSO:' + e.message,
+          duration: 2000,
+          color: 'failure',
+        })
+        .then((toast) => {
+          toast.present()
+        })
+    }
   }
 }

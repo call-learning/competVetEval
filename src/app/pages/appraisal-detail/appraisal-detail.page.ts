@@ -1,4 +1,3 @@
-import { filter } from 'rxjs/operators'
 /**
  * Appraisal details page
  *
@@ -7,7 +6,7 @@ import { filter } from 'rxjs/operators'
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 
@@ -17,7 +16,6 @@ import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalCriterionDetailComponent } from 'src/app/shared/modals/modal-criterion-detail/modal-criterion-detail.component'
 import { AppraisalUiService } from '../../core/services/appraisal-ui.service'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
-import { BaseComponent } from '../../shared/components/base/base.component'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { CriterionForAppraisalTreeModel } from '../../shared/models/ui/criterion-for-appraisal-tree.model'
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
@@ -27,7 +25,7 @@ import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.m
   templateUrl: './appraisal-detail.page.html',
   styleUrls: ['./appraisal-detail.page.scss'],
 })
-export class AppraisalDetailPage extends BaseComponent implements OnInit {
+export class AppraisalDetailPage {
   answerAppraisalForm: FormGroup
   errorMsg = ''
   formSubmitted = false
@@ -35,8 +33,6 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
   appraisalId: number
   appraisal: AppraisalUI
   scheduledSituation: ScheduledSituation
-
-  loader: HTMLIonLoadingElement
 
   constructor(
     private formBuilder: FormBuilder,
@@ -47,37 +43,35 @@ export class AppraisalDetailPage extends BaseComponent implements OnInit {
     private loadingController: LoadingController,
     private scheduledSituationService: ScheduledSituationService
   ) {
-    super()
     this.answerAppraisalForm = this.formBuilder.group({
       answer: ['', [Validators.required]],
     })
   }
 
-  ngOnInit() {
+  ionViewWillEnter() {
     this.appraisalId = parseInt(
       this.activatedRoute.snapshot.paramMap.get('appraisalId'),
       10
     )
 
-    this.loadingController.create().then((res) => {
-      this.loader = res
-      this.loader.present()
+    this.appraisal = null
+    this.scheduledSituation = null
+
+    this.loadingController.create().then((loader) => {
+      loader.present()
 
       this.appraisalUIService
         .waitForAppraisalId(this.appraisalId)
-        .pipe(filter((app) => !!app))
         .subscribe((appraisal) => {
           this.appraisal = appraisal
+
           this.scheduledSituationService.situations$.subscribe((situations) => {
-            if (situations) {
-              this.scheduledSituation = situations.find(
-                (sit) => sit.evalPlanId === this.appraisal.evalPlan.id
-              )
-            }
+            this.scheduledSituation = situations.find(
+              (sit) => sit.evalPlanId === this.appraisal.evalPlan.id
+            )
           })
-          if (this.loader.present) {
-            this.loader.dismiss()
-          }
+
+          loader.dismiss()
         })
     })
   }

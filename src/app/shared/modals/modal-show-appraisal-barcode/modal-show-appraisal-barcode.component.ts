@@ -17,11 +17,13 @@ import {
 import { IonTextarea, ModalController } from '@ionic/angular'
 
 @Component({
-  selector: 'app-show-appraisal-barcode',
-  templateUrl: './show-appraisal-barcode.component.html',
-  styleUrls: ['./show-appraisal-barcode.scss'],
+  selector: 'app-modal-show-appraisal-barcode',
+  templateUrl: './modal-show-appraisal-barcode.component.html',
+  styleUrls: ['./modal-show-appraisal-barcode.scss'],
 })
-export class ShowAppraisalBarcodeComponent implements OnInit, AfterViewInit {
+export class ModalShowAppraisalBarcodeComponent
+  implements OnInit, AfterViewInit
+{
   @Input() appraisalId: number
 
   qrCodeData: string = null

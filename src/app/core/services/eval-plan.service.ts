@@ -1,3 +1,11 @@
+import { Injectable } from '@angular/core'
+
+import { of, BehaviorSubject, Observable } from 'rxjs'
+import { first, tap } from 'rxjs/operators'
+import { filter, map } from 'rxjs/operators'
+import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
+import { MoodleApiService } from '../http-services/moodle-api.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
 /**
  * Load user evaluation plans
  *
@@ -7,19 +15,14 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Injectable } from '@angular/core'
-
-import { BehaviorSubject, Observable } from 'rxjs'
-import { filter, map } from 'rxjs/operators'
-import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService, LOGIN_STATE } from './auth.service'
-
 @Injectable({
   providedIn: 'root',
 })
 export class EvalPlanService {
-  protected planningEntities$ = new BehaviorSubject<EvalPlanModel[]>(null)
+  private planningEntities: EvalPlanModel[] = null
+
+  private isLoaded$ = new BehaviorSubject<boolean>(false)
+  private isLoading = false
 
   /**
    * Constructor
@@ -32,20 +35,43 @@ export class EvalPlanService {
     private authService: AuthService
   ) {
     // Subscribe for the the whole service lifetime
-    this.authService.loginState.subscribe((loginState) => {
-      if (loginState === LOGIN_STATE.LOGGED) {
-        this.refresh().subscribe()
-      } else {
-        this.planningEntities$.next(null)
+    this.authService.loginState$.subscribe((loginState) => {
+      if (loginState !== LOGIN_STATE.LOGGED) {
+        this.resetService()
       }
     })
+  }
+
+  resetService() {
+    this.planningEntities = null
+    this.isLoaded$.next(false)
+    this.isLoading = false
   }
 
   /**
    * Retrieve appraisals for currently logged in user
    */
   public get plans$(): Observable<EvalPlanModel[]> {
-    return this.planningEntities$.asObservable()
+    if (this.planningEntities === null) {
+      if (!this.isLoading) {
+        return this.refresh().pipe(
+          tap(() => {
+            this.isLoading = false
+            this.isLoaded$.next(true)
+          })
+        )
+      } else {
+        return this.isLoaded$.pipe(
+          filter((isLoaded) => !!isLoaded),
+          first(),
+          map(() => {
+            return this.planningEntities
+          })
+        )
+      }
+    } else {
+      return of(this.planningEntities)
+    }
   }
 
   /**
@@ -53,7 +79,6 @@ export class EvalPlanService {
    */
   public planFromId(evalplanId): Observable<EvalPlanModel> {
     return this.plans$.pipe(
-      filter((res) => !!res),
       map((evalplans) => evalplans.find((plan) => plan.id === evalplanId))
     )
   }
@@ -66,14 +91,15 @@ export class EvalPlanService {
    * involved in: all appraisal for a plan that the user is involved in
    */
   public refresh(): Observable<EvalPlanModel[]> {
+    this.isLoading = true
     return this.moodleApiService
-      .fetchIfMoreRecent('evalplan', {}, this.planningEntities$.getValue())
+      .fetchMoreRecentData('evalplan', {}, this.planningEntities)
       .pipe(
         map((evalplans) => {
           const evalplanmodels = evalplans.map(
             (plan) => new EvalPlanModel(plan)
           )
-          this.planningEntities$.next(evalplanmodels)
+          this.planningEntities = evalplanmodels
           return evalplanmodels
         })
       )

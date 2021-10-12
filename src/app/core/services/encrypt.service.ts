@@ -1,7 +1,7 @@
-import { EnvironmentService } from './environment.service'
 import { Injectable } from '@angular/core'
 
 import { SimpleCrypto } from 'simple-crypto-js'
+import { EnvironmentService } from './environment.service'
 
 @Injectable({
   providedIn: 'root',

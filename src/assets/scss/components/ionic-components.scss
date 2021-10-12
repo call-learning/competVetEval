@@ -48,3 +48,9 @@ ion-fab.fab-vertical-bottom {
 ion-fab.fab-horizontal-end {
   right: calc(20px + var(--ion-safe-area-right, 0px));
 }
+
+// popover
+
+ion-popover {
+  --width: 320px !important;
+}

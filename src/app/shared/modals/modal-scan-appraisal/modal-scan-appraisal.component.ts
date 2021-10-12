@@ -16,7 +16,6 @@ import {
   ToastController,
 } from '@ionic/angular'
 
-import { filter, first } from 'rxjs/operators'
 import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
 import { AuthService } from '../../../core/services/auth.service'
 import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
@@ -28,8 +27,6 @@ import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
   providers: [BarcodeScanner],
 })
 export class ModalScanAppraisalComponent implements OnInit {
-  loader: HTMLIonLoadingElement
-
   constructor(
     private modalController: ModalController,
     private toastController: ToastController,
@@ -72,68 +69,10 @@ export class ModalScanAppraisalComponent implements OnInit {
         this.dismissModal()
         const appraisalId = Number.parseInt(barcodeData.text, 10)
 
-        this.loadingController.create().then((res) => {
-          const REFRESH_TIMEOUT = 30000 // If after 30 sec we have no refresh even
-          // we stop the spinner. This happens mostly when the appraiser is not linked
-          // to the student.
-          let loaderDismissed = false
-          const refresh = this.appraisalUIService
-            .waitForAppraisalId(appraisalId, true)
-            .pipe(
-              filter(
-                (appraisal) => appraisal !== null && appraisal !== undefined
-              ),
-              first()
-            )
-            .subscribe((appraisal: AppraisalUI) => {
-              if (this.loader.animated) {
-                this.loader.dismiss().then(() => {
-                  loaderDismissed = true
-                })
-              }
-              if (appraisal.appraiser !== null) {
-                this.toastController
-                  .create({
-                    message:
-                      'Cette observation a déjà été assignée à un autre évaluateur',
-                    duration: 2000,
-                    color: 'danger',
-                  })
-                  .then((toast) => {
-                    toast.present()
-                  })
-              } else {
-                appraisal.appraiser = this.authService.loggedUser.getValue()
+        this.loadingController.create().then((loader) => {
+          loader.present()
 
-                this.appraisalUIService
-                  .submitAppraisal(appraisal)
-                  .subscribe((appraisalid) => {
-                    this.router.navigate(['appraisal-edit', appraisalid])
-                  })
-              }
-            })
-
-          setTimeout(() => {
-            console.log('Scan cancelled')
-            if (!loaderDismissed) {
-              this.loader.dismiss()
-              this.toastController
-                .create({
-                  message:
-                    "L'observation n'a pas pu être récupérée, pourriez-vous " +
-                    'vérifier que vous êtes bien dans la liste des observateurs de cet étudiant?',
-                  duration: 2000,
-                  color: 'warning',
-                })
-                .then((toast) => {
-                  toast.present()
-                })
-              refresh.unsubscribe()
-            }
-          }, REFRESH_TIMEOUT)
-
-          this.loader = res
-          this.loader.present()
+          this.getAppraisal(appraisalId)
         })
       })
       .catch((err) => {
@@ -147,6 +86,49 @@ export class ModalScanAppraisalComponent implements OnInit {
           .then((toast) => {
             toast.present()
           })
+      })
+  }
+
+  getAppraisal(appraisalId: number) {
+    this.appraisalUIService
+      .waitForAppraisalId(appraisalId)
+      .subscribe((appraisal: AppraisalUI) => {
+        if (appraisal) {
+          if (appraisal.appraiser === null) {
+            this.submitAppraisal(appraisal)
+          } else {
+            this.toastController
+              .create({
+                message:
+                  'Cette observation a déjà été assignée à un autre évaluateur',
+                duration: 2000,
+                color: 'danger',
+              })
+              .then((toast) => {
+                toast.present()
+              })
+          }
+        } else {
+          this.toastController
+            .create({
+              message: `L\'observation n\'a pas pu être récupérée, pourriez-vous vérifier que vous êtes bien dans la liste des observateurs de cet étudiant?`,
+              duration: 5000,
+              color: 'danger',
+            })
+            .then((toast) => {
+              toast.present()
+            })
+        }
+      })
+  }
+
+  submitAppraisal(appraisal: AppraisalUI) {
+    appraisal.appraiser = this.authService.loggedUserValue
+
+    this.appraisalUIService
+      .submitAppraisal(appraisal)
+      .subscribe((appraisalid) => {
+        this.router.navigate(['appraisal-edit', appraisalid])
       })
   }
 }

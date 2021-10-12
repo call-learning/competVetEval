@@ -1,4 +1,11 @@
-import { filter } from 'rxjs/operators'
+import { Injectable } from '@angular/core'
+
+import { forkJoin, of, Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { CriterionModel } from '../../shared/models/moodle/criterion.model'
+import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
+import { AuthService, LOGIN_STATE } from './auth.service'
+import { BaseDataService } from './base-data.service'
 /**
  * Criteria based services
  *
@@ -10,14 +17,6 @@ import { filter } from 'rxjs/operators'
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Injectable } from '@angular/core'
-
-import { BehaviorSubject, Observable, of, zip } from 'rxjs'
-import { concatMap, first, map, withLatestFrom } from 'rxjs/operators'
-import { CriterionModel } from '../../shared/models/moodle/criterion.model'
-import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
-import { BaseDataService } from './base-data.service'
-
 /**
  * Manage criteria hierarchical view
  * - criteria / evaluation grid
@@ -26,9 +25,7 @@ import { BaseDataService } from './base-data.service'
   providedIn: 'root',
 })
 export class CriteriaService {
-  private criteriaTreeEntities$ = new BehaviorSubject<CriterionTreeModel[]>(
-    null
-  )
+  private criteriaTreeEntities: CriterionTreeModel[] = null
 
   /**
    * Build the base data service
@@ -36,19 +33,30 @@ export class CriteriaService {
    * @param baseDataService
    * @param authService
    */
-  constructor(private baseDataService: BaseDataService) {
-    this.baseDataService.criteria$
-      .pipe(filter((res) => !!res))
-      .subscribe((newcriteria) => {
-        this.refreshCriteria(newcriteria)
-      })
+  constructor(
+    private baseDataService: BaseDataService,
+    private authService: AuthService
+  ) {
+    this.authService.loginState$.subscribe((loginState) => {
+      if (loginState !== LOGIN_STATE.LOGGED) {
+        this.resetService()
+      }
+    })
+  }
+
+  resetService() {
+    this.criteriaTreeEntities = null
   }
 
   /**
    * Get current criteria tree
    */
   public get criteriaTree$(): Observable<CriterionTreeModel[]> {
-    return this.criteriaTreeEntities$.asObservable()
+    if (this.criteriaTreeEntities === null) {
+      return this.refreshCriteria()
+    } else {
+      return of(this.criteriaTreeEntities)
+    }
   }
 
   /**
@@ -56,11 +64,15 @@ export class CriteriaService {
    *
    * @param newcriteria
    */
-  public refreshCriteria(newcriteria: CriterionModel[]): CriterionTreeModel[] {
-    const allHierarchicalCriteria =
-      CriterionTreeModel.convertToTree(newcriteria)
-    this.criteriaTreeEntities$.next(allHierarchicalCriteria)
-    return allHierarchicalCriteria
+  public refreshCriteria(): Observable<CriterionTreeModel[]> {
+    return this.baseDataService.criteria$.pipe(
+      map((newcriteria) => {
+        const allHierarchicalCriteria =
+          CriterionTreeModel.convertToTree(newcriteria)
+        this.criteriaTreeEntities = allHierarchicalCriteria
+        return allHierarchicalCriteria
+      })
+    )
   }
 
   /**
@@ -70,17 +82,16 @@ export class CriteriaService {
   public getCriteriaFromEvalGrid(
     evalgridId: number
   ): Observable<CriterionModel[]> {
-    return zip(
-      this.baseDataService.criteria$.pipe(filter((res) => !!res)),
-      this.baseDataService.criteriaEvalgrid$.pipe(filter((res) => !!res))
-    ).pipe(
-      first(),
-      map(([allCriteria, allCriteriaEvalGrid]) => {
-        return allCriteriaEvalGrid
+    return forkJoin([
+      this.baseDataService.criteriaEvalGrid$,
+      this.baseDataService.criteria$,
+    ]).pipe(
+      map(([criteriaEvalGrid, criteria]) => {
+        return criteriaEvalGrid
           .filter((evalGridCrit) => evalGridCrit.evalgridid === evalgridId)
           .map((evalGridCrit) => {
-            return allCriteria.find((criteria) => {
-              return criteria.id === evalGridCrit.id
+            return criteria.find((crit) => {
+              return crit.id === evalGridCrit.id
             })
           })
       })

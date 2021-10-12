@@ -1,3 +1,16 @@
+import { EventEmitter, Injectable } from '@angular/core'
+
+import { forkJoin } from 'rxjs'
+import { from, of, BehaviorSubject, Observable } from 'rxjs'
+import { concatMap, filter, map, tap, toArray } from 'rxjs/operators'
+import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
+import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
+import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
+import { MoodleApiService } from '../http-services/moodle-api.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
+import { BaseDataService } from './base-data.service'
+import { CriteriaService } from './criteria.service'
+import { EvalPlanService } from './eval-plan.service'
 /**
  * Appraisal basic model retrieval and submission
  *
@@ -7,19 +20,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-
-import { Injectable } from '@angular/core'
-
-import { combineLatest, from, of, BehaviorSubject, Observable, iif } from 'rxjs'
-import { concatMap, filter, first, map, mapTo, tap } from 'rxjs/operators'
-import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
-import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
-import { mergeExistingBehaviourSubject } from '../../shared/utils/helpers'
-import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService, LOGIN_STATE } from './auth.service'
-import { BaseDataService } from './base-data.service'
-import { CriteriaService } from './criteria.service'
-import { EvalPlanService } from './eval-plan.service'
 
 @Injectable({
   providedIn: 'root',
@@ -38,6 +38,11 @@ export class AppraisalService {
     AppraisalCriterionModel[]
   >(null)
 
+  appraisalsChanged = new EventEmitter<{
+    appraisals: AppraisalModel[]
+    appraisalCriterionModels: AppraisalCriterionModel[]
+  }>()
+
   /**
    * Start and retrieve appraisal and criteria for this user
    *
@@ -55,128 +60,19 @@ export class AppraisalService {
     private baseDataService: BaseDataService,
     private evalPlanService: EvalPlanService
   ) {
-    this.authService.loginState.subscribe((state) => {
-      if (state === LOGIN_STATE.LOGGED) {
-        // Get all appraisals and appraisal criteria for this user.
-        this.refresh().subscribe()
+    this.authService.loginState$.subscribe((state) => {
+      if (state !== LOGIN_STATE.LOGGED) {
+        this.resetService()
       } else {
-        this.appraisalCriterionModels$.next(null)
-        this.appraisalModels$.next(null)
+        this.refresh().subscribe()
       }
     })
   }
 
-  /**
-   * Retrieve appraisals for currently logged in user
-   */
-  public get appraisals$(): Observable<AppraisalModel[]> {
-    return this.appraisalModels$.asObservable()
-  }
-
-  /**
-   * Retrieve appraisals criteria for currently logged in user
-   */
-  public get appraisalsCriteria$(): Observable<AppraisalCriterionModel[]> {
-    return this.appraisalCriterionModels$.asObservable()
-  }
-
-  /**
-   * Retrieve appraisal criteria for this appraisal
-   * Check first if there is more recent version on the server
-   * @param appraisalId
-   */
-  public appraisalsCriteriaForAppraisalId(
-    appraisalId
-  ): Observable<AppraisalCriterionModel[]> {
-    // First check if it is not already loaded.
-    return this.appraisalCriterionModels$.pipe(
-      filter((obj) => obj != null),
-      map((appraisals) =>
-        appraisals.filter((apc) => apc.appraisalid === appraisalId)
-      )
-    )
-  }
-
-  /**
-   * Get model for appraiser
-   *
-   * @protected
-   */
-  protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
-    return combineLatest([
-      this.evalPlanService.plans$.pipe(
-        filter((obj) => obj != null),
-        first()
-      ),
-      this.baseDataService.situations$.pipe(
-        filter((obj) => obj != null),
-        first()
-      ),
-      this.baseDataService.roles$.pipe(
-        filter((obj) => obj != null),
-        first()
-      ),
-    ]).pipe(
-      concatMap(([evalplans, situations, roles]) => {
-        // First check all situations involved.
-        const mySituations = situations.filter((sit) => {
-          return roles.find((r) => r.clsituationid === sit.id) !== undefined
-        })
-        // Filter all eval plan depending on the current appraiser.
-        return from(
-          evalplans.filter((evalplan) => {
-            return (
-              mySituations.find((s) => s.id === evalplan.clsituationid) !==
-              undefined
-            )
-          })
-        )
-      }),
-      // Now fetch the matching appraisal.
-      concatMap((evalPlan) =>
-        this.moodleApiService.fetchIfMoreRecent(
-          'appraisal',
-          { evalplanid: evalPlan.id },
-          this.appraisalModels$
-            .getValue()
-            ?.filter((app) => app.evalplanid === evalPlan.id)
-        )
-      ),
-      tap((newAppraisals: AppraisalModel[]) => {
-        // Merge existing values with new values
-        mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
-          'id',
-        ])
-      })
-    )
-  }
-
-  /**
-   * Get model for student
-   *
-   * @param studentid
-   * @protected
-   */
-  protected getAppraisalsModelForStudent(
-    studentid
-  ): Observable<AppraisalModel[]> {
-    return (
-      this.moodleApiService.fetchIfMoreRecent(
-        'appraisal',
-        { studentid },
-        this.appraisalModels$
-          .getValue()
-          ?.filter((app) => app.studentid === studentid)
-      ) as Observable<AppraisalModel[]>
-    ).pipe(
-      first(),
-      tap((newAppraisals) => {
-        // Merge existing values with new values
-        mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
-          'id',
-        ])
-      })
-    )
+  resetService() {
+    this.appraisalCriterionModels$.next(null)
+    this.appraisalModels$.next(null)
+    this.emitAppraisalsChanged()
   }
 
   /**
@@ -184,18 +80,23 @@ export class AppraisalService {
    *
    * @protected
    */
-  public refresh(): Observable<AppraisalCriterionModel[]> {
-    return iif(
-      () => this.authService.isStudent,
-      this.getAppraisalsModelForStudent(
-        this.authService.loggedUser.getValue().userid
-      ),
-      this.getAppraisalModelForAppraiser()
-    ).pipe(
-      concatMap((appraisalModels) => from(appraisalModels)),
+  public refresh(): Observable<AppraisalCriterionModel[][]> {
+    let refreshObs: Observable<AppraisalModel[]>
+    if (this.authService.isStudent) {
+      refreshObs = this.getAppraisalsModelForStudent(
+        this.authService.loggedUserValue.userid
+      )
+    } else {
+      refreshObs = this.getAppraisalModelForAppraiser()
+    }
+
+    return refreshObs.pipe(
+      concatMap((appraisalModels) => {
+        return from(appraisalModels)
+      }),
       concatMap((appraisal: AppraisalModel) => {
         return this.moodleApiService
-          .fetchIfMoreRecent(
+          .fetchMoreRecentData(
             'appr_crit',
             { appraisalid: appraisal.id },
             this.appraisalCriterionModels$
@@ -218,6 +119,105 @@ export class AppraisalService {
           ['id']
         )
         return appraisalsCriteria as AppraisalCriterionModel[]
+      }),
+      toArray(),
+      tap(() => {
+        this.emitAppraisalsChanged()
+      })
+    )
+  }
+
+  private emitAppraisalsChanged() {
+    this.appraisalsChanged.emit({
+      appraisals: this.appraisalModels$.getValue(),
+      appraisalCriterionModels: this.appraisalCriterionModels$.getValue(),
+    })
+  }
+
+  /**
+   * Retrieve appraisal criteria for this appraisal
+   * Check first if there is more recent version on the server
+   * @param appraisalId
+   */
+  public appraisalsCriteriaForAppraisalId(
+    appraisalId
+  ): Observable<AppraisalCriterionModel[]> {
+    return this.appraisalCriterionModels$.pipe(
+      filter((obj) => obj != null),
+      map((appraisals) =>
+        appraisals.filter((apc) => apc.appraisalid === appraisalId)
+      )
+    )
+  }
+
+  /**
+   * Get model for appraiser
+   *
+   * @protected
+   */
+  protected getAppraisalModelForAppraiser(): Observable<AppraisalModel[]> {
+    return forkJoin([
+      this.baseDataService.situations$,
+      this.baseDataService.roles$,
+      this.evalPlanService.plans$,
+    ]).pipe(
+      concatMap(([situations, roles, evalplans]) => {
+        // First check all situations involved.
+        const mySituations = situations.filter((sit) => {
+          return roles.find((r) => r.clsituationid === sit.id) !== undefined
+        })
+        // Filter all eval plan depending on the current appraiser.
+        return from(
+          evalplans.filter((evalplan) => {
+            return (
+              mySituations.find((s) => s.id === evalplan.clsituationid) !==
+              undefined
+            )
+          })
+        )
+      }),
+      // Now fetch the matching appraisal.
+      concatMap((evalPlan) => {
+        return this.moodleApiService.fetchMoreRecentData(
+          'appraisal',
+          { evalplanid: evalPlan.id },
+          this.appraisalModels$
+            .getValue()
+            ?.filter((app) => app.evalplanid === evalPlan.id)
+        )
+      }),
+      tap((newAppraisals: AppraisalModel[]) => {
+        // Merge existing values with new values
+        mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
+          'id',
+        ])
+      })
+    )
+  }
+
+  /**
+   * Get model for student
+   *
+   * @param studentid
+   * @protected
+   */
+  protected getAppraisalsModelForStudent(
+    studentid
+  ): Observable<AppraisalModel[]> {
+    return (
+      this.moodleApiService.fetchMoreRecentData(
+        'appraisal',
+        { studentid },
+        this.appraisalModels$
+          .getValue()
+          ?.filter((app) => app.studentid === studentid)
+      ) as Observable<AppraisalModel[]>
+    ).pipe(
+      tap((newAppraisals) => {
+        // Merge existing values with new values
+        mergeExistingBehaviourSubject(this.appraisalModels$, newAppraisals, [
+          'id',
+        ])
       })
     )
   }
@@ -251,28 +251,33 @@ export class AppraisalService {
           AppraisalCriterionModel.createFromCriterionModel(criterionmodel)
         )
 
-        // Submit the appraisal, get the ID and then submit the criteria.
-        const newAppraisalModel = this.submitAppraisal(appraisalModel)
-        // Then create the appraisal criterion
-        return newAppraisalModel.pipe(
-          concatMap((resAppraisalModel) => {
-            appraisalCriteriaModel.forEach(
-              (apc) => (apc.appraisalid = resAppraisalModel.id)
-            )
-            return this.submitAppraisalCriteria(appraisalCriteriaModel).pipe(
-              mapTo(appraisalModel),
-              tap((newAppraisal) => {
-                appraisalModel.id = resAppraisalModel.id
-                mergeExistingBehaviourSubject(
-                  this.appraisalModels$,
-                  [newAppraisal],
-                  ['id']
-                )
-              })
-            )
-          })
+        return this.submitAppraisalAndCriteria(
+          appraisalModel,
+          appraisalCriteriaModel
         )
-        // See: https://medium.com/@snorredanielsen/rxjs-accessing-a-previous-value-further-down-the-pipe-chain-b881026701c1
+      })
+    )
+  }
+
+  public submitAppraisalAndCriteria(
+    appraisalModel: AppraisalModel,
+    appraisalCriteriaModel: AppraisalCriterionModel[]
+  ) {
+    // Submit the appraisal, get the ID and then submit the criteria.
+    return this.submitAppraisal(appraisalModel).pipe(
+      // Then create the appraisal criterion
+      concatMap((resAppraisalModel) => {
+        appraisalCriteriaModel.forEach(
+          (apc) => (apc.appraisalid = resAppraisalModel.id)
+        )
+        return forkJoin([
+          of(resAppraisalModel),
+          this.submitAppraisalCriteria(appraisalCriteriaModel),
+        ])
+      }),
+      map(([resAppraisalModel, resAppraisalCriteria]) => resAppraisalModel),
+      tap(() => {
+        this.emitAppraisalsChanged()
       })
     )
   }
@@ -282,7 +287,7 @@ export class AppraisalService {
    *
    * @param appraisalModel
    */
-  public submitAppraisal(
+  private submitAppraisal(
     appraisalModel: AppraisalModel
   ): Observable<AppraisalModel> {
     return this.moodleApiService.submitAppraisal(appraisalModel).pipe(
@@ -302,7 +307,7 @@ export class AppraisalService {
    *
    * @param appraisalModel
    */
-  public submitAppraisalCriteria(
+  private submitAppraisalCriteria(
     appraisalCriterionModels: AppraisalCriterionModel[]
   ): Observable<AppraisalCriterionModel[]> {
     if (appraisalCriterionModels?.length) {

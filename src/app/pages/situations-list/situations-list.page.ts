@@ -1,3 +1,23 @@
+import { SituationsFiltersService } from '../../core/services/situations-filters.service'
+import { PopoverSituationsListFiltersComponent } from './../../shared/popovers/popover-situations-list-filters/popover-situations-list-filters.component'
+import { Component, OnInit } from '@angular/core'
+
+import {
+  LoadingController,
+  MenuController,
+  ModalController,
+  PopoverController,
+} from '@ionic/angular'
+
+import { debounceTime, takeUntil, tap } from 'rxjs/operators'
+import { AuthService } from 'src/app/core/services/auth.service'
+import { BaseComponent } from 'src/app/shared/components/base/base.component'
+import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
+import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appraisal/modal-scan-appraisal.component'
+import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
+import { AppraisalUiService } from './../../core/services/appraisal-ui.service'
+import { SituationsFilters } from 'src/app/core/services/situations-filters.service'
+import { combineLatest, iif } from 'rxjs'
 /**
  * SituationModel List page
  *
@@ -6,21 +26,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-
-import { Component, OnInit } from '@angular/core'
-
-import {
-  LoadingController,
-  MenuController,
-  ModalController,
-} from '@ionic/angular'
-
-import { filter, takeUntil } from 'rxjs/operators'
-import { AuthService } from 'src/app/core/services/auth.service'
-import { BaseComponent } from 'src/app/shared/components/base/base.component'
-import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
-import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appraisal/modal-scan-appraisal.component'
-import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 
 const DAY_SECONDS = 3600 * 24
 const MAX_INTERVAL = 4
@@ -33,44 +38,86 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   situations: ScheduledSituation[]
   situationsDisplayed: ScheduledSituation[]
 
-  loader: HTMLIonLoadingElement
+  situationsFilters: SituationsFilters
+
+  emptyMessage = ''
 
   constructor(
     private menuController: MenuController,
     public authService: AuthService,
     public scheduledSituationsService: ScheduledSituationService,
     private modalController: ModalController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private appraisalUIService: AppraisalUiService,
+    private popoverController: PopoverController,
+    private situationsFiltersService: SituationsFiltersService
   ) {
     super()
   }
 
   ngOnInit() {
+    this.situationsFiltersService.situationsFilter$
+      .pipe(takeUntil(this.alive$), debounceTime(100))
+      .subscribe((res) => {
+        this.situationsFilters = res
+        this.filterSituations()
+      })
+  }
+
+  ionViewWillEnter() {
+    this.menuController.enable(true)
+
     this.loadData()
   }
 
-  loadData() {
-    this.loadingController.create().then((res) => {
-      this.loader = res
-      this.loader.present().then(() =>
-        this.scheduledSituationsService.situations$
-          .pipe(
-            takeUntil(this.alive$),
-            filter((res) => !!res)
-          )
-          .subscribe((situations) => {
-            this.situations = situations
-            this.filterSituations('today')
-            if (this.loader.animated) {
-              this.loader.dismiss()
-            }
-          })
-      )
-    })
+  initComponent() {
+    this.situations = null
+    this.situationsDisplayed = null
   }
 
-  ionViewDidEnter(): void {
-    this.menuController.enable(true)
+  loadData() {
+    this.initComponent()
+    this.loadingController.create().then((loader) => {
+      loader.present().then(() =>
+        combineLatest([
+          this.scheduledSituationsService.situations$,
+          this.scheduledSituationsService.situationStats$,
+        ])
+          .pipe(
+            takeUntil(this.alive$),
+            tap(([situations, stats]) => {
+              this.situations = situations
+            }),
+            tap(([situations, stats]) => {
+              situations.forEach((situation) => {
+                if (this.authService.isStudent) {
+                  this.scheduledSituationsService
+                    .getMyScheduledSituationStats(situation.evalPlan.id)
+                    .subscribe((stats) => {
+                      situation.stats = stats
+                    })
+                } else {
+                  this.scheduledSituationsService
+                    .getAppraiserScheduledSituationStats(
+                      situation.evalPlan.id,
+                      situation.studentId
+                    )
+                    .subscribe((stats) => {
+                      situation.stats = stats
+                    })
+                }
+              })
+            }),
+            tap(([situations, stats]) => {
+              this.filterSituations()
+              if (loader.animated) {
+                loader.dismiss()
+              }
+            })
+          )
+          .subscribe()
+      )
+    })
   }
 
   ionViewDidLeave(): void {
@@ -81,45 +128,159 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     this.menuController.open('main')
   }
 
-  segmentChanged(event) {
-    this.filterSituations(event.detail.value)
+  filtersChanged(event) {
+    this.situationsFiltersService.situationsFilter$.next(this.situationsFilters)
   }
 
-  filterSituations(status: 'today' | 'all') {
-    this.situationsDisplayed = this.situations
-    if (status === 'today') {
-      this.situationsDisplayed = this.filterSituationAroundCurrentTime()
-      this.situationsDisplayed.sort(
-        (sit1, sit2) => sit1.evalPlan.endtime - sit2.evalPlan.endtime
+  filterSituations() {
+    if (this.situations) {
+      this.situationsDisplayed = this.situations
+
+      this.filterByTime()
+      this.filterByTitle()
+      this.filterObservationsNumber()
+      this.sortSituations()
+
+      if (!this.situationsDisplayed.length) {
+        this.computeEmptyMessage()
+      }
+    }
+  }
+
+  filterByTime() {
+    if (this.situationsFilters.status === 'today') {
+      const now = new Date()
+      let maxts = now.getTime() / 1000 + DAY_SECONDS
+      let mints = now.getTime() / 1000 - DAY_SECONDS
+
+      const filterFn = (sit) => {
+        const endtimeIn =
+          sit.evalPlan.endtime < maxts && sit.evalPlan.endtime > mints
+        const startTimeIn =
+          sit.evalPlan.starttime < maxts && sit.evalPlan.starttime > mints
+        return endtimeIn || startTimeIn
+      }
+      let filteredSituations = this.situationsDisplayed.filter(filterFn)
+      let interval = 3
+      while (!filteredSituations?.length) {
+        maxts = now.getTime() / 1000 + DAY_SECONDS * interval
+        mints = now.getTime() / 1000 - DAY_SECONDS * interval
+        filteredSituations = this.situationsDisplayed.filter(filterFn)
+        if (interval++ > MAX_INTERVAL) break
+      }
+      this.situationsDisplayed = filteredSituations
+    }
+  }
+
+  filterByTitle() {
+    if (this.situationsFilters.title.length) {
+      this.situationsDisplayed = this.situationsDisplayed.filter(
+        (situation) => {
+          return situation.situation.title
+            .toLowerCase()
+            .includes(this.situationsFilters.title.toLowerCase())
+        }
+      )
+    }
+  }
+
+  filterObservationsNumber() {
+    if (this.situationsFilters.withoutObservations) {
+      this.situationsDisplayed = this.situationsDisplayed.filter(
+        (situation) => {
+          return situation.stats.appraisalsCompleted === 0
+        }
       )
     } else {
-      this.situationsDisplayed.sort(
-        (sit1, sit2) => sit1.evalPlan.starttime - sit2.evalPlan.starttime
+      this.situationsDisplayed = this.situationsDisplayed.filter(
+        (situation) => {
+          return (
+            situation.stats.appraisalsCompleted >=
+              this.situationsFilters.observationsNumber.lower &&
+            situation.stats.appraisalsCompleted <=
+              this.situationsFilters.observationsNumber.upper
+          )
+        }
       )
     }
   }
 
-  protected filterSituationAroundCurrentTime() {
-    let filteredSituations = []
-    const now = new Date()
-    let maxts = now.getTime() / 1000 + DAY_SECONDS
-    let mints = now.getTime() / 1000 - DAY_SECONDS
-    const filter = (sit) => {
-      const endtimeIn =
-        sit.evalPlan.endtime < maxts && sit.evalPlan.endtime > mints
-      const startTimeIn =
-        sit.evalPlan.starttime < maxts && sit.evalPlan.starttime > mints
-      return endtimeIn || startTimeIn
+  sortSituations() {
+    if (this.situationsFilters.sortBy === 'startTimeASC') {
+      this.situationsDisplayed = this.situationsDisplayed.sort(
+        (sit1, sit2) => sit1.evalPlan.starttime - sit2.evalPlan.starttime
+      )
+    } else if (this.situationsFilters.sortBy === 'startTimeDESC') {
+      this.situationsDisplayed = this.situationsDisplayed.sort(
+        (sit1, sit2) => sit2.evalPlan.starttime - sit1.evalPlan.starttime
+      )
+    } else if (this.situationsFilters.sortBy === 'endTimeASC') {
+      this.situationsDisplayed = this.situationsDisplayed.sort(
+        (sit1, sit2) => sit1.evalPlan.endtime - sit2.evalPlan.endtime
+      )
+    } else if (this.situationsFilters.sortBy === 'endTimeDESC') {
+      this.situationsDisplayed = this.situationsDisplayed.sort(
+        (sit1, sit2) => sit2.evalPlan.endtime - sit1.evalPlan.endtime
+      )
+    } else if (this.situationsFilters.sortBy === 'observationsASC') {
+      this.situationsDisplayed = this.situationsDisplayed.sort(
+        (sit1, sit2) =>
+          sit1.stats.appraisalsCompleted - sit2.stats.appraisalsCompleted
+      )
+    } else if (this.situationsFilters.sortBy === 'observationssDESC') {
+      this.situationsDisplayed = this.situationsDisplayed.sort(
+        (sit1, sit2) =>
+          sit2.stats.appraisalsCompleted - sit1.stats.appraisalsCompleted
+      )
     }
-    filteredSituations = this.situations.filter(filter)
-    let interval = 3
-    while (!filteredSituations?.length) {
-      maxts = now.getTime() / 1000 + DAY_SECONDS * interval
-      mints = now.getTime() / 1000 - DAY_SECONDS * interval
-      filteredSituations = this.situations.filter(filter)
-      if (interval++ > MAX_INTERVAL) break
+  }
+
+  computeEmptyMessage() {
+    this.emptyMessage = ''
+    if (this.situations.length && !this.situationsDisplayed.length) {
+      if (this.authService.isStudent) {
+        this.emptyMessage = `Aucune situations ne correspond à ces filtres.`
+      } else {
+        this.emptyMessage = `Aucune situations à évaluer ne correspond à ces filtres.`
+      }
+    } else {
+      if (this.authService.isStudent) {
+        this.scheduledSituationsService
+          .getStudentGroupAssignments(this.authService.loggedUserValue)
+          .subscribe((groups) => {
+            if (!groups.length) {
+              this.emptyMessage = `Vous n'appartenez à aucun groupe d'évaluation.`
+            } else {
+              this.emptyMessage = `Vous n'êtes lié à aucune situation.`
+            }
+          })
+      } else {
+        this.scheduledSituationsService
+          .getAppraiserRoles(this.authService.loggedUserValue)
+          .subscribe((roles) => {
+            if (!roles.length) {
+              this.emptyMessage = `Vous n'avez pas de rôle défini.`
+            } else {
+              this.emptyMessage = `Vous n'avez pas de situations à évaluer.`
+            }
+          })
+      }
     }
-    return filteredSituations
+  }
+
+  showFilteringOptions(event: any) {
+    const popover = this.popoverController
+      .create({
+        component: PopoverSituationsListFiltersComponent,
+        cssClass: 'popover-situations-list-filters',
+        translucent: true,
+        event,
+      })
+      .then((popover) => {
+        popover.present()
+      })
+
+    // const { role } = await popover.onDidDismiss();
   }
 
   openModalScanAppraisal() {
@@ -133,18 +294,11 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   doRefresh(event) {
-    const REFRESH_TIMEOUT = 10000 // If after 10 sec we have no refresh even
-    // we stop the spinner. This happens when there is no appraisal at all but
-    // this is a temporary solution that has to be dealt with differently.
-    const refresh = this.scheduledSituationsService
-      .refreshStats()
-      .subscribe((allsituations) => {
+    this.appraisalUIService
+      .refreshAppraisals()
+      .pipe(takeUntil(this.alive$))
+      .subscribe(() => {
         event.target.complete()
       })
-    setTimeout(() => {
-      console.log('Situation list: refresh event cancelled')
-      event.target.complete()
-      refresh.unsubscribe()
-    }, REFRESH_TIMEOUT)
   }
 }

@@ -9,7 +9,7 @@
 import { Injectable } from '@angular/core'
 
 import { of, Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { filter, tap } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
@@ -37,11 +37,11 @@ export class UserDataService {
     private moodleApiService: MoodleApiService,
     private authService: AuthService
   ) {
-    this.authService.loggedUser.subscribe((cveUser) => {
-      if (!this.authService.isStillLoggedIn()) {
+    this.authService.loggedUser$
+      .pipe(filter((loggedUser) => !loggedUser))
+      .subscribe((cveUser) => {
         this.userProfiles = []
-      }
-    })
+      })
   }
 
   /**

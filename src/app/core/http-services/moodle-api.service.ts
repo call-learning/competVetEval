@@ -9,8 +9,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { of, throwError, Observable } from 'rxjs'
-import { catchError, map, mergeMap } from 'rxjs/operators'
+import { of, Observable } from 'rxjs'
+import { concatMap, map } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
@@ -48,11 +48,6 @@ export class MoodleApiService {
         : {},
       this.http,
       this.endPointService.server()
-    ).pipe(
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
-      })
     )
   }
 
@@ -63,29 +58,35 @@ export class MoodleApiService {
    * @param args
    * @param currentEntities
    */
-  public fetchIfMoreRecent(
+  public fetchMoreRecentData(
+    entityType: string,
+    args: object,
+    currentEntities: BaseMoodleModel[]
+  ): Observable<BaseMoodleModel[]> {
+    if (!!currentEntities) {
+      return this.fetchIfMoreRecent(entityType, args, currentEntities)
+    } else {
+      return this.getEntities(entityType, args)
+    }
+  }
+
+  fetchIfMoreRecent(
     entityType: string,
     args: object,
     currentEntities: BaseMoodleModel[]
   ): Observable<BaseMoodleModel[]> {
     return this.getLatestModificationDate(entityType, args).pipe(
-      map((latestModif: number) => {
-        if (currentEntities) {
-          const currentStoredEntitiesMaxModified = currentEntities.reduce(
-            (acc, entity) =>
-              acc > entity.timemodified ? acc : entity.timemodified,
-            0
-          )
-          if (currentStoredEntitiesMaxModified >= latestModif) {
-            return of(currentEntities)
-          }
+      concatMap((latestModif: number) => {
+        const currentStoredEntitiesMaxModified = currentEntities.reduce(
+          (acc, entity) =>
+            acc > entity.timemodified ? acc : entity.timemodified,
+          0
+        )
+        if (currentStoredEntitiesMaxModified >= latestModif) {
+          return of(currentEntities)
+        } else {
+          return this.getEntities(entityType, args)
         }
-        return this.getEntities(entityType, args)
-      }),
-      mergeMap((value) => value),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -117,10 +118,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return res
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -134,7 +131,7 @@ export class MoodleApiService {
     ).pipe(
       map((latestmodifobject) => {
         const { latestmodifications } = latestmodifobject
-        return latestmodifications
+        return latestmodifications as number
       })
     )
   }
@@ -173,10 +170,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return new CevUser(res)
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -200,10 +193,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return new AppraisalModel(res)
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }
@@ -227,10 +216,6 @@ export class MoodleApiService {
     ).pipe(
       map((res) => {
         return res.map((apprcrit) => new AppraisalCriterionModel(apprcrit))
-      }),
-      catchError((err) => {
-        console.error(err)
-        return throwError(err)
       })
     )
   }

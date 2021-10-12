@@ -3,6 +3,8 @@
 import { parseIntMember } from '../../utils/parse-functions'
 import { EvalPlanModel } from '../moodle/eval-plan.model'
 import { SituationModel } from '../moodle/situation.model'
+import { AppraiserSituationStatsModel } from './appraiser-situation-stats.model'
+import { StudentSituationStatsModel } from './student-situation-stats.model'
 
 // This entity is deduced from several API calls to Moodle and compiled in the App
 
@@ -14,6 +16,7 @@ export class ScheduledSituation {
   situation: SituationModel
   evalPlan: EvalPlanModel
   studentId?: number
+  stats: StudentSituationStatsModel | AppraiserSituationStatsModel
 
   constructor(input: any) {
     parseIntMember(input, 'evalPlanId')

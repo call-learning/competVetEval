@@ -16,12 +16,29 @@ import { BehaviorSubject } from 'rxjs'
 import { Md5 } from 'ts-md5'
 
 /**
+ * Compares two objects and return false if different
+ * @param a
+ * @param b
+ */
+const compareObjects = (a, b) => {
+  const s = (o) =>
+    Object.entries(o)
+      .sort()
+      .map((i) => {
+        if (i[1] instanceof Object) i[1] = s(i[1])
+        return i
+      })
+  return JSON.stringify(s(a)) === JSON.stringify(s(b))
+}
+
+/**
  * Merge new array with existing and send a next signal
  *
  * @param behaviourSubject
  * @param newEntities
  * @param keyname
  */
+
 export const mergeExistingBehaviourSubject = (
   behaviourSubject: BehaviorSubject<any[]>,
   newEntities: any[],
@@ -31,7 +48,7 @@ export const mergeExistingBehaviourSubject = (
     const currentValues = behaviourSubject.getValue()
     let hasChanged = currentValues ? false : true
 
-    let nextValues = newEntities.reduce(
+    const nextValues = newEntities.reduce(
       (acc, cval) => {
         const foundIndex = acc.findIndex((e) => {
           let isMatching = true
@@ -74,41 +91,23 @@ export const mergeExistingBehaviourSubject = (
   }
 }
 
-/**
- * Compares two objects and return false if different
- * @param a
- * @param b
- */
-const compareObjects = (a, b) => {
-  let s = (o) =>
-    Object.entries(o)
-      .sort()
-      .map((i) => {
-        if (i[1] instanceof Object) i[1] = s(i[1])
-        return i
-      })
-  return JSON.stringify(s(a)) === JSON.stringify(s(b))
-}
-
 export const getTokenFromLaunchURL = (launchURL, siteURL) => {
   if (launchURL) {
     const params = launchURL.split('://')
 
     if (params && params.length > 1) {
-      console.log('Token Params:' + params + ', Site URL:' + siteURL)
       const searchParams = new URLSearchParams(params[1])
       const tokenvalueb64 = searchParams.get('token')
       const tokenvalue = atob(tokenvalueb64)
 
       const tokenparts = tokenvalue.split(':::')
       // No trailing space.
-      const hashedSiteURL = <string>(
-        Md5.hashAsciiStr(siteURL.replace(/^(.+?)\/*?$/, '$1'))
-      )
-      if (tokenparts[0] != hashedSiteURL) {
+      const hashedSiteURL = Md5.hashAsciiStr(
+        siteURL.replace(/^(.+?)\/*?$/, '$1')
+      ) as string
+      if (tokenparts[0] !== hashedSiteURL) {
         throw new Error("Le site d'origine ne correspond pas" + tokenparts[0])
       }
-      console.log('User Token:' + tokenparts[1])
       return tokenparts[1]
     }
   }

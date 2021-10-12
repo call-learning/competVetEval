@@ -11,8 +11,8 @@
 
 import { Injectable } from '@angular/core'
 
-import { of, BehaviorSubject, Observable } from 'rxjs'
-import { first, tap } from 'rxjs/operators'
+import { forkJoin, of, BehaviorSubject, Observable } from 'rxjs'
+import { filter, first, map, tap } from 'rxjs/operators'
 import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
@@ -21,14 +21,6 @@ import { RoleModel } from '../../shared/models/moodle/role.model'
 import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
-
-const EntityClass: any = {
-  clsituation: SituationModel,
-  criterion: CriterionModel,
-  cevalgrid: CriterionEvalgridModel,
-  role: RoleModel,
-  group_assign: GroupAssignmentModel,
-}
 
 /**
  * Load basic user data (stable data that does not change with user interaction with the app), like
@@ -40,13 +32,16 @@ const EntityClass: any = {
   providedIn: 'root',
 })
 export class BaseDataService {
-  entities$ = {
-    clsituation: new BehaviorSubject<SituationModel[]>(null),
-    criterion: new BehaviorSubject<CriterionModel[]>(null),
-    cevalgrid: new BehaviorSubject<CriterionEvalgridModel[]>(null),
-    role: new BehaviorSubject<RoleModel[]>(null),
-    group_assign: new BehaviorSubject<GroupAssignmentModel[]>(null),
-  }
+  private entities: {
+    situations: SituationModel[]
+    criteria: CriterionModel[]
+    criteriaEvalGrid: CriterionEvalgridModel[]
+    roles: RoleModel[]
+    groupAssignments: GroupAssignmentModel[]
+  } = null
+
+  private isLoaded$ = new BehaviorSubject<boolean>(false)
+  private isLoading = false
 
   /**
    * Build the base data service
@@ -58,66 +53,91 @@ export class BaseDataService {
     private moodleApiService: MoodleApiService,
     private authService: AuthService
   ) {
-    this.authService.loginState.subscribe((loginState) => {
-      if (loginState === LOGIN_STATE.LOGGED) {
-        Object.keys(this.entities$).forEach((entityName) => {
-          this.refresh(entityName).subscribe()
-          // Subscribe for the whole service lifetime
-        })
-      } else {
-        Object.keys(this.entities$).forEach((entityName) => {
-          this.entities$[entityName].next(null)
-        })
+    this.authService.loginState$.subscribe((loginState) => {
+      if (loginState !== LOGIN_STATE.LOGGED) {
+        this.resetService()
       }
     })
   }
 
-  /**
-   * Get current situations
-   */
+  resetService() {
+    this.entities = null
+    this.isLoaded$.next(false)
+    this.isLoading = false
+  }
+
   public get situations$(): Observable<SituationModel[]> {
-    return this.entities$.clsituation.asObservable()
+    return this.getLoadedEntity('situations')
   }
 
-  /**
-   * Get current criteria
-   */
   public get criteria$(): Observable<CriterionModel[]> {
-    return this.entities$.criterion.asObservable()
+    return this.getLoadedEntity('criteria')
   }
 
-  /**
-   * Get current criteria evaluation grid
-   */
-  public get criteriaEvalgrid$(): Observable<CriterionEvalgridModel[]> {
-    return this.entities$.cevalgrid.asObservable()
+  public get criteriaEvalGrid$(): Observable<CriterionEvalgridModel[]> {
+    return this.getLoadedEntity('criteriaEvalGrid')
   }
-  /**
-   * Get role for current logged in user
-   */
+
   public get roles$(): Observable<RoleModel[]> {
-    return this.entities$.role.asObservable()
+    return this.getLoadedEntity('roles')
   }
 
-  /**
-   * Get group assignment model
-   */
-  public get groupAssignment$(): Observable<GroupAssignmentModel[]> {
-    return this.entities$.group_assign.asObservable()
+  public get groupAssignments$(): Observable<GroupAssignmentModel[]> {
+    return this.getLoadedEntity('groupAssignments')
   }
 
-  /**
-   * Get entity by Id
-   *
-   * @param entityType
-   * @param id
-   */
-  public getEntityById(entityType, id): BaseMoodleModel | null {
-    const entities = this.entities$[entityType].getValue()
-    if (entities) {
-      return entities.find((entity) => entity.id === id)
+  private getLoadedEntity(entityType) {
+    if (this.entities === null) {
+      if (!this.isLoading) {
+        return this.refreshAllEntities().pipe(
+          tap(() => {
+            this.isLoading = false
+            this.isLoaded$.next(true)
+          }),
+          map(() => {
+            return this.entities[entityType]
+          })
+        )
+      } else {
+        return this.isLoaded$.pipe(
+          filter((isLoaded) => !!isLoaded),
+          first(),
+          map(() => {
+            return this.entities[entityType]
+          })
+        )
+      }
+    } else {
+      return of(this.entities[entityType])
     }
-    return null
+  }
+
+  refreshAllEntities() {
+    this.isLoading = true
+    return forkJoin([
+      this.refresh('clsituation'),
+      this.refresh('criterion'),
+      this.refresh('cevalgrid'),
+      this.refresh('role'),
+      this.refresh('group_assign'),
+    ]).pipe(
+      tap(
+        ([situations, criteria, criteriaEvalGrid, roles, groupAssignments]) => {
+          this.entities = {
+            situations: situations.map((elt) => new SituationModel(elt)),
+            criteria: criteria.map((elt) => new CriterionModel(elt)),
+            criteriaEvalGrid: criteriaEvalGrid.map(
+              (elt) => new CriterionEvalgridModel(elt)
+            ),
+            roles: roles.map((elt) => new RoleModel(elt)),
+            groupAssignments: groupAssignments.map(
+              (elt) => new GroupAssignmentModel(elt)
+            ),
+          }
+          this.isLoaded$.next(true)
+        }
+      )
+    )
   }
 
   /**
@@ -129,11 +149,11 @@ export class BaseDataService {
     if (this.authService.isStillLoggedIn()) {
       let query = {}
       if (entityType === 'role') {
-        query = { userid: this.authService.loggedUser.getValue().userid }
+        query = { userid: this.authService.loggedUserValue.userid }
       }
       return this.doRefreshData(entityType, query)
     } else {
-      return of(this.entities$[entityType].getValue())
+      return of(null)
     }
   }
 
@@ -146,18 +166,10 @@ export class BaseDataService {
     entityType,
     query: object
   ): Observable<BaseMoodleModel[]> {
-    return this.moodleApiService
-      .fetchIfMoreRecent(
-        entityType,
-        query,
-        this.entities$[entityType].getValue()
-      )
-      .pipe(
-        tap((entities: BaseMoodleModel[]) => {
-          this.entities$[entityType].next(
-            entities.map((e) => new EntityClass[entityType](e))
-          )
-        })
-      )
+    return this.moodleApiService.fetchMoreRecentData(
+      entityType,
+      query,
+      this.entities ? this.entities[entityType] : null
+    )
   }
 }

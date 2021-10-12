@@ -65,7 +65,6 @@
 }
 
 .list-item-info {
-  opacity: 0.5;
   font-size: 14px;
   margin-right: 20px;
 
@@ -131,4 +130,11 @@
       filter: none;
     }
   }
+}
+
+.spinner-element-container {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

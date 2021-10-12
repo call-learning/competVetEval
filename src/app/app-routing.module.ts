@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
-import { ApplicationIsLoadedGuard } from './core/guards/application-is-loaded.guard'
 import { AuthenticatedGuard } from './core/guards/authenticated.guard'
 import { GuestGuard } from './core/guards/guest.guard'
 import { SchoolGuard } from './core/guards/school.guard'
@@ -18,14 +17,12 @@ const routes: Routes = [
       import('./pages/school-choice/school-choice.module').then(
         (m) => m.SchoolChoicePageModule
       ),
-    canLoad: [ApplicationIsLoadedGuard],
     canActivate: [GuestGuard],
   },
   {
     path: 'login',
     loadChildren: () =>
       import('./pages/login/login.module').then((m) => m.LoginPageModule),
-    canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, GuestGuard],
   },
   {
@@ -34,7 +31,6 @@ const routes: Routes = [
       import('./pages/situations-list/situations-list.module').then(
         (m) => m.SituationsListPageModule
       ),
-    canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
@@ -43,7 +39,6 @@ const routes: Routes = [
       import('./pages/situation-detail/situation-detail.module').then(
         (m) => m.SituationDetailPageModule
       ),
-    canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
@@ -52,7 +47,6 @@ const routes: Routes = [
       import('./pages/appraisal-detail/appraisal-detail.module').then(
         (m) => m.AppraisalDetailPageModule
       ),
-    canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
@@ -61,7 +55,6 @@ const routes: Routes = [
       import('./pages/appraisal-edit/appraisal-edit.module').then(
         (m) => m.AppraisalEditModule
       ),
-    canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
@@ -70,7 +63,6 @@ const routes: Routes = [
       import('./pages/evaluate/evaluate.module').then(
         (m) => m.EvaluatePageModule
       ),
-    canLoad: [ApplicationIsLoadedGuard],
     canActivate: [SchoolGuard, AuthenticatedGuard],
   },
   {
