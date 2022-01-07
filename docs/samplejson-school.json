@@ -22,5 +22,11 @@
     "name": "VetAgro Sup",
     "logo": "assets/images/schools/logo-vetagro.png",
     "moodleUrl": "https://vetagro-sup.call-learning.io/"
+  },
+  {
+    "id": "test-preprod",
+    "name": "CALL Learning Test Preprod",
+    "logo": "assets/images/schools/logo-calllearning.png",
+    "moodleUrl": "https://vetagro-sup.call-learning.io/"
   }
 ]

@@ -70,8 +70,8 @@ export class AppraisalService {
   }
 
   resetService() {
-    this.appraisalCriterionModels$.next(null)
-    this.appraisalModels$.next(null)
+    this.appraisalCriterionModels$.next([])
+    this.appraisalModels$.next([])
     this.emitAppraisalsChanged()
   }
 
@@ -89,27 +89,25 @@ export class AppraisalService {
     } else {
       refreshObs = this.getAppraisalModelForAppraiser()
     }
-
     return refreshObs.pipe(
-      concatMap((appraisalModels) => {
-        return from(appraisalModels)
-      }),
-      concatMap((appraisal: AppraisalModel) => {
-        return this.moodleApiService
-          .fetchMoreRecentData(
+      concatMap((appraisals: AppraisalModel[]) => {
+        if (appraisals.length > 0) {
+          const appraisalIds = appraisals.map((appraisal) => appraisal.id)
+          return this.moodleApiService.fetchMoreRecentData(
             'appr_crit',
-            { appraisalid: appraisal.id },
+            { appraisalid: { operator: 'in', values: appraisalIds } },
             this.appraisalCriterionModels$
               .getValue()
-              ?.filter((appc) => appc.appraisalid === appraisal.id)
+              ?.filter((appc) => appraisalIds.includes(appc.appraisalid))
           )
-          .pipe(
-            map((appraisalCriteriaModels) => {
-              return appraisalCriteriaModels.map(
-                (model) => new AppraisalCriterionModel(model)
-              )
-            })
-          )
+        } else {
+          return of([])
+        }
+      }),
+      map((appraisalCriteriaModels) => {
+        return appraisalCriteriaModels.map(
+          (model) => new AppraisalCriterionModel(model)
+        )
       }),
       map((appraisalsCriteria) => {
         // Make sure we store them so we can retrieve them later.

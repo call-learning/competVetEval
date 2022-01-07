@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core'
 import { forkJoin } from 'rxjs'
 import { combineLatest, of, BehaviorSubject, Observable } from 'rxjs'
 import { concatMap, filter, first, map, tap } from 'rxjs/operators'
-// import evalplan from '../../../mock/fixtures/evalplan'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
 import { RoleModel } from '../../shared/models/moodle/role.model'
@@ -52,7 +51,7 @@ export class ScheduledSituationService {
     })
 
     combineLatest([
-      this.appraisalUIService.appraisals$,
+      this.appraisalUIService.appraisals$.asObservable(),
       this.scheduledSituationsEntities$,
     ])
       .pipe(
@@ -325,6 +324,7 @@ export class ScheduledSituationService {
       filter((obj) => obj != null),
       map((allstats) => allstats as AppraiserSituationStatsModel[]),
       map((allstats: AppraiserSituationStatsModel[]) => {
+        // Skip while.
         return allstats.find(
           (stat) => stat.id === evalPlanId && stat.studentId === studentId
         )

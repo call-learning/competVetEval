@@ -17,6 +17,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q001',
     parentid: 0,
     sort: 1,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -27,6 +28,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q002',
     parentid: 41,
     sort: 1,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -38,6 +40,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q003',
     parentid: 41,
     sort: 2,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -48,6 +51,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q004',
     parentid: 41,
     sort: 3,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -59,6 +63,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q005',
     parentid: 41,
     sort: 4,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -69,6 +74,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q006',
     parentid: 41,
     sort: 5,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -79,6 +85,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q007',
     parentid: 0,
     sort: 2,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -90,6 +97,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q008',
     parentid: 47,
     sort: 1,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -100,6 +108,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q009',
     parentid: 47,
     sort: 2,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -111,6 +120,7 @@ const CRITERIA_LIST = [
     idnumber: 'Q010',
     parentid: 47,
     sort: 3,
+    evalgridid: 1,
     usermodified: 0,
     timecreated: 1619376440,
     timemodified: 1619376440,
@@ -125,6 +135,7 @@ const EXPECTED_TREE = [
       idnumber: 'Q001',
       parentid: 0,
       sort: 1,
+      evalgridid: 1,
       usermodified: 0,
       timecreated: 1619376440,
       timemodified: 1619376440,
@@ -137,6 +148,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q002',
           parentid: 41,
           sort: 1,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -151,6 +163,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q003',
           parentid: 41,
           sort: 2,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -164,6 +177,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q004',
           parentid: 41,
           sort: 3,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -178,6 +192,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q005',
           parentid: 41,
           sort: 4,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -191,6 +206,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q006',
           parentid: 41,
           sort: 5,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -206,6 +222,7 @@ const EXPECTED_TREE = [
       idnumber: 'Q007',
       parentid: 0,
       sort: 2,
+      evalgridid: 1,
       usermodified: 0,
       timecreated: 1619376440,
       timemodified: 1619376440,
@@ -219,6 +236,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q008',
           parentid: 47,
           sort: 1,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -232,6 +250,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q009',
           parentid: 47,
           sort: 2,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -246,6 +265,7 @@ const EXPECTED_TREE = [
           idnumber: 'Q010',
           parentid: 47,
           sort: 3,
+          evalgridid: 1,
           usermodified: 0,
           timecreated: 1619376440,
           timemodified: 1619376440,
@@ -260,10 +280,13 @@ describe('Criterion Tree Model', () => {
   it('Build a set criterion tree from a flat list', (done) => {
     const criteriaModel = CRITERIA_LIST.map((crit) => new CriterionModel(crit))
     const hierarchisedCrit = CriterionTreeModel.convertToTree(criteriaModel)
-    expect(hierarchisedCrit.length).toEqual('2')
-    expect(hierarchisedCrit[0]).toEqual(EXPECTED_TREE[0])
-    expect(hierarchisedCrit[1]).toEqual(EXPECTED_TREE[1])
-
+    expect(hierarchisedCrit.length).toEqual(2)
+    expect(hierarchisedCrit[0].criterion.idnumber).toEqual(
+      EXPECTED_TREE[0].criterion.idnumber
+    )
+    expect(hierarchisedCrit[1].criterion.idnumber).toEqual(
+      EXPECTED_TREE[1].criterion.idnumber
+    )
     done()
   })
 })

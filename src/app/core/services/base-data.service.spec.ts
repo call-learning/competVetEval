@@ -1,7 +1,7 @@
 /**
- * Auth service file tests
+ * Base Data service file tests
  *
- * Manage authentication and user role
+ * Manage base data (situation,...)
  *
  * @author Marjory Gaillot <marjory.gaillot@gmail.com>
  * @author Laurent David <laurent@call-learning.fr>
@@ -25,6 +25,8 @@ import { SchoolsProviderService } from '../providers/schools-provider.service'
 import { ServicesModule } from '../services.module'
 import { AuthService } from './auth.service'
 import { BaseDataService } from './base-data.service'
+import { TestScheduler } from 'rxjs/testing'
+import situations from 'src/mock/fixtures/situations'
 
 // Dummy component for routes.
 @Component({ template: '' })
@@ -32,6 +34,8 @@ class TestComponent {}
 
 describe('BaseDataService', () => {
   let mockedRouter: Router
+  let testScheduler: TestScheduler
+  // Start mock server.
   beforeAll(async () => {
     await worker.start()
   })
@@ -56,9 +60,15 @@ describe('BaseDataService', () => {
     worker.resetHandlers()
   })
 
+  beforeEach(() => {
+    testScheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toEqual(expected)
+    })
+  })
   afterAll(() => {
     worker.stop()
   })
+
   it('I retrieve all criterion', inject(
     [SchoolsProviderService, AuthService, BaseDataService],
     async (
@@ -70,14 +80,15 @@ describe('BaseDataService', () => {
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refreshAllEntities().toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(service.entities.criteria).toContain(
+      expect(await service.criteria$.toPromise()).toContain(
         new CriterionModel({
-          id: '41',
+          id: 41,
           label: 'Savoir être',
           idnumber: 'Q001',
-          parentid: '0',
-          sort: '1',
-          usermodified: '0',
+          parentid: 0,
+          evalgridid: 1,
+          sort: 1,
+          usermodified: 0,
           timecreated: '1619376440',
           timemodified: '1619376440',
         })
@@ -95,19 +106,19 @@ describe('BaseDataService', () => {
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refreshAllEntities().toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(service.entities.situations).toContain(
+      expect(await service.situations$.toPromise()).toContain(
         new SituationModel({
-          id: '1',
+          id: 1,
           title: 'Consultations de médecine générale',
           description:
             'Clinique des animaux de compagnie : médecine générale – médecine interne – médecine d’urgence et soins intensifs',
-          descriptionformat: '1',
+          descriptionformat: 1,
           idnumber: 'TMG',
-          expectedevalsnb: '1',
-          evalgridid: '1',
-          timecreated: '1619376440',
-          timemodified: '1619376440',
-          usermodified: '0',
+          expectedevalsnb: 1,
+          evalgridid: 1,
+          timecreated: 1619376440,
+          timemodified: 1619376440,
+          usermodified: 0,
         })
       )
     }
@@ -123,29 +134,29 @@ describe('BaseDataService', () => {
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refreshAllEntities().toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(service.entities.roles).not.toContain(
+      expect(service.roles$).not.toContain(
         new RoleModel({
-          id: '1',
-          userid: '5',
-          clsituationid: '1',
-          type: '1',
-          usermodified: '0',
-          timecreated: '1619376440',
-          timemodified: '1619376440',
+          id: 1,
+          userid: 5,
+          clsituationid: 1,
+          type: 1,
+          usermodified: 0,
+          timecreated: 1619376440,
+          timemodified: 1619376440,
         })
       )
       authService.logout() // We login first using the Mocked Auth service.
       await authService.login('appraiser1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refreshAllEntities().toPromise()
-      expect(service.entities.roles).toContain(
+      expect(await service.roles$.toPromise()).toContain(
         new RoleModel({
-          id: '1',
-          userid: '5',
-          clsituationid: '1',
-          type: '1',
-          usermodified: '0',
-          timecreated: '1619376440',
-          timemodified: '1619376440',
+          id: 1,
+          userid: 5,
+          clsituationid: 1,
+          type: 1,
+          usermodified: 0,
+          timecreated: 1619376440,
+          timemodified: 1619376440,
         })
       )
     }
@@ -160,26 +171,25 @@ describe('BaseDataService', () => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       await service.refreshAllEntities().toPromise()
-      // Now we expect the criteria to be the same as the one in the fixtures.
       // We should have retrieved information for this user only.
-      expect(service.entities.groupAssignments).not.toContain(
+      expect(await service.groupAssignments$.toPromise()).not.toContain(
         new GroupAssignmentModel({
-          id: '6',
-          studentid: '2',
-          groupid: '1',
-          usermodified: '0',
-          timecreated: '1619376441',
-          timemodified: '1619376441',
+          id: 6,
+          studentid: 2,
+          groupid: 1,
+          usermodified: 0,
+          timecreated: 1619376441,
+          timemodified: 1619376441,
         })
       )
-      expect(service.entities.groupAssignments).toContain(
+      expect(await service.groupAssignments$.toPromise()).toContain(
         new GroupAssignmentModel({
-          id: '5',
-          studentid: '1',
-          groupid: '1',
-          usermodified: '0',
-          timecreated: '1619376441',
-          timemodified: '1619376441',
+          id: 5,
+          studentid: 1,
+          groupid: 1,
+          usermodified: 0,
+          timecreated: 1619376441,
+          timemodified: 1619376441,
         })
       )
     }
@@ -194,63 +204,51 @@ describe('BaseDataService', () => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
       // await service.groupAssignment.toPromise()
-      expect(service.entities.groupAssignments).toContain(
+      expect(await service.groupAssignments$.toPromise()).toContain(
         new GroupAssignmentModel({
-          id: '5',
-          studentid: '1',
-          groupid: '1',
-          usermodified: '0',
-          timecreated: '1619376441',
-          timemodified: '1619376441',
+          id: 5,
+          studentid: 1,
+          groupid: 1,
+          usermodified: 0,
+          timecreated: 1619376441,
+          timemodified: 1619376441,
         })
       )
-      expect(service.entities.situations).toContain(
+      expect(await service.situations$.toPromise()).toContain(
         new SituationModel({
-          id: '1',
+          id: 1,
           title: 'Consultations de médecine générale',
           description:
             'Clinique des animaux de compagnie : médecine générale – médecine interne – médecine d’urgence et soins intensifs',
-          descriptionformat: '1',
+          descriptionformat: 1,
           idnumber: 'TMG',
-          expectedevalsnb: '1',
-          evalgridid: '1',
-          timecreated: '1619376440',
-          timemodified: '1619376440',
-          usermodified: '0',
+          expectedevalsnb: 1,
+          evalgridid: 1,
+          timecreated: 1619376440,
+          timemodified: 1619376440,
+          usermodified: 0,
         })
       )
     }
   ))
+  // Test with marble diagrams.
+  it('refresh data rxjs scheduled correctly', inject(
+    [SchoolsProviderService, AuthService, BaseDataService],
+    async (
+      schoolproviderService: SchoolsProviderService,
+      authService: AuthService,
+      service: BaseDataService
+    ) => {
+      schoolproviderService.setSelectedSchoolId('mock-api-instance')
+      await authService.login('student1', 'password').toPromise()
+      await service.refreshAllEntities().toPromise()
+      const values = {
+        s: situations.map((s) => new SituationModel(s)),
+      }
+      testScheduler.run(async (helpers) => {
+        const { cold, expectObservable, expectSubscriptions } = helpers
+        expectObservable(service.situations$).toBe('(s|)', values)
+      })
+    }
+  ))
 })
-
-// Note : We could have also used the HTTT Testing controller
-// Here we describe the expected sequence of events though HttpTestingController.
-// let req = httpTestingController.expectOne(
-//   `${schoolproviderService.getSelectedSchoolUrl()}/webservice/rest/server.php?moodlewsrestformat=json`
-// )
-// expect(Array.from(req.request.body.entries())).toEqual([
-//   ['moodlewssettingfilter', 'true'],
-//   ['moodlewssettingfileurl', 'true'],
-//   ['wsfunction', 'local_cveteval_get_latest_modifications'],
-//   ['entitytype', 'criterion'],
-// ])
-// req.flush(13456)
-// req = httpTestingController.expectOne(
-//   `${schoolproviderService.getSelectedSchoolUrl()}/webservice/rest/server.php?moodlewsrestformat=json`
-// )
-// expect(Array.from(req.request.body.entries())).toEqual([
-//   ['moodlewssettingfilter', 'true'],
-//   ['moodlewssettingfileurl', 'true'],
-//   ['wsfunction', 'local_cveteval_get_all_criterion'],
-// ])
-// const criteria = [
-//   new CriterionModel({
-//     id: 1,
-//     label: 'criteriaLabel',
-//     idnumber: '13345',
-//     parentid: 0,
-//     sort: 0,
-//   }),
-// ]
-// req.flush(criteria)
-// httpTestingController.verify()

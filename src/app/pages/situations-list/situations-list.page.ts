@@ -9,7 +9,7 @@ import {
   PopoverController,
 } from '@ionic/angular'
 
-import { debounceTime, takeUntil, tap } from 'rxjs/operators'
+import { filter, takeUntil, tap } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
@@ -17,7 +17,8 @@ import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appr
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 import { AppraisalUiService } from './../../core/services/appraisal-ui.service'
 import { SituationsFilters } from 'src/app/core/services/situations-filters.service'
-import { combineLatest, iif } from 'rxjs'
+import { BehaviorSubject, combineLatest } from 'rxjs'
+
 /**
  * SituationModel List page
  *
@@ -29,6 +30,7 @@ import { combineLatest, iif } from 'rxjs'
 
 const DAY_SECONDS = 3600 * 24
 const MAX_INTERVAL = 4
+
 @Component({
   selector: 'app-situations-list',
   templateUrl: './situations-list.page.html',
@@ -38,7 +40,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   situations: ScheduledSituation[]
   situationsDisplayed: ScheduledSituation[]
 
-  situationsFilters: SituationsFilters
+  situationsFilters: BehaviorSubject<SituationsFilters>
 
   emptyMessage = ''
 
@@ -53,20 +55,20 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     private situationsFiltersService: SituationsFiltersService
   ) {
     super()
+    this.situationsFilters = new BehaviorSubject<SituationsFilters>(null)
   }
 
   ngOnInit() {
+    this.situationsDisplayed = []
     this.situationsFiltersService.situationsFilter$
-      .pipe(takeUntil(this.alive$), debounceTime(100))
+      .pipe(takeUntil(this.alive$))
       .subscribe((res) => {
-        this.situationsFilters = res
-        this.filterSituations()
+        this.situationsFilters.next(res)
       })
   }
 
   ionViewWillEnter() {
     this.menuController.enable(true)
-
     this.loadData()
   }
 
@@ -82,13 +84,15 @@ export class SituationsListPage extends BaseComponent implements OnInit {
         combineLatest([
           this.scheduledSituationsService.situations$,
           this.scheduledSituationsService.situationStats$,
+          this.situationsFilters,
         ])
           .pipe(
-            takeUntil(this.alive$),
-            tap(([situations, stats]) => {
+            filter(
+              ([situations, stats, filters]) =>
+                situations != null && stats != null && filters != null
+            ),
+            tap(([situations, stats, filters]) => {
               this.situations = situations
-            }),
-            tap(([situations, stats]) => {
               situations.forEach((situation) => {
                 if (this.authService.isStudent) {
                   this.scheduledSituationsService
@@ -107,8 +111,6 @@ export class SituationsListPage extends BaseComponent implements OnInit {
                     })
                 }
               })
-            }),
-            tap(([situations, stats]) => {
               this.filterSituations()
               if (loader.animated) {
                 loader.dismiss()
@@ -122,6 +124,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
 
   ionViewDidLeave(): void {
     this.menuController.enable(false)
+    this.situationsDisplayed = []
   }
 
   openMenu() {
@@ -129,7 +132,12 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   filtersChanged(event) {
-    this.situationsFiltersService.situationsFilter$.next(this.situationsFilters)
+    if (this.situationsFilters.getValue()) {
+      this.situationsFiltersService.situationsFilter$.next(
+        this.situationsFilters.getValue()
+      )
+      this.filterSituations()
+    }
   }
 
   filterSituations() {
@@ -148,7 +156,7 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   filterByTime() {
-    if (this.situationsFilters.status === 'today') {
+    if (this.situationsFilters.getValue().status === 'today') {
       const now = new Date()
       let maxts = now.getTime() / 1000 + DAY_SECONDS
       let mints = now.getTime() / 1000 - DAY_SECONDS
@@ -173,19 +181,19 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   filterByTitle() {
-    if (this.situationsFilters.title.length) {
+    if (this.situationsFilters.getValue().title.length) {
       this.situationsDisplayed = this.situationsDisplayed.filter(
         (situation) => {
           return situation.situation.title
             .toLowerCase()
-            .includes(this.situationsFilters.title.toLowerCase())
+            .includes(this.situationsFilters.getValue().title.toLowerCase())
         }
       )
     }
   }
 
   filterObservationsNumber() {
-    if (this.situationsFilters.withoutObservations) {
+    if (this.situationsFilters.getValue().withoutObservations) {
       this.situationsDisplayed = this.situationsDisplayed.filter(
         (situation) => {
           return situation.stats.appraisalsCompleted === 0
@@ -196,9 +204,9 @@ export class SituationsListPage extends BaseComponent implements OnInit {
         (situation) => {
           return (
             situation.stats.appraisalsCompleted >=
-              this.situationsFilters.observationsNumber.lower &&
+              this.situationsFilters.getValue().observationsNumber.lower &&
             situation.stats.appraisalsCompleted <=
-              this.situationsFilters.observationsNumber.upper
+              this.situationsFilters.getValue().observationsNumber.upper
           )
         }
       )
@@ -206,28 +214,30 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   sortSituations() {
-    if (this.situationsFilters.sortBy === 'startTimeASC') {
+    if (this.situationsFilters.getValue().sortBy === 'startTimeASC') {
       this.situationsDisplayed = this.situationsDisplayed.sort(
         (sit1, sit2) => sit1.evalPlan.starttime - sit2.evalPlan.starttime
       )
-    } else if (this.situationsFilters.sortBy === 'startTimeDESC') {
+    } else if (this.situationsFilters.getValue().sortBy === 'startTimeDESC') {
       this.situationsDisplayed = this.situationsDisplayed.sort(
         (sit1, sit2) => sit2.evalPlan.starttime - sit1.evalPlan.starttime
       )
-    } else if (this.situationsFilters.sortBy === 'endTimeASC') {
+    } else if (this.situationsFilters.getValue().sortBy === 'endTimeASC') {
       this.situationsDisplayed = this.situationsDisplayed.sort(
         (sit1, sit2) => sit1.evalPlan.endtime - sit2.evalPlan.endtime
       )
-    } else if (this.situationsFilters.sortBy === 'endTimeDESC') {
+    } else if (this.situationsFilters.getValue().sortBy === 'endTimeDESC') {
       this.situationsDisplayed = this.situationsDisplayed.sort(
         (sit1, sit2) => sit2.evalPlan.endtime - sit1.evalPlan.endtime
       )
-    } else if (this.situationsFilters.sortBy === 'observationsASC') {
+    } else if (this.situationsFilters.getValue().sortBy === 'observationsASC') {
       this.situationsDisplayed = this.situationsDisplayed.sort(
         (sit1, sit2) =>
           sit1.stats.appraisalsCompleted - sit2.stats.appraisalsCompleted
       )
-    } else if (this.situationsFilters.sortBy === 'observationssDESC') {
+    } else if (
+      this.situationsFilters.getValue().sortBy === 'observationssDESC'
+    ) {
       this.situationsDisplayed = this.situationsDisplayed.sort(
         (sit1, sit2) =>
           sit2.stats.appraisalsCompleted - sit1.stats.appraisalsCompleted

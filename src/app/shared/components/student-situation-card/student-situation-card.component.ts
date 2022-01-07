@@ -7,12 +7,10 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input } from '@angular/core'
 
-import { takeUntil } from 'rxjs/operators'
 import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
 import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
-import { StudentSituationStatsModel } from '../../models/ui/student-situation-stats.model'
 import { BaseComponent } from '../base/base.component'
 
 @Component({

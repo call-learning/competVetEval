@@ -17,11 +17,13 @@ export class CriterionModel extends BaseMoodleModel {
   label: string
   idnumber: string
   parentid: number
+  evalgridid: number
   sort: number
 
   constructor(input) {
     parseIntMember(input, 'id')
     parseIntMember(input, 'parentid')
+    parseIntMember(input, 'evalgridid')
     parseIntMember(input, 'sort')
 
     super(input)

@@ -9,8 +9,10 @@
     "build": "ng build",
     "test": "ng test --configuration=test",
     "lint": "ng lint app --fix",
-    "e2e": "ng e2e --configuration=test",
-    "update-msw": "npx msw init src --no-save"
+    "e2e": "ng e2e",
+    "update-msw": "npx msw init src --no-save",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "private": true,
   "husky": {
@@ -45,11 +47,12 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.8",
-    "@angular/cli": "~10.0.8",
+    "@angular/cli": "10.2.4",
     "@angular/compiler": "~10.0.14",
     "@angular/compiler-cli": "~10.0.14",
     "@angular/language-service": "~10.0.14",
     "@capacitor/cli": "2.4.7",
+    "@cypress/schematic": "^1.6.0",
     "@ionic/angular-toolkit": "^2.3.3",
     "@ionic/lab": "3.2.10",
     "@types/jasmine": "~3.5.14",
@@ -60,7 +63,7 @@
     "husky": "^4.3.8",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.2",
-    "karma": "~5.0.9",
+    "karma": "~5.2.3",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~3.0.3",
     "karma-jasmine": "~3.3.1",
@@ -68,11 +71,13 @@
     "msw": "^0.28.2",
     "prettier": "^2.3.0",
     "pretty-quick": "^3.1.0",
-    "protractor": "~7.0.0",
+    "protractor": "~5.4.4",
+    "rxjs-debug": "^1.3.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.3",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.9.9"
+    "typescript": "^3.9.9",
+    "cypress": "latest"
   },
   "description": "An Ionic project",
   "msw": {

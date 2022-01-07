@@ -40,19 +40,19 @@ export class PageObjectBase {
     return element(by.css(`${this.tag} ion-title`)).getText()
   }
 
-  protected enterInputText(sel: string, text: string) {
+  public enterInputText(sel: string, text: string) {
     const el = element(by.css(`${this.tag}${sel}`))
     const inp = el.element(by.css('input'))
     inp.sendKeys(text)
   }
 
-  protected enterTextareaText(sel: string, text: string) {
+  public enterTextareaText(sel: string, text: string) {
     const el = element(by.css(`${this.tag}${sel}`))
     const inp = el.element(by.css('textarea'))
     inp.sendKeys(text)
   }
 
-  protected clickButton(sel: string) {
+  public clickButton(sel: string) {
     const el = element(by.css(`${this.tag}${sel}`))
     browser.wait(ExpectedConditions.elementToBeClickable(el))
     el.click()

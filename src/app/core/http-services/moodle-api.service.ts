@@ -9,8 +9,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-import { of, Observable } from 'rxjs'
-import { concatMap, map } from 'rxjs/operators'
+import { of, Observable, throwError } from 'rxjs'
+import { map, mergeMap } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
@@ -18,6 +18,7 @@ import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 import { MoodleApiUtils } from '../../shared/utils/moodle-api-utils'
 import { EndpointsServices } from './endpoints.services'
+import { catchError } from 'rxjs/internal/operators/catchError'
 
 @Injectable({
   providedIn: 'root',
@@ -55,7 +56,7 @@ export class MoodleApiService {
    * Fetch from Moodle table if more recent
    *
    * @param entityType
-   * @param args
+   * @param args a query in the form of { fieldname : value } or {fieldname: {operator :'in', values : []}}
    * @param currentEntities
    */
   public fetchMoreRecentData(
@@ -63,7 +64,7 @@ export class MoodleApiService {
     args: object,
     currentEntities: BaseMoodleModel[]
   ): Observable<BaseMoodleModel[]> {
-    if (!!currentEntities) {
+    if (!!currentEntities && currentEntities.length > 0) {
       return this.fetchIfMoreRecent(entityType, args, currentEntities)
     } else {
       return this.getEntities(entityType, args)
@@ -76,7 +77,7 @@ export class MoodleApiService {
     currentEntities: BaseMoodleModel[]
   ): Observable<BaseMoodleModel[]> {
     return this.getLatestModificationDate(entityType, args).pipe(
-      concatMap((latestModif: number) => {
+      mergeMap((latestModif: number) => {
         const currentStoredEntitiesMaxModified = currentEntities.reduce(
           (acc, entity) =>
             acc > entity.timemodified ? acc : entity.timemodified,
@@ -168,6 +169,9 @@ export class MoodleApiService {
       this.http,
       this.endPointService.server()
     ).pipe(
+      catchError((err) => {
+        return throwError(err)
+      }),
       map((res) => {
         return new CevUser(res)
       })

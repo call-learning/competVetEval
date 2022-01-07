@@ -91,6 +91,24 @@ export class SituationDetailPage extends BaseComponent {
                   s.evalPlanId === this.evalPlanId &&
                   (this.studentId == null || this.studentId === s.studentId)
               )
+              if (this.authService.isStudent) {
+                this.situationService
+                  .getMyScheduledSituationStats(
+                    this.scheduledSituation.evalPlan.id
+                  )
+                  .subscribe((stats) => {
+                    this.scheduledSituation.stats = stats
+                  })
+              } else {
+                this.situationService
+                  .getAppraiserScheduledSituationStats(
+                    this.scheduledSituation.evalPlan.id,
+                    this.scheduledSituation.studentId
+                  )
+                  .subscribe((stats) => {
+                    this.scheduledSituation.stats = stats
+                  })
+              }
               if (userProfile) {
                 this.studentInfo = userProfile
               }

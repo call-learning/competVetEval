@@ -21,12 +21,22 @@ import { HttpAuthService } from '../http-services/http-auth.service'
 import SpyObj = jasmine.SpyObj
 import { ServicesModule } from '../services.module'
 import { AuthService, LOGIN_STATE } from './auth.service'
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing'
 
 // Dummy component for routes.
 @Component({ template: '' })
 class TestComponent {}
 
 describe('AuthService', () => {
+  let httpTestingController: HttpTestingController
+
+  afterEach(() => {
+    httpTestingController.verify()
+  })
+
   let httpServiceFixture: SpyObj<HttpAuthService>
   let mockedRouter
   beforeEach(() => {
@@ -51,10 +61,12 @@ describe('AuthService', () => {
           },
         ]),
         ServicesModule,
+        HttpClientTestingModule,
       ],
     }).compileComponents()
     mockedRouter = TestBed.inject(Router)
   })
+  beforeEach(() => (httpTestingController = TestBed.get(HttpTestingController)))
   it('I login as a user and I should retrieve profile info', inject(
     [AuthService],
     (service: AuthService) => {

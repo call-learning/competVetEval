@@ -9,11 +9,26 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { inject } from '@angular/core/testing'
+import { async, inject, TestBed } from '@angular/core/testing'
 
 import { SchoolsProviderService } from './schools-provider.service'
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing'
 
 describe('SchoolsProviderService', () => {
+  let httpTestingController: HttpTestingController
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    }).compileComponents()
+  }))
+  beforeEach(() => (httpTestingController = TestBed.get(HttpTestingController)))
+  afterEach(() => {
+    httpTestingController.verify()
+  })
+
   it('There should be no school selected at first', inject(
     [SchoolsProviderService],
     (service: SchoolsProviderService) => {

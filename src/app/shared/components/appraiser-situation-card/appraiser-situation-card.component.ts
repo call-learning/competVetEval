@@ -1,10 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core'
 
-import { takeUntil } from 'rxjs/operators'
 import { ScheduledSituationService } from '../../../core/services/scheduled-situation.service'
 import { UserDataService } from '../../../core/services/user-data.service'
 import { CevUser } from '../../models/cev-user.model'
-import { AppraiserSituationStatsModel } from '../../models/ui/appraiser-situation-stats.model'
 import { ScheduledSituation } from '../../models/ui/scheduled-situation.model'
 import { BaseComponent } from './../base/base.component'
 /**

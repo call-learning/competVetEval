@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-import { forkJoin, of, Observable } from 'rxjs'
+import { of, Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
@@ -82,18 +82,9 @@ export class CriteriaService {
   public getCriteriaFromEvalGrid(
     evalgridId: number
   ): Observable<CriterionModel[]> {
-    return forkJoin([
-      this.baseDataService.criteriaEvalGrid$,
-      this.baseDataService.criteria$,
-    ]).pipe(
-      map(([criteriaEvalGrid, criteria]) => {
-        return criteriaEvalGrid
-          .filter((evalGridCrit) => evalGridCrit.evalgridid === evalgridId)
-          .map((evalGridCrit) => {
-            return criteria.find((crit) => {
-              return crit.id === evalGridCrit.id
-            })
-          })
+    return this.baseDataService.criteria$.pipe(
+      map((criteria) => {
+        return criteria.filter((crit) => crit.evalgridid === evalgridId)
       })
     )
   }

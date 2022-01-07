@@ -11,10 +11,16 @@
 
 import { Injectable } from '@angular/core'
 
-import { forkJoin, of, BehaviorSubject, Observable } from 'rxjs'
+import {
+  forkJoin,
+  of,
+  BehaviorSubject,
+  Observable,
+  combineLatest,
+  zip,
+} from 'rxjs'
 import { filter, first, map, tap } from 'rxjs/operators'
 import { BaseMoodleModel } from '../../shared/models/moodle/base-moodle.model'
-import { CriterionEvalgridModel } from '../../shared/models/moodle/criterion-evalgrid.model'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { GroupAssignmentModel } from '../../shared/models/moodle/group-assignment.model'
 import { RoleModel } from '../../shared/models/moodle/role.model'
@@ -35,7 +41,6 @@ export class BaseDataService {
   private entities: {
     situations: SituationModel[]
     criteria: CriterionModel[]
-    criteriaEvalGrid: CriterionEvalgridModel[]
     roles: RoleModel[]
     groupAssignments: GroupAssignmentModel[]
   } = null
@@ -56,6 +61,8 @@ export class BaseDataService {
     this.authService.loginState$.subscribe((loginState) => {
       if (loginState !== LOGIN_STATE.LOGGED) {
         this.resetService()
+      } else {
+        this.refreshAllEntities().subscribe()
       }
     })
   }
@@ -72,10 +79,6 @@ export class BaseDataService {
 
   public get criteria$(): Observable<CriterionModel[]> {
     return this.getLoadedEntity('criteria')
-  }
-
-  public get criteriaEvalGrid$(): Observable<CriterionEvalgridModel[]> {
-    return this.getLoadedEntity('criteriaEvalGrid')
   }
 
   public get roles$(): Observable<RoleModel[]> {
@@ -117,26 +120,27 @@ export class BaseDataService {
     return forkJoin([
       this.refresh('clsituation'),
       this.refresh('criterion'),
-      this.refresh('cevalgrid'),
       this.refresh('role'),
       this.refresh('group_assign'),
     ]).pipe(
-      tap(
-        ([situations, criteria, criteriaEvalGrid, roles, groupAssignments]) => {
-          this.entities = {
-            situations: situations.map((elt) => new SituationModel(elt)),
-            criteria: criteria.map((elt) => new CriterionModel(elt)),
-            criteriaEvalGrid: criteriaEvalGrid.map(
-              (elt) => new CriterionEvalgridModel(elt)
-            ),
-            roles: roles.map((elt) => new RoleModel(elt)),
-            groupAssignments: groupAssignments.map(
-              (elt) => new GroupAssignmentModel(elt)
-            ),
-          }
-          this.isLoaded$.next(true)
+      filter(
+        ([situations, criteria, roles, groupAssignments]) =>
+          situations != null &&
+          criteria != null &&
+          roles != null &&
+          groupAssignments != null
+      ),
+      tap(([situations, criteria, roles, groupAssignments]) => {
+        this.entities = {
+          situations: situations.map((elt) => new SituationModel(elt)),
+          criteria: criteria.map((elt) => new CriterionModel(elt)),
+          roles: roles.map((elt) => new RoleModel(elt)),
+          groupAssignments: groupAssignments.map(
+            (elt) => new GroupAssignmentModel(elt)
+          ),
         }
-      )
+        this.isLoaded$.next(true)
+      })
     )
   }
 
@@ -150,6 +154,9 @@ export class BaseDataService {
       let query = {}
       if (entityType === 'role') {
         query = { userid: this.authService.loggedUserValue.userid }
+      }
+      if (entityType === 'group_assign' && this.authService.isStudent) {
+        query = { studentid: this.authService.loggedUserValue.userid }
       }
       return this.doRefreshData(entityType, query)
     } else {

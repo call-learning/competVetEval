@@ -2,7 +2,6 @@ import { rest } from 'msw'
 import { isNumeric } from 'rxjs/internal-compatibility'
 import appr from './fixtures/appr'
 import apprcrit from './fixtures/apprcrit'
-import cevalgrid from './fixtures/cevalgrid'
 import criterion from './fixtures/criterion'
 import evalplan from './fixtures/evalplan'
 import groupassign from './fixtures/groupassign'
@@ -39,7 +38,6 @@ const entities = {
   group: groups,
   role,
   evalplan,
-  cevalgrid,
   appraisal: appr,
   appr_crit: apprcrit,
 }
@@ -53,8 +51,18 @@ const getEntities = (entitytype, queryJSON) => {
       returnedEntities = returnedEntities.filter((e) => {
         let isMacthing = true
         for (const property in query) {
-          if (e[property] !== query[property]) {
-            isMacthing = false
+          if (typeof query[property] === 'object') {
+            if (Array.isArray(query[property].in)) {
+              let arrayMatch = false
+              query[property].in.foreach((val) => {
+                arrayMatch = arrayMatch || e[property] == val
+              })
+              isMacthing = arrayMatch
+            }
+          } else {
+            if (e[property] !== query[property]) {
+              isMacthing = false
+            }
           }
         }
         return isMacthing
@@ -133,9 +141,6 @@ const restServerCallback = {
   },
   local_cveteval_get_criterion: (req, res, ctx) => {
     return queryEntity('criterion', req, res, ctx)
-  },
-  local_cveteval_get_cevalgrid: (req, res, ctx) => {
-    return queryEntity('cevalgrid', req, res, ctx)
   },
   local_cveteval_get_role: (req, res, ctx) => {
     return queryEntity('role', req, res, ctx)

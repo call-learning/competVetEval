@@ -8,8 +8,8 @@
  */
 import { Injectable } from '@angular/core'
 
-import { of, Observable } from 'rxjs'
-import { filter, tap } from 'rxjs/operators'
+import { of, Observable, BehaviorSubject } from 'rxjs'
+import { filter, map, tap } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService } from './auth.service'
@@ -27,7 +27,10 @@ import { AuthService } from './auth.service'
   providedIn: 'root',
 })
 export class UserDataService {
-  protected userProfiles: CevUser[] = []
+  protected userProfiles: BehaviorSubject<CevUser[]> = new BehaviorSubject<
+    CevUser[]
+  >([])
+  protected pendingProfiles: Set<number> = new Set<number>()
   /**
    * Build the user data service
    *
@@ -40,7 +43,7 @@ export class UserDataService {
     this.authService.loggedUser$
       .pipe(filter((loggedUser) => !loggedUser))
       .subscribe((cveUser) => {
-        this.userProfiles = []
+        this.userProfiles.next([])
       })
   }
 
@@ -55,17 +58,28 @@ export class UserDataService {
     if (!userid) {
       return of(null)
     }
-
-    const existingProfile = this.userProfiles.find(
-      (user) => user.userid === userid
-    )
-
-    if (!existingProfile) {
-      return this.moodleApiService
-        .getUserProfileInfo(userid)
-        .pipe(tap((user) => this.userProfiles.push(user)))
-    } else {
+    const existingProfile = this.userProfiles
+      .getValue()
+      .find((user) => user.userid === userid)
+    if (existingProfile) {
       return of(existingProfile)
     }
+    if (this.pendingProfiles.has(userid)) {
+      return this.userProfiles.pipe(
+        map((users) => users.find((user) => user.userid === userid)),
+        filter((user) => !!user),
+        tap((user) => {
+          this.pendingProfiles.delete(user.userid)
+        })
+      )
+    }
+    this.pendingProfiles.add(userid)
+    return this.moodleApiService.getUserProfileInfo(userid).pipe(
+      tap((user) => {
+        const users = this.userProfiles.getValue()
+        users.push(user)
+        this.userProfiles.next(users)
+      })
+    )
   }
 }
