@@ -92,9 +92,6 @@
                   "with": "src/environments/environment.localdev.ts"
                 }
               ]
-            },
-            "ci": {
-              "progress": false
             }
           }
         },
@@ -112,9 +109,6 @@
             },
             "localdev": {
               "browserTarget": "app:build:localdev"
-            },
-            "ci": {
-              "progress": false
             }
           }
         },
@@ -154,10 +148,6 @@
             ]
           },
           "configurations": {
-            "ci": {
-              "progress": false,
-              "watch": false
-            },
             "test": {
               "progress": false,
               "watch": false
@@ -178,13 +168,14 @@
         "e2e": {
           "builder": "@cypress/schematic:cypress",
           "options": {
-            "devServerTarget": "app:serve",
+            "devServerTarget": "app:serve:test",
             "watch": true,
             "headless": false
           },
           "configurations": {
-            "production": {
-              "devServerTarget": "app:serve:production"
+            "test": {
+              "progress": false,
+              "watch": false
             }
           }
         },
@@ -215,11 +206,12 @@
         "cypress-run": {
           "builder": "@cypress/schematic:cypress",
           "options": {
-            "devServerTarget": "app:serve"
+            "devServerTarget": "app:serve:test"
           },
           "configurations": {
-            "production": {
-              "devServerTarget": "app:serve:production"
+            "test": {
+              "progress": false,
+              "watch": false
             }
           }
         },
