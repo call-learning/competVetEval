@@ -6,13 +6,15 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { Injectable } from '@angular/core'
+import { EventEmitter, Injectable } from '@angular/core'
 
 import { of, Observable, BehaviorSubject } from 'rxjs'
 import { filter, map, tap } from 'rxjs/operators'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
-import { AuthService } from './auth.service'
+import { AuthService, LOGIN_STATE } from './auth.service'
+import { CloneVisitor } from '@angular/compiler/src/i18n/i18n_ast'
+import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 
 /**
  * Load user profile info for a given user or all related users
@@ -27,10 +29,15 @@ import { AuthService } from './auth.service'
   providedIn: 'root',
 })
 export class UserDataService {
-  protected userProfiles: BehaviorSubject<CevUser[]> = new BehaviorSubject<
-    CevUser[]
-  >([])
-  protected pendingProfiles: Set<number> = new Set<number>()
+  private userProfiles: Map<number, CevUser> = new Map<number, CevUser>()
+
+  // If if this not null, then we are currently loading, so we need
+  // to wait for the process to finish.
+  private loadingEvents: Map<number, EventEmitter<CevUser>> = new Map<
+    number,
+    EventEmitter<CevUser>
+  >()
+
   /**
    * Build the user data service
    *
@@ -40,11 +47,14 @@ export class UserDataService {
     private moodleApiService: MoodleApiService,
     private authService: AuthService
   ) {
-    this.authService.loggedUser$
-      .pipe(filter((loggedUser) => !loggedUser))
-      .subscribe((cveUser) => {
-        this.userProfiles.next([])
-      })
+    this.authService.loggedUser$.subscribe((loggedUser) => {
+      if (!loggedUser) {
+        this.userProfiles.clear()
+        this.loadingEvents.clear()
+      } else {
+        this.userProfiles.set(loggedUser.userid, loggedUser)
+      }
+    })
   }
 
   /**
@@ -58,28 +68,30 @@ export class UserDataService {
     if (!userid) {
       return of(null)
     }
-    const existingProfile = this.userProfiles
-      .getValue()
-      .find((user) => user.userid === userid)
-    if (existingProfile) {
-      return of(existingProfile)
+    if (this.userProfiles.has(userid)) {
+      return of(this.userProfiles.get(userid))
     }
-    if (this.pendingProfiles.has(userid)) {
-      return this.userProfiles.pipe(
-        map((users) => users.find((user) => user.userid === userid)),
-        filter((user) => !!user),
-        tap((user) => {
-          this.pendingProfiles.delete(user.userid)
-        })
-      )
-    }
-    this.pendingProfiles.add(userid)
-    return this.moodleApiService.getUserProfileInfo(userid).pipe(
-      tap((user) => {
-        const users = this.userProfiles.getValue()
-        users.push(user)
-        this.userProfiles.next(users)
+    return this.retrieveUserData(userid)
+  }
+
+  /**
+   * Helper
+   *
+   * @param userid
+   * @private
+   */
+  public retrieveUserData(userid: number) {
+    let loadingEvent = this.loadingEvents.get(userid)
+    if (!loadingEvent) {
+      loadingEvent = new EventEmitter<CevUser>()
+      this.loadingEvents.set(userid, loadingEvent)
+      this.moodleApiService.getUserProfileInfo(userid).subscribe((user) => {
+        loadingEvent.emit(user)
+        loadingEvent.complete()
+        this.loadingEvents.delete(userid)
+        this.userProfiles.set(userid, user)
       })
-    )
+    }
+    return loadingEvent.asObservable()
   }
 }

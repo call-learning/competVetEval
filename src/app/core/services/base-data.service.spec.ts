@@ -69,32 +69,6 @@ describe('BaseDataService', () => {
     worker.stop()
   })
 
-  it('I retrieve all criterion', inject(
-    [SchoolsProviderService, AuthService, BaseDataService],
-    async (
-      schoolproviderService: SchoolsProviderService,
-      authService: AuthService,
-      service: BaseDataService
-    ) => {
-      schoolproviderService.setSelectedSchoolId('mock-api-instance')
-      await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await service.refreshAllEntities().toPromise()
-      // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(await service.criteria$.toPromise()).toContain(
-        new CriterionModel({
-          id: 41,
-          label: 'Savoir être',
-          idnumber: 'Q001',
-          parentid: 0,
-          evalgridid: 1,
-          sort: 1,
-          usermodified: 0,
-          timecreated: '1619376440',
-          timemodified: '1619376440',
-        })
-      )
-    }
-  ))
   it('I retrieve all situation', inject(
     [SchoolsProviderService, AuthService, BaseDataService],
     async (
@@ -104,7 +78,6 @@ describe('BaseDataService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await service.refreshAllEntities().toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
       expect(await service.situations$.toPromise()).toContain(
         new SituationModel({
@@ -123,7 +96,7 @@ describe('BaseDataService', () => {
       )
     }
   ))
-  it('I retrieve my roles', inject(
+  it('I retrieve my roles as student', inject(
     [SchoolsProviderService, AuthService, BaseDataService],
     async (
       schoolproviderService: SchoolsProviderService,
@@ -132,9 +105,8 @@ describe('BaseDataService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await service.refreshAllEntities().toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      expect(service.roles$).not.toContain(
+      expect(service.roles$.toPromise()).not.toContain(
         new RoleModel({
           id: 1,
           userid: 5,
@@ -145,10 +117,55 @@ describe('BaseDataService', () => {
           timemodified: 1619376440,
         })
       )
-      authService.logout() // We login first using the Mocked Auth service.
+    }
+  ))
+  it('I retrieve my roles as appraiser', inject(
+    [SchoolsProviderService, AuthService, BaseDataService],
+    async (
+      schoolproviderService: SchoolsProviderService,
+      authService: AuthService,
+      service: BaseDataService
+    ) => {
       await authService.login('appraiser1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await service.refreshAllEntities().toPromise()
       expect(await service.roles$.toPromise()).toContain(
+        new RoleModel({
+          id: 1,
+          userid: 5,
+          clsituationid: 1,
+          type: 1,
+          usermodified: 0,
+          timecreated: 1619376440,
+          timemodified: 1619376440,
+        })
+      )
+    }
+  ))
+  it('I retrieve my roles between different logins', inject(
+    [SchoolsProviderService, AuthService, BaseDataService],
+    async (
+      schoolproviderService: SchoolsProviderService,
+      authService: AuthService,
+      service: BaseDataService
+    ) => {
+      schoolproviderService.setSelectedSchoolId('mock-api-instance')
+      await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
+      // Now we expect the criteria to be the same as the one in the fixtures.
+      const rolesStudent = await service.roles$.toPromise()
+      expect(rolesStudent).not.toContain(
+        new RoleModel({
+          id: 1,
+          userid: 5,
+          clsituationid: 1,
+          type: 1,
+          usermodified: 0,
+          timecreated: 1619376440,
+          timemodified: 1619376440,
+        })
+      )
+      authService.logout() // We log out
+      await authService.login('appraiser1', 'password').toPromise() // We login first using the Mocked Auth service.
+      const rolesAppraiser = await service.roles$.toPromise()
+      expect(rolesAppraiser).toContain(
         new RoleModel({
           id: 1,
           userid: 5,
@@ -170,7 +187,6 @@ describe('BaseDataService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await service.refreshAllEntities().toPromise()
       // We should have retrieved information for this user only.
       expect(await service.groupAssignments$.toPromise()).not.toContain(
         new GroupAssignmentModel({
@@ -203,7 +219,6 @@ describe('BaseDataService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      // await service.groupAssignment.toPromise()
       expect(await service.groupAssignments$.toPromise()).toContain(
         new GroupAssignmentModel({
           id: 5,
@@ -241,13 +256,12 @@ describe('BaseDataService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise()
-      await service.refreshAllEntities().toPromise()
       const values = {
         s: situations.map((s) => new SituationModel(s)),
       }
       testScheduler.run(async (helpers) => {
         const { cold, expectObservable, expectSubscriptions } = helpers
-        expectObservable(service.situations$).toBe('(s|)', values)
+        expectObservable(service.situations$).toBe('(s)', values)
       })
     }
   ))

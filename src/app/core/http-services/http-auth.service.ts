@@ -10,7 +10,7 @@ import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { filter, map } from 'rxjs/operators'
 import { LoginResult } from '../../shared/models/auth.model'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { IdpModel } from '../../shared/models/idp.model'
@@ -77,6 +77,7 @@ export class HttpAuthService {
       this.http,
       this.endPointService.server()
     ).pipe(
+      filter((res) => res && Object.keys(res).length !== 0),
       map((res) => {
         return new CevUser(res)
       })

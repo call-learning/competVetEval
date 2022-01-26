@@ -46,4 +46,17 @@ export default [
     timemodified: 1619376440,
     usermodified: 0,
   },
+  {
+    id: 4,
+    title: 'Consultations de médecine générale bis',
+    description:
+      'Clinique des animaux de compagnie : médecine générale – médecine interne – médecine d’urgence et soins intensifs',
+    descriptionformat: 1,
+    idnumber: 'TMG',
+    expectedevalsnb: 1,
+    evalgridid: 2,
+    timecreated: 1619376440,
+    timemodified: 1619376440,
+    usermodified: 0,
+  },
 ]

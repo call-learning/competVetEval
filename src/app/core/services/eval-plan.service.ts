@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core'
+import { EventEmitter, Injectable } from '@angular/core'
 
 import { of, BehaviorSubject, Observable } from 'rxjs'
-import { first, tap } from 'rxjs/operators'
+import { first, mergeMap, tap } from 'rxjs/operators'
 import { filter, map } from 'rxjs/operators'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
+import { BaseDataService } from './base-data.service'
+import { SituationModel } from '../../shared/models/moodle/situation.model'
 /**
  * Load user evaluation plans
  *
@@ -21,8 +23,11 @@ import { AuthService, LOGIN_STATE } from './auth.service'
 export class EvalPlanService {
   private planningEntities: EvalPlanModel[] = null
 
-  private isLoaded$ = new BehaviorSubject<boolean>(false)
-  private isLoading = false
+  // If if this not null, then we are currently loading, so we need
+  // to wait for the process to finish.
+  private loadingEvent: EventEmitter<EvalPlanModel[]> = new EventEmitter<
+    EvalPlanModel[]
+  >()
 
   /**
    * Constructor
@@ -32,7 +37,8 @@ export class EvalPlanService {
    */
   constructor(
     private moodleApiService: MoodleApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private baseDataService: BaseDataService
   ) {
     // Subscribe for the the whole service lifetime
     this.authService.loginState$.subscribe((loginState) => {
@@ -42,33 +48,12 @@ export class EvalPlanService {
     })
   }
 
-  resetService() {
-    this.planningEntities = null
-    this.isLoaded$.next(false)
-    this.isLoading = false
-  }
-
   /**
-   * Retrieve appraisals for currently logged in user
+   * Retrieve appraisals for currently logged-in user
    */
   public get plans$(): Observable<EvalPlanModel[]> {
     if (this.planningEntities === null) {
-      if (!this.isLoading) {
-        return this.refresh().pipe(
-          tap(() => {
-            this.isLoading = false
-            this.isLoaded$.next(true)
-          })
-        )
-      } else {
-        return this.isLoaded$.pipe(
-          filter((isLoaded) => !!isLoaded),
-          first(),
-          map(() => {
-            return this.planningEntities
-          })
-        )
-      }
+      return this.refresh()
     } else {
       return of(this.planningEntities)
     }
@@ -82,26 +67,61 @@ export class EvalPlanService {
       map((evalplans) => evalplans.find((plan) => plan.id === evalplanId))
     )
   }
-
   /**
-   * Refresh all appraisals for the currently logged in user
+   * Get Eval Grid Id from a given evalPlanId
+   * @param evalPlanId
+   */
+  public getEvalGridIdFromEvalPlanId(evalPlanId): Observable<number> {
+    return this.plans$.pipe(
+      map((plans) => plans.find((p) => p.id === evalPlanId)),
+      mergeMap((plan: EvalPlanModel) => {
+        if (plan) {
+          return this.baseDataService.situations$.pipe(
+            map((situations) =>
+              situations.find((s) => s.id === plan.clsituationid)
+            )
+          )
+        }
+        return of(null)
+      }),
+      map((situation) => (!situation ? 1 : situation.evalgridid))
+    )
+  }
+  /**
+   * Refresh all appraisals for the currently logged-in user
    *
    * If user is a student, we will retrieve all appraisal for this student
    * If a user is an appraiser we will retrieve all appraisals that the appraiser is
    * involved in: all appraisal for a plan that the user is involved in
    */
-  public refresh(): Observable<EvalPlanModel[]> {
-    this.isLoading = true
-    return this.moodleApiService
-      .fetchMoreRecentData('evalplan', {}, this.planningEntities)
-      .pipe(
-        map((evalplans) => {
-          const evalplanmodels = evalplans.map(
-            (plan) => new EvalPlanModel(plan)
-          )
-          this.planningEntities = evalplanmodels
-          return evalplanmodels
+  protected refresh(): Observable<EvalPlanModel[]> {
+    if (this.loadingEvent.isStopped) {
+      this.loadingEvent = new EventEmitter<EvalPlanModel[]>()
+      this.moodleApiService
+        .fetchMoreRecentData('evalplan', {}, this.planningEntities)
+        .pipe(
+          map((evalplans) => {
+            const evalplanmodels = evalplans.map(
+              (plan) => new EvalPlanModel(plan)
+            )
+            return evalplanmodels
+          })
+        )
+        .subscribe((allPlans) => {
+          this.loadingEvent.emit(allPlans)
+          this.planningEntities = allPlans
+          this.loadingEvent.complete() // Important : if not event is not emitted.
         })
-      )
+    }
+    return this.loadingEvent.asObservable()
+  }
+
+  /**
+   * Reset Service
+   * @protected
+   */
+  protected resetService() {
+    this.planningEntities = null
+    this.loadingEvent.complete()
   }
 }

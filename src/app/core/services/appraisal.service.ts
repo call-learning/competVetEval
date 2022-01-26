@@ -38,7 +38,7 @@ export class AppraisalService {
     AppraisalCriterionModel[]
   >(null)
 
-  appraisalsChanged = new EventEmitter<{
+  public appraisalsChangedEvent = new EventEmitter<{
     appraisals: AppraisalModel[]
     appraisalCriterionModels: AppraisalCriterionModel[]
   }>()
@@ -126,7 +126,7 @@ export class AppraisalService {
   }
 
   private emitAppraisalsChanged() {
-    this.appraisalsChanged.emit({
+    this.appraisalsChangedEvent.emit({
       appraisals: this.appraisalModels$.getValue(),
       appraisalCriterionModels: this.appraisalCriterionModels$.getValue(),
     })
@@ -243,7 +243,7 @@ export class AppraisalService {
       context
     )
 
-    return this.criteriaService.getCriteriaFromEvalGrid(evalGridId).pipe(
+    return this.criteriaService.getCriteria(evalGridId).pipe(
       concatMap((criteria) => {
         const appraisalCriteriaModel = criteria.map((criterionmodel) =>
           AppraisalCriterionModel.createFromCriterionModel(criterionmodel)

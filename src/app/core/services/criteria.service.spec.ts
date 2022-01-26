@@ -1,7 +1,7 @@
 /**
- * Appraisal ervice file tests
+ * Criteria service tests
  *
- * Manage appraisals service
+ * Manage base data (situation,...)
  *
  * @author Marjory Gaillot <marjory.gaillot@gmail.com>
  * @author Laurent David <laurent@call-learning.fr>
@@ -22,20 +22,13 @@ import { SchoolsProviderService } from '../providers/schools-provider.service'
 import { ServicesModule } from '../services.module'
 import { AuthService } from './auth.service'
 import { BaseDataService } from './base-data.service'
-import { TestScheduler } from 'rxjs/testing'
-import situations from 'src/mock/fixtures/situations'
-import { AppraisalUiService } from './appraisal-ui.service'
 import { CriteriaService } from './criteria.service'
-import { UserDataService } from './user-data.service'
-import { EvalPlanService } from './eval-plan.service'
-import { AppraisalService } from './appraisal.service'
-import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
 
 // Dummy component for routes.
 @Component({ template: '' })
 class TestComponent {}
 
-describe('AppraisalService', () => {
+describe('Criteria Service', () => {
   let mockedRouter: Router
   // Start mock server.
   beforeAll(async () => {
@@ -65,34 +58,64 @@ describe('AppraisalService', () => {
     worker.stop()
   })
 
-  it('I retrieve all appraisal criterion models', inject(
-    [
-      SchoolsProviderService,
-      AuthService,
-      CriteriaService,
-      UserDataService,
-      EvalPlanService,
-      BaseDataService,
-      AppraisalService,
-    ],
+  it('I retrieve all criterion as a tree', inject(
+    [SchoolsProviderService, AuthService, BaseDataService, CriteriaService],
     async (
       schoolproviderService: SchoolsProviderService,
       authService: AuthService,
-      criteriaService: CriteriaService,
-      userDataService: UserDataService,
-      evalPlanService: EvalPlanService,
       baseDataService: BaseDataService,
-      service: AppraisalService
+      service: CriteriaService
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await service.resetService()
+      const situations = await baseDataService.situations$.toPromise()
+      const criteriaTree = await service
+        .getCriteriaTree(situations[0].evalgridid)
+        .toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      const appraisals = await service.refresh().toPromise()
-      expect(appraisals.length).toEqual(1)
-      expect(appraisals[0].length).toEqual(80) // 80 criterion
+      expect(criteriaTree[0].criterion).toEqual(
+        new CriterionModel({
+          id: 41,
+          label: 'Savoir être',
+          idnumber: 'Q001',
+          parentid: 0,
+          evalgridid: 1,
+          sort: 1,
+          usermodified: 0,
+          timecreated: '1619376440',
+          timemodified: '1619376440',
+        })
+      )
     }
   ))
-
-  // TODO: submit appraisal and so on.
+  it('I retrieve all criterion as a list', inject(
+    [SchoolsProviderService, AuthService, BaseDataService, CriteriaService],
+    async (
+      schoolproviderService: SchoolsProviderService,
+      authService: AuthService,
+      baseDataService: BaseDataService,
+      service: CriteriaService
+    ) => {
+      schoolproviderService.setSelectedSchoolId('mock-api-instance')
+      await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
+      const situations = await baseDataService.situations$.toPromise()
+      const criteriaList = await service
+        .getCriteria(situations[0].evalgridid)
+        .toPromise()
+      // Now we expect the criteria to be the same as the one in the fixtures.
+      expect(criteriaList[0]).toEqual(
+        new CriterionModel({
+          id: 41,
+          label: 'Savoir être',
+          idnumber: 'Q001',
+          parentid: 0,
+          evalgridid: 1,
+          sort: 1,
+          usermodified: 0,
+          timecreated: '1619376440',
+          timemodified: '1619376440',
+        })
+      )
+    }
+  ))
 })

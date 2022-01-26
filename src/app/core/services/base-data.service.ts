@@ -9,7 +9,7 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { Injectable } from '@angular/core'
+import { EventEmitter, Injectable } from '@angular/core'
 
 import {
   forkJoin,
@@ -27,6 +27,7 @@ import { RoleModel } from '../../shared/models/moodle/role.model'
 import { SituationModel } from '../../shared/models/moodle/situation.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
+import Role from '../../../mock/fixtures/role'
 
 /**
  * Load basic user data (stable data that does not change with user interaction with the app), like
@@ -39,14 +40,18 @@ import { AuthService, LOGIN_STATE } from './auth.service'
 })
 export class BaseDataService {
   private entities: {
-    situations: SituationModel[]
-    criteria: CriterionModel[]
-    roles: RoleModel[]
-    groupAssignments: GroupAssignmentModel[]
-  } = null
-
-  private isLoaded$ = new BehaviorSubject<boolean>(false)
-  private isLoading = false
+    clsituation: SituationModel[]
+    role: RoleModel[]
+    group_assign: GroupAssignmentModel[]
+  } = {
+    clsituation: null,
+    role: null,
+    group_assign: null,
+  }
+  private loadingEvents: Map<string, EventEmitter<BaseMoodleModel[]>> = new Map<
+    string,
+    EventEmitter<BaseMoodleModel[]>
+  >()
 
   /**
    * Build the base data service
@@ -61,87 +66,28 @@ export class BaseDataService {
     this.authService.loginState$.subscribe((loginState) => {
       if (loginState !== LOGIN_STATE.LOGGED) {
         this.resetService()
-      } else {
-        this.refreshAllEntities().subscribe()
       }
     })
   }
 
-  resetService() {
-    this.entities = null
-    this.isLoaded$.next(false)
-    this.isLoading = false
-  }
-
   public get situations$(): Observable<SituationModel[]> {
-    return this.getLoadedEntity('situations')
-  }
-
-  public get criteria$(): Observable<CriterionModel[]> {
-    return this.getLoadedEntity('criteria')
+    return this.getLoadedEntity('clsituation')
   }
 
   public get roles$(): Observable<RoleModel[]> {
-    return this.getLoadedEntity('roles')
+    return this.getLoadedEntity('role')
   }
 
   public get groupAssignments$(): Observable<GroupAssignmentModel[]> {
-    return this.getLoadedEntity('groupAssignments')
+    return this.getLoadedEntity('group_assign')
   }
 
   private getLoadedEntity(entityType) {
-    if (this.entities === null) {
-      if (!this.isLoading) {
-        return this.refreshAllEntities().pipe(
-          tap(() => {
-            this.isLoading = false
-            this.isLoaded$.next(true)
-          }),
-          map(() => {
-            return this.entities[entityType]
-          })
-        )
-      } else {
-        return this.isLoaded$.pipe(
-          filter((isLoaded) => !!isLoaded),
-          first(),
-          map(() => {
-            return this.entities[entityType]
-          })
-        )
-      }
+    if (!this.entities[entityType]) {
+      return this.refresh(entityType)
     } else {
       return of(this.entities[entityType])
     }
-  }
-
-  refreshAllEntities() {
-    this.isLoading = true
-    return forkJoin([
-      this.refresh('clsituation'),
-      this.refresh('criterion'),
-      this.refresh('role'),
-      this.refresh('group_assign'),
-    ]).pipe(
-      filter(
-        ([situations, criteria, roles, groupAssignments]) =>
-          situations != null &&
-          criteria != null &&
-          roles != null &&
-          groupAssignments != null
-      ),
-      tap(([situations, criteria, roles, groupAssignments]) => {
-        this.entities = {
-          situations: situations.map((elt) => new SituationModel(elt)),
-          criteria: criteria.map((elt) => new CriterionModel(elt)),
-          roles: roles.map((elt) => new RoleModel(elt)),
-          groupAssignments: groupAssignments.map(
-            (elt) => new GroupAssignmentModel(elt)
-          ),
-        }
-        this.isLoaded$.next(true)
-      })
-    )
   }
 
   /**
@@ -150,18 +96,27 @@ export class BaseDataService {
    * @param entityType
    */
   public refresh(entityType: string): Observable<BaseMoodleModel[]> {
-    if (this.authService.isStillLoggedIn()) {
-      let query = {}
-      if (entityType === 'role') {
-        query = { userid: this.authService.loggedUserValue.userid }
-      }
-      if (entityType === 'group_assign' && this.authService.isStudent) {
-        query = { studentid: this.authService.loggedUserValue.userid }
-      }
-      return this.doRefreshData(entityType, query)
-    } else {
-      return of(null)
+    let loadingEvent = this.loadingEvents.get(entityType)
+    if (loadingEvent === undefined) {
+      loadingEvent = new EventEmitter<BaseMoodleModel[]>()
+      this.loadingEvents.set(entityType, loadingEvent)
+      this.refreshFromAPI(entityType).subscribe((model) => {
+        this.entities[entityType] = model.map((model) => {
+          switch (entityType) {
+            case 'clsituation':
+              return new SituationModel(model)
+            case 'role':
+              return new RoleModel(model)
+            case 'group_assign':
+              return new GroupAssignmentModel(model)
+          }
+        })
+        loadingEvent.emit(this.entities[entityType])
+        loadingEvent.complete()
+        this.loadingEvents.delete(entityType)
+      })
     }
+    return loadingEvent.asObservable()
   }
 
   /**
@@ -169,14 +124,32 @@ export class BaseDataService {
    *
    * @param entityType
    */
-  private doRefreshData(
-    entityType,
-    query: object
-  ): Observable<BaseMoodleModel[]> {
+  private refreshFromAPI(entityType): Observable<BaseMoodleModel[]> {
+    let query = {}
+    if (entityType === 'role') {
+      query = { userid: this.authService.loggedUserValue.userid }
+    }
+    if (entityType === 'group_assign' && this.authService.isStudent) {
+      query = { studentid: this.authService.loggedUserValue.userid }
+    }
     return this.moodleApiService.fetchMoreRecentData(
       entityType,
       query,
       this.entities ? this.entities[entityType] : null
     )
+  }
+
+  /**
+   * Reset service
+   *
+   * @protected
+   */
+  private resetService() {
+    this.entities = {
+      clsituation: null,
+      role: null,
+      group_assign: null,
+    }
+    this.loadingEvents.clear()
   }
 }

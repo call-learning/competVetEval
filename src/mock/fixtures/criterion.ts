@@ -465,4 +465,15 @@ export default [
     timecreated: 1619376440,
     timemodified: 1619376440,
   },
+  {
+    id: 41,
+    label: 'Savoir être bis',
+    idnumber: 'Q001',
+    parentid: 0,
+    evalgridid: 2,
+    sort: 1,
+    usermodified: 0,
+    timecreated: 1619376440,
+    timemodified: 1619376440,
+  },
 ]

@@ -24,7 +24,15 @@ import {
   from,
   combineLatest,
 } from 'rxjs'
-import { filter, first, map, mergeAll, mergeMap, tap } from 'rxjs/operators'
+import {
+  concatMap,
+  filter,
+  first,
+  map,
+  mergeAll,
+  mergeMap,
+  tap,
+} from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
@@ -38,6 +46,7 @@ import { EvalPlanService } from './eval-plan.service'
 import { UserDataService } from './user-data.service'
 import appr from '../../../mock/fixtures/appr'
 import { $D } from 'rxjs-debug'
+import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +61,7 @@ export class AppraisalUiService {
     private evalPlanService: EvalPlanService,
     private appraisalService: AppraisalService
   ) {
-    this.appraisalService.appraisalsChanged
+    this.appraisalService.appraisalsChangedEvent
       .pipe(
         tap((appraisalsChanged) => {
           let appraisalModels = appraisalsChanged.appraisals
@@ -96,30 +105,29 @@ export class AppraisalUiService {
       from(appraisalModels)
         .pipe(
           mergeMap((appraisalModel: AppraisalModel) =>
-            this.convertAppraisalCriterionModelsToTree(
-              appraisalCriteriaModels.filter(
-                (apc) => apc.appraisalid === appraisalModel.id
+            this.evalPlanService
+              .getEvalGridIdFromEvalPlanId(appraisalModel.evalplanid)
+              .pipe(
+                mergeMap((evalGridId) =>
+                  this.convertAppraisalCriterionModelsToTree(
+                    appraisalCriteriaModels.filter(
+                      (apc) => apc.appraisalid === appraisalModel.id
+                    ),
+                    evalGridId
+                  )
+                ),
+                mergeMap((treeModel) =>
+                  this.convertAppraisalModel(appraisalModel, treeModel)
+                ),
+                tap((appraisalsUI: AppraisalUI) => {
+                  mergeExistingBehaviourSubject(
+                    this.appraisalEntities$,
+                    [appraisalsUI],
+                    ['id']
+                  )
+                })
               )
-            ).pipe(
-              map((ctm: CriterionForAppraisalTreeModel[]) => {
-                return {
-                  model: appraisalModel,
-                  crtreeModel: ctm,
-                }
-              })
-            )
-          ),
-          map((info) =>
-            this.convertAppraisalModel(info.model, info.crtreeModel)
-          ),
-          mergeAll(),
-          tap((appraisalsUI: AppraisalUI) => {
-            mergeExistingBehaviourSubject(
-              this.appraisalEntities$,
-              [appraisalsUI],
-              ['id']
-            )
-          })
+          )
         )
         .subscribe()
     }
@@ -132,7 +140,8 @@ export class AppraisalUiService {
    * @protected
    */
   private convertAppraisalCriterionModelsToTree(
-    apprcriteria: AppraisalCriterionModel[]
+    apprcriteria: AppraisalCriterionModel[],
+    evalGridId: number
   ): Observable<CriterionForAppraisalTreeModel[]> {
     const recurseThroughCriteriaTree = (criterionmodel: CriterionTreeModel) => {
       const currentAppraisalCriteria = apprcriteria.find(
@@ -150,8 +159,7 @@ export class AppraisalUiService {
         return null
       }
     }
-
-    return this.criteriaService.criteriaTree$.pipe(
+    return this.criteriaService.getCriteriaTree(evalGridId).pipe(
       map((criteriaTree) => {
         return criteriaTree
           .map((criteriontree) => recurseThroughCriteriaTree(criteriontree))

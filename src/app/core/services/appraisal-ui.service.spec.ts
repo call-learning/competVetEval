@@ -88,7 +88,6 @@ describe('AppraisalUIService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await baseDataService.refreshAllEntities().toPromise()
       await service.refreshAppraisals().toPromise()
       // Now we expect the criteria to be the same as the one in the fixtures.
       const appraisals = service.appraisals$.getValue()
