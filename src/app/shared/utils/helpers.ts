@@ -14,6 +14,7 @@
  */
 import { BehaviorSubject } from 'rxjs'
 import { Md5 } from 'ts-md5'
+import { has } from 'lodash'
 
 /**
  * Compares two objects and return false if different
@@ -34,25 +35,66 @@ const compareObjects = (a, b) => {
 /**
  * Merge new array with existing and send a next signal
  *
- * @param behaviourSubject
- * @param newEntities
- * @param keyname
+ * @param currentValues
+ * @param newValues
+ * @param keyNames
+ * @return any[] next set of values
  */
 
-export const mergeExistingBehaviourSubject = (
-  behaviourSubject: BehaviorSubject<any[]>,
-  newEntities: any[],
-  keynames: string[]
+export const areSame = (
+  currentValues: any[],
+  newValues: any[],
+  keyNames: string[]
 ) => {
-  if (newEntities) {
-    const currentValues = behaviourSubject.getValue()
-    let hasChanged = currentValues ? false : true
+  if (newValues == currentValues) {
+    return true
+  }
+  if (newValues == null) {
+    return !currentValues
+  }
+  if (
+    (!newValues && currentValues) ||
+    (newValues && !currentValues) ||
+    newValues.length != currentValues.length
+  ) {
+    return false
+  }
+  const isSame = newValues.reduce((acc, newValue) => {
+    const foundIndex = currentValues.findIndex((e) => {
+      let isMatching = true
+      keyNames.forEach((key) => {
+        if (e[key] !== newValue[key]) {
+          isMatching = false
+        }
+      })
+      return isMatching
+    })
+    return acc && foundIndex
+  }, true)
+  return isSame
+}
 
-    const nextValues = newEntities.reduce(
+/**
+ * Merge new array with existing and send a next signal
+ *
+ * @param currentValues
+ * @param newValues
+ * @param keyNames
+ * @return any[] next set of values sorted by key
+ */
+
+export const mergeWithExisting = (
+  currentValues: any[],
+  newValues: any[],
+  keyNames: string[]
+) => {
+  let nextValues = currentValues
+  if (newValues) {
+    nextValues = newValues.reduce(
       (acc, cval) => {
         const foundIndex = acc.findIndex((e) => {
           let isMatching = true
-          keynames.forEach((key) => {
+          keyNames.forEach((key) => {
             if (e[key] !== cval[key]) {
               isMatching = false
             }
@@ -62,11 +104,9 @@ export const mergeExistingBehaviourSubject = (
         // If the new value is not found or has changed, then we
         // add it to the list
         if (foundIndex === -1) {
-          hasChanged = true
           acc.push(cval)
         } else {
           if (!compareObjects(acc[foundIndex], cval)) {
-            hasChanged = true
             acc[foundIndex] = cval
           }
         }
@@ -77,18 +117,17 @@ export const mergeExistingBehaviourSubject = (
 
     nextValues.sort((e1, e2) => {
       let compareResults = 0
-      keynames.forEach((key) => {
+      keyNames.forEach((key) => {
         if (e1[key] instanceof String) {
           compareResults = compareResults || e1[key].localeCompare(e2[key])
         } else {
           compareResults = compareResults || e1[key] - e2[key]
         }
       })
+      return compareResults
     })
-    if (hasChanged) {
-      behaviourSubject.next(nextValues)
-    }
   }
+  return nextValues
 }
 
 export const getTokenFromLaunchURL = (launchURL, siteURL) => {

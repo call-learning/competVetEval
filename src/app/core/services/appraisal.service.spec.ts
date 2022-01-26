@@ -30,6 +30,8 @@ import { UserDataService } from './user-data.service'
 import { EvalPlanService } from './eval-plan.service'
 import { AppraisalService } from './appraisal.service'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
+import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
+import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 
 // Dummy component for routes.
 @Component({ template: '' })
@@ -65,6 +67,32 @@ describe('AppraisalService', () => {
     worker.stop()
   })
 
+  it('I retrieve all appraisal models', inject(
+    [
+      SchoolsProviderService,
+      AuthService,
+      CriteriaService,
+      UserDataService,
+      EvalPlanService,
+      BaseDataService,
+      AppraisalService,
+    ],
+    async (
+      schoolproviderService: SchoolsProviderService,
+      authService: AuthService,
+      criteriaService: CriteriaService,
+      userDataService: UserDataService,
+      evalPlanService: EvalPlanService,
+      baseDataService: BaseDataService,
+      service: AppraisalService
+    ) => {
+      schoolproviderService.setSelectedSchoolId('mock-api-instance')
+      await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
+      // Now we expect the criteria to be the same as the one in the fixtures.
+      const appraisals = await service.appraisals$.toPromise()
+      expect(appraisals.length).toEqual(2)
+    }
+  ))
   it('I retrieve all appraisal criterion models', inject(
     [
       SchoolsProviderService,
@@ -86,13 +114,49 @@ describe('AppraisalService', () => {
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      await service.resetService()
       // Now we expect the criteria to be the same as the one in the fixtures.
-      const appraisals = await service.refresh().toPromise()
-      expect(appraisals.length).toEqual(1)
-      expect(appraisals[0].length).toEqual(80) // 80 criterion
+      const appraisalsCriteria = await service.appraisalCriteria$.toPromise()
+      expect(appraisalsCriteria.length).toEqual(80) // 40 criterion
     }
   ))
+  it('I get a message when all criteria are loaded', (done) =>
+    inject(
+      [
+        SchoolsProviderService,
+        AuthService,
+        CriteriaService,
+        UserDataService,
+        EvalPlanService,
+        BaseDataService,
+        AppraisalService,
+      ],
+      async (
+        schoolproviderService: SchoolsProviderService,
+        authService: AuthService,
+        criteriaService: CriteriaService,
+        userDataService: UserDataService,
+        evalPlanService: EvalPlanService,
+        baseDataService: BaseDataService,
+        service: AppraisalService
+      ) => {
+        schoolproviderService.setSelectedSchoolId('mock-api-instance')
+
+        await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
+        // Now we expect the criteria to be the same as the one in the fixtures.
+        service.forceRefresh()
+
+        service.appraisalLoadedEvent.subscribe(
+          ({
+            appraisals: appraisalModel,
+            appraisalCriterionModels: appraisalsCriteria,
+          }) => {
+            expect(appraisalsCriteria.length).toEqual(80) // 80 criterion
+            expect(appraisalModel.length).toEqual(2)
+            done()
+          }
+        )
+      }
+    )()) // Braket important here if not never called: https://stackoverflow.com/questions/25274152/jasmine-2-0-async-done-and-angular-mocks-inject-in-same-test-it
 
   // TODO: submit appraisal and so on.
 })

@@ -1,8 +1,8 @@
-import { EventEmitter, Injectable } from '@angular/core'
+import { Injectable } from '@angular/core'
 
-import { of, BehaviorSubject, Observable } from 'rxjs'
-import { first, mergeMap, tap } from 'rxjs/operators'
-import { filter, map } from 'rxjs/operators'
+import { of, Observable, Subject } from 'rxjs'
+import { mergeMap } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
@@ -25,9 +25,7 @@ export class EvalPlanService {
 
   // If if this not null, then we are currently loading, so we need
   // to wait for the process to finish.
-  private loadingEvent: EventEmitter<EvalPlanModel[]> = new EventEmitter<
-    EvalPlanModel[]
-  >()
+  private loadingEvent: Subject<EvalPlanModel[]> = null
 
   /**
    * Constructor
@@ -94,9 +92,9 @@ export class EvalPlanService {
    * If a user is an appraiser we will retrieve all appraisals that the appraiser is
    * involved in: all appraisal for a plan that the user is involved in
    */
-  protected refresh(): Observable<EvalPlanModel[]> {
-    if (this.loadingEvent.isStopped) {
-      this.loadingEvent = new EventEmitter<EvalPlanModel[]>()
+  private refresh(): Observable<EvalPlanModel[]> {
+    if (!this.loadingEvent || this.loadingEvent.isStopped) {
+      this.loadingEvent = new Subject<EvalPlanModel[]>()
       this.moodleApiService
         .fetchMoreRecentData('evalplan', {}, this.planningEntities)
         .pipe(
@@ -108,7 +106,7 @@ export class EvalPlanService {
           })
         )
         .subscribe((allPlans) => {
-          this.loadingEvent.emit(allPlans)
+          this.loadingEvent.next(allPlans)
           this.planningEntities = allPlans
           this.loadingEvent.complete() // Important : if not event is not emitted.
         })
@@ -120,8 +118,8 @@ export class EvalPlanService {
    * Reset Service
    * @protected
    */
-  protected resetService() {
+  private resetService() {
     this.planningEntities = null
-    this.loadingEvent.complete()
+    this.loadingEvent = null
   }
 }

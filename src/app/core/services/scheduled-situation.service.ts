@@ -51,7 +51,7 @@ export class ScheduledSituationService {
     })
 
     combineLatest([
-      this.appraisalUIService.appraisals$.asObservable(),
+      this.appraisalUIService.appraisals$,
       this.scheduledSituationsEntities$,
     ])
       .pipe(

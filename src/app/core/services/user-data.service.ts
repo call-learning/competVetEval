@@ -6,15 +6,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
-import { EventEmitter, Injectable } from '@angular/core'
+import { Injectable } from '@angular/core'
 
-import { of, Observable, BehaviorSubject } from 'rxjs'
-import { filter, map, tap } from 'rxjs/operators'
+import { of, Observable, BehaviorSubject, Subject } from 'rxjs'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
-import { CloneVisitor } from '@angular/compiler/src/i18n/i18n_ast'
-import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 
 /**
  * Load user profile info for a given user or all related users
@@ -33,9 +30,9 @@ export class UserDataService {
 
   // If if this not null, then we are currently loading, so we need
   // to wait for the process to finish.
-  private loadingEvents: Map<number, EventEmitter<CevUser>> = new Map<
+  private loadingEvents: Map<number, Subject<CevUser>> = new Map<
     number,
-    EventEmitter<CevUser>
+    Subject<CevUser>
   >()
 
   /**
@@ -80,13 +77,13 @@ export class UserDataService {
    * @param userid
    * @private
    */
-  public retrieveUserData(userid: number) {
+  private retrieveUserData(userid: number) {
     let loadingEvent = this.loadingEvents.get(userid)
     if (!loadingEvent) {
-      loadingEvent = new EventEmitter<CevUser>()
+      loadingEvent = new Subject<CevUser>()
       this.loadingEvents.set(userid, loadingEvent)
       this.moodleApiService.getUserProfileInfo(userid).subscribe((user) => {
-        loadingEvent.emit(user)
+        loadingEvent.next(user)
         loadingEvent.complete()
         this.loadingEvents.delete(userid)
         this.userProfiles.set(userid, user)

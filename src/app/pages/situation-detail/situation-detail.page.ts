@@ -188,8 +188,9 @@ export class SituationDetailPage extends BaseComponent {
    * @param event
    */
   doRefresh(event) {
-    this.appraisalUIService.refreshAppraisals().subscribe(() => {
+    this.appraisalUIService.appraisals$.subscribe(() => {
       event.target.complete()
     })
+    this.appraisalUIService.forceRefresh()
   }
 }

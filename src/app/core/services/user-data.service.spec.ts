@@ -86,7 +86,10 @@ describe('User Data Service', () => {
       schoolProviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
 
-      const spiedService = spyOn(service, 'retrieveUserData').and.callThrough()
+      const spiedService = spyOn<any>(
+        service,
+        'retrieveUserData'
+      ).and.callThrough()
       const user1 = await service.getUserProfileInfo(1).toPromise()
       // Now we expect the plans to be the same as the one in the fixtures.
       expect(user1.username).toEqual('student1')

@@ -7,9 +7,8 @@
  * @copyright  2021 SAS CALL Learning <call-learning.fr>
  */
 
-import { BehaviorSubject } from 'rxjs'
 import { Md5 } from 'ts-md5'
-import { getTokenFromLaunchURL, mergeExistingBehaviourSubject } from './helpers'
+import { getTokenFromLaunchURL, mergeWithExisting } from './helpers'
 
 const SIMPLE_VALUES = [
   { id: 1, subarray: [] },
@@ -232,48 +231,31 @@ const NEXT_VALUES_CHANGE = [
 ]
 
 describe('Helpers', () => {
-  it('I merge two array with objects', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(SIMPLE_VALUES)
-    mergeExistingBehaviourSubject(currentvalues, SIMPLE_VALUES_MERGE, ['id'])
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toEqual(SIMPLE_VALUES_RESULT)
-      done()
-    })
+  it('I merge two array with objects', () => {
+    expect(
+      mergeWithExisting(SIMPLE_VALUES, SIMPLE_VALUES_MERGE, ['id'])
+    ).toEqual(SIMPLE_VALUES_RESULT)
   })
-  it('I merge an existing behavioursubject array with a new value', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
-    mergeExistingBehaviourSubject(currentvalues, NEXT_VALUES_ADD_NEW, ['id'])
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toContain(NEXT_VALUES_ADD_NEW[0])
-      done()
-    })
+  it('I merge an existing behavioursubject array with a new value', () => {
+    expect(
+      mergeWithExisting(SIMPLE_VALUES, NEXT_VALUES_ADD_NEW, ['id'])
+    ).toContain(NEXT_VALUES_ADD_NEW[0])
   })
 
-  it('I merge an existing behavioursubject array with a modified value', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
-    mergeExistingBehaviourSubject(currentvalues, NEXT_VALUES_CHANGE, ['id'])
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toContain(NEXT_VALUES_CHANGE[0])
-      done()
-    })
+  it('I merge an existing behavioursubject array with a modified value', () => {
+    expect(
+      mergeWithExisting(SIMPLE_VALUES, NEXT_VALUES_CHANGE, ['id'])
+    ).toContain(NEXT_VALUES_CHANGE[0])
   })
 
-  it('I merge two arrays array with a modified value', (done) => {
-    let currentvalues: BehaviorSubject<any>
-    currentvalues = new BehaviorSubject<Array<object>>(CURRENT_VALUES)
-    mergeExistingBehaviourSubject(
-      currentvalues,
+  it('I merge two arrays array with a modified value', () => {
+    const mergedValues = mergeWithExisting(
+      CURRENT_VALUES,
       [...NEXT_VALUES_CHANGE, ...NEXT_VALUES_ADD_NEW],
       ['id']
     )
-    currentvalues.subscribe((newValue) => {
-      expect(newValue).toContain(NEXT_VALUES_CHANGE[0])
-      expect(newValue).toContain(NEXT_VALUES_ADD_NEW[0])
-      done()
-    })
+    expect(mergedValues).toContain(NEXT_VALUES_CHANGE[0])
+    expect(mergedValues).toContain(NEXT_VALUES_ADD_NEW[0])
   })
 
   it('I parse the token from WRONG url', () => {

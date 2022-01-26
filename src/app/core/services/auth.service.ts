@@ -46,7 +46,7 @@ export class AuthService {
     private schoolsProviderService: SchoolsProviderService
   ) {}
 
-  login(
+  public login(
     username: string,
     password: string
   ): Observable<'student' | 'appraiser'> {
@@ -70,7 +70,7 @@ export class AuthService {
     )
   }
 
-  loginWithToken(tokenString) {
+  public loginWithToken(tokenString) {
     this.setSession(tokenString)
     return this.loadUserProfile().pipe(
       tap(() => {
@@ -79,7 +79,7 @@ export class AuthService {
     )
   }
 
-  logout() {
+  public logout() {
     this.router.navigate(['login'])
 
     this.cleanUp()
@@ -91,7 +91,7 @@ export class AuthService {
     this.currentUserRole$.next(null)
   }
 
-  setChosenSchool(school: School) {
+  public setChosenSchool(school: School) {
     if (school) {
       this.schoolsProviderService.setSelectedSchoolId(school.id)
     } else {
@@ -101,7 +101,7 @@ export class AuthService {
     this.chosenSchool = school
   }
 
-  recoverSession(): Observable<boolean> {
+  public recoverSession(): Observable<boolean> {
     if (this.schoolsProviderService.getSelectedSchoolId()) {
       this.setChosenSchool(
         this.schoolsProviderService.getSchoolFromId(
@@ -130,17 +130,29 @@ export class AuthService {
     }
   }
 
-  setSession(token: string) {
+  public setSession(token: string) {
     this.accessToken = token
     localStorage.setItem(LocaleKeys.tokenId, this.accessToken)
   }
 
-  variablesInSessionExists() {
+  public variablesInSessionExists() {
     return localStorage.getItem(LocaleKeys.tokenId)
   }
 
-  isStillLoggedIn() {
+  public isStillLoggedIn() {
     return !!this.variablesInSessionExists()
+  }
+
+  public get loggedUserValue() {
+    return this.loggedUser$.getValue()
+  }
+
+  public get isStudent() {
+    return this.currentUserRole$.getValue() === 'student'
+  }
+
+  public get isAppraiser() {
+    return this.currentUserRole$.getValue() !== 'student'
   }
 
   private recoverStorageVariables() {
@@ -183,17 +195,5 @@ export class AuthService {
   private cleanUp() {
     this.accessToken = null
     LocaleKeys.cleanupAuthStorage()
-  }
-
-  get loggedUserValue() {
-    return this.loggedUser$.getValue()
-  }
-
-  get isStudent() {
-    return this.currentUserRole$.getValue() === 'student'
-  }
-
-  get isAppraiser() {
-    return this.currentUserRole$.getValue() !== 'student'
   }
 }

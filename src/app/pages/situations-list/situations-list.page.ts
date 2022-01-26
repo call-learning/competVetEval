@@ -304,11 +304,9 @@ export class SituationsListPage extends BaseComponent implements OnInit {
   }
 
   doRefresh(event) {
-    this.appraisalUIService
-      .refreshAppraisals()
-      .pipe(takeUntil(this.alive$))
-      .subscribe(() => {
-        event.target.complete()
-      })
+    this.appraisalUIService.appraisals$.subscribe(() => {
+      event.target.complete()
+    })
+    this.appraisalUIService.forceRefresh()
   }
 }

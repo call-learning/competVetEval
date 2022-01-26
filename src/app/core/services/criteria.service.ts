@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core'
 
-import { of, Observable } from 'rxjs'
+import { of, Observable, Subject } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
@@ -37,8 +37,8 @@ export class CriteriaService {
   >()
   private loadingEvents: Map<
     number,
-    EventEmitter<[CriterionTreeModel[], CriterionModel[]]>
-  > = new Map<number, EventEmitter<[CriterionTreeModel[], CriterionModel[]]>>()
+    Subject<[CriterionTreeModel[], CriterionModel[]]>
+  > = new Map<number, Subject<[CriterionTreeModel[], CriterionModel[]]>>()
   /**
    * Build the base data service
    *
@@ -84,7 +84,7 @@ export class CriteriaService {
    * Reset service
    * @protected
    */
-  protected resetService() {
+  private resetService() {
     this.criteriaTreeEntities.clear()
     this.criteriaList.clear()
     this.loadingEvents.clear()
@@ -93,14 +93,12 @@ export class CriteriaService {
    * Build a tree model of criteria from a flat list
    * @return Observable<CriterionTreeModel[]
    */
-  protected refresh(
+  private refresh(
     evalGridId
   ): Observable<[CriterionTreeModel[], CriterionModel[]]> {
     let loadingEvent = this.loadingEvents.get(evalGridId)
     if (!loadingEvent) {
-      loadingEvent = new EventEmitter<
-        [CriterionTreeModel[], CriterionModel[]]
-      >()
+      loadingEvent = new Subject<[CriterionTreeModel[], CriterionModel[]]>()
       this.loadingEvents.set(evalGridId, loadingEvent)
 
       let query = { evalgridid: evalGridId }
@@ -122,7 +120,7 @@ export class CriteriaService {
           const allHierarchicalCriteria =
             CriterionTreeModel.convertToTree(newCriteriaList)
           this.criteriaTreeEntities.set(evalGridId, allHierarchicalCriteria)
-          loadingEvent.emit([allHierarchicalCriteria, newCriteriaList])
+          loadingEvent.next([allHierarchicalCriteria, newCriteriaList])
           loadingEvent.complete()
           this.loadingEvents.delete(evalGridId)
         })
