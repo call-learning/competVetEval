@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 
 import { of, Observable, Subject } from 'rxjs'
-import { mergeMap } from 'rxjs/operators'
+import { first, mergeMap, tap } from 'rxjs/operators'
 import { map } from 'rxjs/operators'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
@@ -23,8 +23,13 @@ import { SituationModel } from '../../shared/models/moodle/situation.model'
 export class EvalPlanService {
   private planningEntities: EvalPlanModel[] = null
 
-  // If if this not null, then we are currently loading, so we need
+  // If if this not null or not stopped, then we are currently loading, so we need
   // to wait for the process to finish.
+  //
+  // This is the pattern used in most services:
+  // * We prevent double loading of the eval plan by using Subject/Emitter
+  // * We either do the actual loading or return the Subject as an Observable
+  // then when data is loaded we emit event with the result.
   private loadingEvent: Subject<EvalPlanModel[]> = null
 
   /**
@@ -85,6 +90,14 @@ export class EvalPlanService {
       map((situation) => (!situation ? 1 : situation.evalgridid))
     )
   }
+
+  /**
+   * Force refresh
+   */
+  public forceRefresh() {
+    this.resetService()
+    this.refresh().pipe(first()).subscribe()
+  }
   /**
    * Refresh all appraisals for the currently logged-in user
    *
@@ -93,25 +106,26 @@ export class EvalPlanService {
    * involved in: all appraisal for a plan that the user is involved in
    */
   private refresh(): Observable<EvalPlanModel[]> {
-    if (!this.loadingEvent || this.loadingEvent.isStopped) {
-      this.loadingEvent = new Subject<EvalPlanModel[]>()
-      this.moodleApiService
-        .fetchMoreRecentData('evalplan', {}, this.planningEntities)
-        .pipe(
-          map((evalplans) => {
-            const evalplanmodels = evalplans.map(
-              (plan) => new EvalPlanModel(plan)
-            )
-            return evalplanmodels
-          })
-        )
-        .subscribe((allPlans) => {
+    if (this.loadingEvent && !this.loadingEvent.isStopped) {
+      return this.loadingEvent.asObservable()
+    }
+
+    this.loadingEvent = new Subject<EvalPlanModel[]>()
+    return this.moodleApiService
+      .fetchMoreRecentData('evalplan', {}, this.planningEntities)
+      .pipe(
+        map((evalplans) => {
+          const evalplanmodels = evalplans.map(
+            (plan) => new EvalPlanModel(plan)
+          )
+          return evalplanmodels
+        }),
+        tap((allPlans) => {
           this.loadingEvent.next(allPlans)
           this.planningEntities = allPlans
           this.loadingEvent.complete() // Important : if not event is not emitted.
         })
-    }
-    return this.loadingEvent.asObservable()
+      )
   }
 
   /**

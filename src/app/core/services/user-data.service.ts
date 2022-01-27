@@ -12,6 +12,7 @@ import { of, Observable, BehaviorSubject, Subject } from 'rxjs'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { MoodleApiService } from '../http-services/moodle-api.service'
 import { AuthService, LOGIN_STATE } from './auth.service'
+import { tap } from 'rxjs/operators'
 
 /**
  * Load user profile info for a given user or all related users
@@ -77,18 +78,20 @@ export class UserDataService {
    * @param userid
    * @private
    */
-  private retrieveUserData(userid: number) {
+  private retrieveUserData(userid: number): Observable<CevUser> {
     let loadingEvent = this.loadingEvents.get(userid)
-    if (!loadingEvent) {
-      loadingEvent = new Subject<CevUser>()
-      this.loadingEvents.set(userid, loadingEvent)
-      this.moodleApiService.getUserProfileInfo(userid).subscribe((user) => {
+    if (loadingEvent && !loadingEvent.isStopped) {
+      return loadingEvent.asObservable()
+    }
+    loadingEvent = new Subject<CevUser>()
+    this.loadingEvents.set(userid, loadingEvent)
+    return this.moodleApiService.getUserProfileInfo(userid).pipe(
+      tap((user) => {
         loadingEvent.next(user)
         loadingEvent.complete()
         this.loadingEvents.delete(userid)
         this.userProfiles.set(userid, user)
       })
-    }
-    return loadingEvent.asObservable()
+    )
   }
 }

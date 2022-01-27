@@ -11,6 +11,7 @@ import { Router } from '@angular/router'
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import {
+  AlertController,
   LoadingController,
   ModalController,
   ToastController,
@@ -19,6 +20,8 @@ import {
 import { AppraisalUiService } from '../../../core/services/appraisal-ui.service'
 import { AuthService } from '../../../core/services/auth.service'
 import { AppraisalUI } from '../../models/ui/appraisal-ui.model'
+import { map, tap } from 'rxjs/operators'
+import appr from '../../../../mock/fixtures/appr'
 
 @Component({
   selector: 'app-modal-scan-appraisal',
@@ -34,7 +37,8 @@ export class ModalScanAppraisalComponent implements OnInit {
     private appraisalUIService: AppraisalUiService,
     private authService: AuthService,
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private alertController: AlertController
   ) {}
 
   ngOnInit() {}
@@ -56,46 +60,80 @@ export class ModalScanAppraisalComponent implements OnInit {
         resultDisplayDuration: 500,
         formats: 'QR_CODE',
       })
-      .then((barcodeData) => {
-        this.toastController
-          .create({
-            message: 'Scan réussi !',
-            duration: 2000,
-            color: 'success',
-          })
-          .then((toast) => {
-            toast.present()
-          })
-        this.dismissModal()
-        const appraisalId = Number.parseInt(barcodeData.text, 10)
-
-        this.loadingController.create().then((loader) => {
-          loader.present()
-
-          this.getAppraisal(appraisalId)
-        })
-      })
+      .then((barcodeData) => this.processScan(barcodeData))
       .catch((err) => {
-        console.error('Error', err)
-        this.toastController
-          .create({
-            message: 'Erreur lors du scan',
-            duration: 2000,
-            color: 'danger',
-          })
-          .then((toast) => {
-            toast.present()
-          })
+        if (err == 'cordova_not_available') {
+          this.alertController
+            .create({
+              inputs: [
+                {
+                  name: 'appraisalid',
+                  placeholder: "Code de l'évaluation",
+                },
+              ],
+              buttons: [
+                {
+                  text: 'Ok',
+                  handler: (data) => {
+                    this.showAppraisal(Number.parseInt(data.appraisalid))
+                  },
+                },
+              ],
+            })
+            .then((alert) => {
+              alert.present()
+            })
+        } else {
+          console.error('Error', err)
+          this.toastController
+            .create({
+              message: 'Erreur lors du scan',
+              duration: 2000,
+              color: 'danger',
+            })
+            .then((toast) => {
+              toast.present()
+            })
+        }
       })
   }
 
-  getAppraisal(appraisalId: number) {
-    this.appraisalUIService
-      .waitForAppraisalId(appraisalId)
-      .subscribe((appraisal: AppraisalUI) => {
+  private processScan(barcodeData) {
+    this.toastController
+      .create({
+        message: 'Scan réussi.',
+        duration: 2000,
+        color: 'success',
+      })
+      .then((toast) => {
+        toast.present()
+      })
+    const appraisalId = Number.parseInt(barcodeData.text, 10)
+    this.showAppraisal(appraisalId)
+  }
+
+  private showAppraisal(appraisalId: number) {
+    this.dismissModal()
+    this.loadingController.create().then((loader) => {
+      loader.present()
+      this.retrieveAppraisal(appraisalId).subscribe(
+        (appraisal: AppraisalUI) => {
+          loader.dismiss().then(() => {
+            if (appraisal) {
+              this.submitAppraisal(appraisal)
+            }
+          })
+        }
+      )
+    })
+  }
+
+  protected retrieveAppraisal(appraisalId: number) {
+    return this.appraisalUIService.waitForAppraisalId(appraisalId).pipe(
+      map((appraisal: AppraisalUI) => {
         if (appraisal) {
           if (appraisal.appraiser === null) {
-            this.submitAppraisal(appraisal)
+            return appraisal
           } else {
             this.toastController
               .create({
@@ -119,7 +157,9 @@ export class ModalScanAppraisalComponent implements OnInit {
               toast.present()
             })
         }
+        return null
       })
+    )
   }
 
   submitAppraisal(appraisal: AppraisalUI) {

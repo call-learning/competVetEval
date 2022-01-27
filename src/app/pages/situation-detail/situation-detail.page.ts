@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router'
 
 import { LoadingController, ModalController } from '@ionic/angular'
 
-import { forkJoin } from 'rxjs'
-import { map, takeUntil } from 'rxjs/operators'
+import { combineLatest, forkJoin } from 'rxjs'
+import { first, map, takeUntil, tap } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { ModalAskAppraisalComponent } from 'src/app/shared/modals/modal-ask-appraisal/modal-ask-appraisal.component'
 import { ModalSituationChartComponent } from 'src/app/shared/modals/modal-situation-chart/modal-situation-chart.component'
@@ -16,6 +16,7 @@ import { BaseComponent } from '../../shared/components/base/base.component'
 import { ModalShowAppraisalBarcodeComponent } from '../../shared/modals/modal-show-appraisal-barcode/modal-show-appraisal-barcode.component'
 import { CevUser } from '../../shared/models/cev-user.model'
 import { AppraisalUI } from '../../shared/models/ui/appraisal-ui.model'
+import situations from '../../../mock/fixtures/situations'
 
 @Component({
   selector: 'app-situation-detail',
@@ -69,7 +70,9 @@ export class SituationDetailPage extends BaseComponent {
       .fetchAppraisalsForEvalPlanStudentId(this.evalPlanId, this.studentId)
       .pipe(takeUntil(this.alive$))
       .subscribe((appraisals) => {
-        this.appraisals = appraisals
+        this.appraisals = appraisals.sort(
+          (ap1, ap2) => ap2.timeModified - ap1.timeModified
+        )
       })
   }
 
@@ -77,46 +80,11 @@ export class SituationDetailPage extends BaseComponent {
     this.scheduledSituation = null
 
     this.loadingController.create().then((loader) => {
-      loader.present()
-
-      forkJoin([
-        this.situationService.situations$,
-        this.userDataService.getUserProfileInfo(this.studentId),
-      ])
-        .pipe(
-          map(([situations, userProfile]) => {
-            if (situations) {
-              this.scheduledSituation = situations.find(
-                (s) =>
-                  s.evalPlanId === this.evalPlanId &&
-                  (this.studentId == null || this.studentId === s.studentId)
-              )
-              if (this.authService.isStudent) {
-                this.situationService
-                  .getMyScheduledSituationStats(
-                    this.scheduledSituation.evalPlan.id
-                  )
-                  .subscribe((stats) => {
-                    this.scheduledSituation.stats = stats
-                  })
-              } else {
-                this.situationService
-                  .getAppraiserScheduledSituationStats(
-                    this.scheduledSituation.evalPlan.id,
-                    this.scheduledSituation.studentId
-                  )
-                  .subscribe((stats) => {
-                    this.scheduledSituation.stats = stats
-                  })
-              }
-              if (userProfile) {
-                this.studentInfo = userProfile
-              }
-              loader.dismiss()
-            }
-          })
-        )
-        .subscribe()
+      loader.present().then(() => {
+        this.getLoadDataObservable().subscribe(() => {
+          loader.dismiss()
+        })
+      })
     })
   }
 
@@ -188,9 +156,38 @@ export class SituationDetailPage extends BaseComponent {
    * @param event
    */
   doRefresh(event) {
-    this.appraisalUIService.appraisals$.subscribe(() => {
-      event.target.complete()
-    })
     this.appraisalUIService.forceRefresh()
+    this.appraisalUIService
+      .fetchAppraisalsForEvalPlanStudentId(this.evalPlanId, this.studentId)
+      .pipe(takeUntil(this.alive$))
+      .subscribe((appraisals) => {
+        event.target.complete()
+        this.appraisals = appraisals.sort(
+          (ap1, ap2) => ap2.timeModified - ap1.timeModified
+        )
+      })
+    this.getLoadDataObservable().pipe(first()).subscribe()
+  }
+
+  protected getLoadDataObservable() {
+    if (this.studentId) {
+      this.userDataService
+        .getUserProfileInfo(this.studentId)
+        .subscribe((userProfile) => {
+          this.studentInfo = userProfile
+        })
+    }
+    return combineLatest([
+      this.situationService.situations$,
+      this.appraisalUIService.appraisals$,
+    ]).pipe(
+      tap(([situations]) => {
+        this.scheduledSituation = situations.find(
+          (s) =>
+            s.evalPlanId === this.evalPlanId &&
+            (this.studentId == null || this.studentId === s.studentId)
+        )
+      })
+    )
   }
 }

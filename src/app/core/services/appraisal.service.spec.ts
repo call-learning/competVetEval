@@ -39,6 +39,8 @@ class TestComponent {}
 
 describe('AppraisalService', () => {
   let mockedRouter: Router
+  // https://stackoverflow.com/questions/29352578/some-of-your-tests-did-a-full-page-reload-error-when-running-jasmine-tests
+  window.onbeforeunload = jasmine.createSpy() // Prevent error message "Some of your tests did a full page reload"
   // Start mock server.
   beforeAll(async () => {
     await worker.start()
@@ -62,28 +64,17 @@ describe('AppraisalService', () => {
   })
   afterEach(() => {
     worker.resetHandlers()
+    TestBed.resetTestingModule()
   })
   afterAll(() => {
     worker.stop()
   })
 
   it('I retrieve all appraisal models', inject(
-    [
-      SchoolsProviderService,
-      AuthService,
-      CriteriaService,
-      UserDataService,
-      EvalPlanService,
-      BaseDataService,
-      AppraisalService,
-    ],
+    [SchoolsProviderService, AuthService, AppraisalService],
     async (
       schoolproviderService: SchoolsProviderService,
       authService: AuthService,
-      criteriaService: CriteriaService,
-      userDataService: UserDataService,
-      evalPlanService: EvalPlanService,
-      baseDataService: BaseDataService,
       service: AppraisalService
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
@@ -94,22 +85,10 @@ describe('AppraisalService', () => {
     }
   ))
   it('I retrieve all appraisal criterion models', inject(
-    [
-      SchoolsProviderService,
-      AuthService,
-      CriteriaService,
-      UserDataService,
-      EvalPlanService,
-      BaseDataService,
-      AppraisalService,
-    ],
+    [SchoolsProviderService, AuthService, AppraisalService],
     async (
       schoolproviderService: SchoolsProviderService,
       authService: AuthService,
-      criteriaService: CriteriaService,
-      userDataService: UserDataService,
-      evalPlanService: EvalPlanService,
-      baseDataService: BaseDataService,
       service: AppraisalService
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
@@ -121,22 +100,10 @@ describe('AppraisalService', () => {
   ))
   it('I get a message when all criteria are loaded', (done) =>
     inject(
-      [
-        SchoolsProviderService,
-        AuthService,
-        CriteriaService,
-        UserDataService,
-        EvalPlanService,
-        BaseDataService,
-        AppraisalService,
-      ],
+      [SchoolsProviderService, AuthService, AppraisalService],
       async (
         schoolproviderService: SchoolsProviderService,
         authService: AuthService,
-        criteriaService: CriteriaService,
-        userDataService: UserDataService,
-        evalPlanService: EvalPlanService,
-        baseDataService: BaseDataService,
         service: AppraisalService
       ) => {
         schoolproviderService.setSelectedSchoolId('mock-api-instance')

@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core'
 
 import { of, Observable, Subject } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
+import { concatMap, first, map, mapTo, tap } from 'rxjs/operators'
 import { CriterionModel } from '../../shared/models/moodle/criterion.model'
 import { CriterionTreeModel } from '../../shared/models/ui/criterion-tree.model'
 import { AuthService, LOGIN_STATE } from './auth.service'
@@ -39,6 +39,7 @@ export class CriteriaService {
     number,
     Subject<[CriterionTreeModel[], CriterionModel[]]>
   > = new Map<number, Subject<[CriterionTreeModel[], CriterionModel[]]>>()
+
   /**
    * Build the base data service
    *
@@ -89,6 +90,17 @@ export class CriteriaService {
     this.criteriaList.clear()
     this.loadingEvents.clear()
   }
+
+  public forceRefresh() {
+    const evalGrids = this.criteriaList.keys()
+    this.resetService()
+    if (evalGrids) {
+      Array.from(evalGrids).forEach((evalGridId) =>
+        this.refresh(evalGridId).pipe(first()).subscribe()
+      )
+    }
+  }
+
   /**
    * Build a tree model of criteria from a flat list
    * @return Observable<CriterionTreeModel[]
@@ -97,34 +109,36 @@ export class CriteriaService {
     evalGridId
   ): Observable<[CriterionTreeModel[], CriterionModel[]]> {
     let loadingEvent = this.loadingEvents.get(evalGridId)
-    if (!loadingEvent) {
-      loadingEvent = new Subject<[CriterionTreeModel[], CriterionModel[]]>()
-      this.loadingEvents.set(evalGridId, loadingEvent)
+    if (loadingEvent && !loadingEvent.isStopped) {
+      return loadingEvent.asObservable()
+    }
+    loadingEvent = new Subject<[CriterionTreeModel[], CriterionModel[]]>()
+    this.loadingEvents.set(evalGridId, loadingEvent)
 
-      let query = { evalgridid: evalGridId }
-      this.moodleApiService
-        .fetchMoreRecentData(
-          'criterion',
-          query,
-          this.criteriaList.get(evalGridId)
-        )
-        .pipe(
-          map((newCriteriaList: Object[]) =>
-            newCriteriaList.map((obj) => new CriterionModel(obj))
-          ),
-          tap((newCriteriaList: CriterionModel[]) => {
-            this.criteriaList.set(evalGridId, newCriteriaList)
-          })
-        )
-        .subscribe((newCriteriaList: CriterionModel[]) => {
+    let query = { evalgridid: evalGridId }
+    return this.moodleApiService
+      .fetchMoreRecentData(
+        'criterion',
+        query,
+        this.criteriaList.get(evalGridId)
+      )
+      .pipe(
+        map((newCriteriaList: Object[]) =>
+          newCriteriaList.map((obj) => new CriterionModel(obj))
+        ),
+        tap((newCriteriaList: CriterionModel[]) => {
+          this.criteriaList.set(evalGridId, newCriteriaList)
+        }),
+        map((newCriteriaList: CriterionModel[]) => {
           const allHierarchicalCriteria =
             CriterionTreeModel.convertToTree(newCriteriaList)
+          const returnedValue = [allHierarchicalCriteria, newCriteriaList]
           this.criteriaTreeEntities.set(evalGridId, allHierarchicalCriteria)
           loadingEvent.next([allHierarchicalCriteria, newCriteriaList])
           loadingEvent.complete()
           this.loadingEvents.delete(evalGridId)
+          return [allHierarchicalCriteria, newCriteriaList]
         })
-    }
-    return loadingEvent.asObservable()
+      )
   }
 }

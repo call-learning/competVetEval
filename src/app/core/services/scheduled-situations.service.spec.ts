@@ -19,14 +19,16 @@ import { CoreModule } from '../core.module'
 import { SchoolsProviderService } from '../providers/schools-provider.service'
 import { ServicesModule } from '../services.module'
 import { AuthService } from './auth.service'
+import { BaseDataService } from './base-data.service'
 import { EvalPlanService } from './eval-plan.service'
 import { EvalPlanModel } from '../../shared/models/moodle/eval-plan.model'
+import { ScheduledSituationService } from './scheduled-situation.service'
 
 // Dummy component for routes.
 @Component({ template: '' })
 class TestComponent {}
 
-describe('Eval plan Service', () => {
+describe('Scheduled Situation Service', () => {
   let mockedRouter: Router
   // https://stackoverflow.com/questions/29352578/some-of-your-tests-did-a-full-page-reload-error-when-running-jasmine-tests
   window.onbeforeunload = jasmine.createSpy() // Prevent error message "Some of your tests did a full page reload"
@@ -48,7 +50,8 @@ describe('Eval plan Service', () => {
         HttpClientModule,
         CoreModule,
       ],
-    }).compileComponents()
+    })
+    TestBed.compileComponents()
     mockedRouter = TestBed.inject(Router)
   })
   afterEach(() => {
@@ -60,66 +63,78 @@ describe('Eval plan Service', () => {
     worker.stop()
   })
 
-  it('I should receive all eval plan', inject(
-    [SchoolsProviderService, AuthService, EvalPlanService],
+  it('As a student I should be able to see my situations', inject(
+    [SchoolsProviderService, AuthService, ScheduledSituationService],
     async (
       schoolProviderService: SchoolsProviderService,
       authService: AuthService,
-      service: EvalPlanService
+      service: ScheduledSituationService
     ) => {
       schoolProviderService.setSelectedSchoolId('mock-api-instance')
       await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      const plans = await service.plans$.toPromise()
+      const situations = await service.situations$.toPromise()
       // Now we expect the plans to be the same as the one in the fixtures.
-      expect(plans).toContain(
-        new EvalPlanModel({
-          id: 13,
-          groupid: 1,
-          clsituationid: 1,
-          starttime: 1618253241,
-          endtime: 1618858041,
-          timecreated: 1619376441,
-          timemodified: 1619376441,
-          usermodified: 0,
-        })
-      )
-      expect(plans.length).toEqual(13)
+      // expect(situations).toContain(
+      //   {}
+      // )
+      expect(situations.length).toEqual(6)
+      authService.logout()
     }
   ))
-  it('I should get Eval grid ID from an eval plan', inject(
-    [SchoolsProviderService, AuthService, EvalPlanService],
+  it('As an appraiser I should be able to see my situations', inject(
+    [SchoolsProviderService, AuthService, ScheduledSituationService],
     async (
       schoolProviderService: SchoolsProviderService,
       authService: AuthService,
-      service: EvalPlanService
+      service: ScheduledSituationService
     ) => {
       schoolProviderService.setSelectedSchoolId('mock-api-instance')
-      await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      const evalGridId = await service
-        .getEvalGridIdFromEvalPlanId(13)
-        .toPromise()
-      const evalGridIdNotFound = await service
-        .getEvalGridIdFromEvalPlanId(250)
-        .toPromise()
+      await authService.login('appraiser1', 'password').toPromise() // We login first using the Mocked Auth service.
+      const situations = await service.situations$.toPromise()
       // Now we expect the plans to be the same as the one in the fixtures.
-      expect(evalGridId).toEqual(1)
-      expect(evalGridIdNotFound).toEqual(1)
+      // expect(situations).toContain(
+      //   {}
+      // )
+      expect(situations.length).toEqual(16)
+      authService.logout()
     }
   ))
-  it('I should get Eval grid ID from an eval plan', inject(
-    [SchoolsProviderService, AuthService, EvalPlanService],
+  it('As appraiser2 I should be able to see my situations', inject(
+    [SchoolsProviderService, AuthService, ScheduledSituationService],
     async (
       schoolProviderService: SchoolsProviderService,
       authService: AuthService,
-      service: EvalPlanService
+      service: ScheduledSituationService
     ) => {
       schoolProviderService.setSelectedSchoolId('mock-api-instance')
-      await authService.login('student1', 'password').toPromise() // We login first using the Mocked Auth service.
-      const evalGridId = await service
-        .getEvalGridIdFromEvalPlanId(25)
-        .toPromise()
+      await authService.login('appraiser2', 'password').toPromise() // We login first using the Mocked Auth service.
+      const situations = await service.situations$.toPromise()
       // Now we expect the plans to be the same as the one in the fixtures.
-      expect(evalGridId).toEqual(2)
+      // expect(situations).toContain(
+      //   {}
+      // )
+      expect(situations.length).toEqual(8)
+      authService.logout()
+    }
+  ))
+  it('As appraiser I should be able to see my situations and the stats', inject(
+    [SchoolsProviderService, AuthService, ScheduledSituationService],
+    async (
+      schoolProviderService: SchoolsProviderService,
+      authService: AuthService,
+      service: ScheduledSituationService
+    ) => {
+      schoolProviderService.setSelectedSchoolId('mock-api-instance')
+      await authService.login('appraiser2', 'password').toPromise() // We login first using the Mocked Auth service.
+      const situations = await service.situations$.toPromise()
+      await service.statsComputedEvent$.toPromise()
+      // Now we expect the plans to be the same as the one in the fixtures.
+      // expect(situations).toContain(
+      //   {}
+      // )
+      expect(situations.length).toEqual(8)
+      situations.forEach((situation) => expect(!!situation.stats).toBeTrue())
+      authService.logout()
     }
   ))
 })

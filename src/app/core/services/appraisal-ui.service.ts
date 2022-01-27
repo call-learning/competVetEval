@@ -79,7 +79,7 @@ export class AppraisalUiService {
    */
   public get appraisals$(): Observable<AppraisalUI[]> {
     if (this.appraisalEntities === null) {
-      return forkJoin([
+      return combineLatest([
         this.appraisalService.appraisals$,
         this.appraisalService.appraisalCriteria$,
       ]).pipe(
@@ -104,41 +104,42 @@ export class AppraisalUiService {
     appraisalCriteriaModels: AppraisalCriterionModel[]
   ) {
     let convertEvent = this.appraisalConvertedEvent
-    if (!convertEvent || convertEvent.isStopped) {
-      convertEvent = new Subject<AppraisalUI[]>()
-      this.appraisalConvertedEvent = convertEvent
-
-      from(appraisalModels)
-        .pipe(
-          mergeMap((appraisalModel) =>
-            forkJoin({
-              appraisalModel: of(appraisalModel),
-              gridId: this.evalPlanService.getEvalGridIdFromEvalPlanId(
-                appraisalModel.evalplanid
-              ),
-            })
-          ),
-          mergeMap((info) =>
-            this.convertAppraisalCriterionModelsToTree(
-              appraisalCriteriaModels.filter(
-                (apc) => apc.appraisalid === info.appraisalModel.id
-              ),
-              info.gridId
-            ).pipe(
-              mergeMap((treeModel) =>
-                this.convertAppraisalModel(info.appraisalModel, treeModel)
-              )
-            )
-          ),
-          toArray()
-        )
-        .subscribe((appraisalModelsUI) => {
-          this.appraisalEntities = appraisalModelsUI
-          convertEvent.next(appraisalModelsUI)
-          convertEvent.complete()
-        })
+    if (convertEvent && !convertEvent.isStopped) {
+      return convertEvent.asObservable()
     }
-    return convertEvent.asObservable()
+
+    convertEvent = new Subject<AppraisalUI[]>()
+    this.appraisalConvertedEvent = convertEvent
+
+    return from(appraisalModels).pipe(
+      mergeMap((appraisalModel) =>
+        forkJoin({
+          appraisalModel: of(appraisalModel),
+          gridId: this.evalPlanService.getEvalGridIdFromEvalPlanId(
+            appraisalModel.evalplanid
+          ),
+        })
+      ),
+      mergeMap((info) =>
+        this.convertAppraisalCriterionModelsToTree(
+          appraisalCriteriaModels.filter(
+            (apc) => apc.appraisalid === info.appraisalModel.id
+          ),
+          info.gridId
+        ).pipe(
+          mergeMap((treeModel) =>
+            this.convertAppraisalModel(info.appraisalModel, treeModel)
+          )
+        )
+      ),
+      toArray(),
+      map((appraisalModelsUI) => {
+        this.appraisalEntities = appraisalModelsUI
+        convertEvent.next(appraisalModelsUI)
+        convertEvent.complete()
+        return appraisalModelsUI
+      })
+    )
   }
 
   /**

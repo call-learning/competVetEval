@@ -37,6 +37,8 @@ class TestComponent {}
 
 describe('AppraisalUIService', () => {
   let mockedRouter: Router
+  // https://stackoverflow.com/questions/29352578/some-of-your-tests-did-a-full-page-reload-error-when-running-jasmine-tests
+  window.onbeforeunload = jasmine.createSpy() // Prevent error message "Some of your tests did a full page reload"
   // Start mock server.
   beforeAll(async () => {
     await worker.start()
@@ -60,30 +62,17 @@ describe('AppraisalUIService', () => {
   })
   afterEach(() => {
     worker.resetHandlers()
+    TestBed.resetTestingModule()
   })
   afterAll(() => {
     worker.stop()
   })
 
   it('I retrieve all appraisal models and transform them', inject(
-    [
-      SchoolsProviderService,
-      AuthService,
-      CriteriaService,
-      UserDataService,
-      EvalPlanService,
-      AppraisalService,
-      BaseDataService,
-      AppraisalUiService,
-    ],
+    [SchoolsProviderService, AuthService, AppraisalUiService],
     async (
       schoolproviderService: SchoolsProviderService,
       authService: AuthService,
-      criteriaService: CriteriaService,
-      userDataService: UserDataService,
-      evalPlanService: EvalPlanService,
-      appraisalService: AppraisalService,
-      baseDataService: BaseDataService,
       service: AppraisalUiService
     ) => {
       schoolproviderService.setSelectedSchoolId('mock-api-instance')
@@ -91,8 +80,8 @@ describe('AppraisalUIService', () => {
       // Now we expect the criteria to be the same as the one in the fixtures.
       const appraisals = await service.appraisals$.toPromise()
       expect(appraisals.length).toEqual(2)
-      const expected = [
-        {
+      const expected = {
+        1: {
           studentid: 1,
           appraiserid: 5,
           evalplanid: 13,
@@ -100,7 +89,7 @@ describe('AppraisalUIService', () => {
           situationid: 1,
           criterianb: 7,
         },
-        {
+        2: {
           studentid: 1,
           appraiserid: 6,
           evalplanid: 13,
@@ -108,20 +97,18 @@ describe('AppraisalUIService', () => {
           situationid: 1,
           criterianb: 7,
         },
-      ]
-      expected.forEach((expectedvals, index) => {
-        expect(appraisals[index].student.userid).toEqual(expectedvals.studentid)
-        expect(appraisals[index].appraiser.userid).toEqual(
-          expectedvals.appraiserid
-        )
-        expect(appraisals[index].evalPlan.id).toEqual(expectedvals.evalplanid)
-        expect(appraisals[index].evalPlan.groupid).toEqual(expectedvals.groupid)
-        expect(appraisals[index].evalPlan.clsituationid).toEqual(
+      }
+      appraisals.forEach((appraisal) => {
+        const id = appraisal.id
+        const expectedvals = expected[id]
+        expect(appraisal.student.userid).toEqual(expectedvals.studentid)
+        expect(appraisal.appraiser.userid).toEqual(expectedvals.appraiserid)
+        expect(appraisal.evalPlan.id).toEqual(expectedvals.evalplanid)
+        expect(appraisal.evalPlan.groupid).toEqual(expectedvals.groupid)
+        expect(appraisal.evalPlan.clsituationid).toEqual(
           expectedvals.situationid
         )
-        expect(appraisals[index].criteria.length).toEqual(
-          expectedvals.criterianb
-        )
+        expect(appraisal.criteria.length).toEqual(expectedvals.criterianb)
       })
     }
   ))

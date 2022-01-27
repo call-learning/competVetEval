@@ -51,6 +51,7 @@ export class AuthService {
     password: string
   ): Observable<'student' | 'appraiser'> {
     this.cleanUp()
+    //this.loginState$.next(LOGIN_STATE.ATTEMPT_TO_RECOVER)
     return this.httpAuthService.login(username, password).pipe(
       tap((res: LoginResult) => {
         if (res.errorcode) {

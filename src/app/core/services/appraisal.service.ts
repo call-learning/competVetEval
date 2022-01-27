@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 
 import { forkJoin, Subject } from 'rxjs'
 import { of, Observable } from 'rxjs'
-import { concatMap, map, mergeMap, tap } from 'rxjs/operators'
+import { concatMap, first, map, mergeMap, tap } from 'rxjs/operators'
 import { AppraisalCriterionModel } from '../../shared/models/moodle/appraisal-criterion.model'
 import { AppraisalModel } from '../../shared/models/moodle/appraisal.model'
 import { mergeWithExisting } from '../../shared/utils/helpers'
@@ -72,8 +72,6 @@ export class AppraisalService {
     this.authService.loginState$.subscribe((state) => {
       if (state !== LOGIN_STATE.LOGGED) {
         this.resetService()
-      } else {
-        this.refreshAppraisalCriterionModels().subscribe() // Launch retrieval once.
       }
     })
   }
@@ -105,7 +103,10 @@ export class AppraisalService {
    */
   public forceRefresh() {
     this.resetService()
-    return this.refreshAppraisalCriterionModels().subscribe()
+    this.baseDataService.forceRefresh()
+    this.criteriaService.forceRefresh()
+    this.evalPlanService.forceRefresh()
+    this.refreshAppraisalCriterionModels().pipe(first()).subscribe()
   }
 
   /**
@@ -290,30 +291,36 @@ export class AppraisalService {
   private refreshAppraisals(): Observable<AppraisalModel[]> {
     let refreshObs: Observable<Object[]> = null
     let loadingEvent = this.appraisalModelLoadingEvent
-    if (!loadingEvent || loadingEvent.isStopped) {
-      loadingEvent = new Subject<AppraisalModel[]>()
-      this.appraisalModelLoadingEvent = loadingEvent
-      if (this.authService.isStudent) {
-        const studentid = this.authService.loggedUser$.getValue().userid
-        refreshObs = this.getAppraisalForStudent(studentid)
-      } else {
-        refreshObs = this.getAppraisalForAppraiser()
-      }
-      refreshObs.subscribe((newAppraisalsObject) => {
-        // Merge existing values with new values
-        const newAppraisals = newAppraisalsObject.map(
-          (a) => new AppraisalModel(a)
-        )
-        this.appraisalModels = mergeWithExisting(
-          this.appraisalModels,
-          newAppraisals,
-          ['id']
-        )
-        loadingEvent.next(newAppraisals)
-        loadingEvent.complete()
-      })
+    if (loadingEvent && !loadingEvent.isStopped) {
+      return loadingEvent.asObservable()
     }
-    return loadingEvent.asObservable()
+
+    loadingEvent = new Subject<AppraisalModel[]>()
+    this.appraisalModelLoadingEvent = loadingEvent
+    if (this.authService.isStudent) {
+      const studentid = this.authService.loggedUser$.getValue().userid
+      refreshObs = this.getAppraisalForStudent(studentid)
+    } else {
+      refreshObs = this.getAppraisalForAppraiser()
+    }
+    return refreshObs.pipe(
+      map((newAppraisalsObject) => {
+        {
+          // Merge existing values with new values
+          const newAppraisals = newAppraisalsObject.map(
+            (a) => new AppraisalModel(a)
+          )
+          this.appraisalModels = mergeWithExisting(
+            this.appraisalModels,
+            newAppraisals,
+            ['id']
+          )
+          loadingEvent.next(newAppraisals)
+          loadingEvent.complete()
+          return newAppraisals
+        }
+      })
+    )
   }
 
   /**
@@ -325,41 +332,41 @@ export class AppraisalService {
     AppraisalCriterionModel[]
   > {
     let loadingEvent = this.appraisalCriterionModelLoadingEvent
-    if (!loadingEvent || loadingEvent.isStopped) {
-      loadingEvent = new Subject<AppraisalCriterionModel[]>()
-      this.appraisalCriterionModelLoadingEvent = loadingEvent
-      this.appraisals$
-        .pipe(
-          mergeMap((appraisals) => {
-            if (appraisals.length == 0) {
-              return of([])
-            }
-            const appraisalIds = appraisals.map((appraisal) => appraisal.id)
-            return this.moodleApiService.fetchMoreRecentData(
-              'appr_crit',
-              { appraisalid: { operator: 'in', values: appraisalIds } },
-              this.appraisalCriterionModels?.filter((appc) =>
-                appraisalIds.includes(appc.appraisalid)
-              )
-            )
-          })
-        )
-        .subscribe((appraisalsCriteria) => {
-          // Merge existing values with new values
-          const newAppraisalsCriteria = appraisalsCriteria.map(
-            (a) => new AppraisalCriterionModel(a)
-          )
-          this.appraisalCriterionModels = mergeWithExisting(
-            this.appraisalCriterionModels,
-            newAppraisalsCriteria,
-            ['id']
-          )
-          loadingEvent.next(newAppraisalsCriteria)
-          loadingEvent.complete()
-          this.emitAppraisalsLoaded()
-        })
+    if (loadingEvent && !loadingEvent.isStopped) {
+      return loadingEvent.asObservable()
     }
-    return loadingEvent.asObservable()
+    loadingEvent = new Subject<AppraisalCriterionModel[]>()
+    this.appraisalCriterionModelLoadingEvent = loadingEvent
+    return this.appraisals$.pipe(
+      mergeMap((appraisals) => {
+        if (appraisals.length == 0) {
+          return of([])
+        }
+        const appraisalIds = appraisals.map((appraisal) => appraisal.id)
+        return this.moodleApiService.fetchMoreRecentData(
+          'appr_crit',
+          { appraisalid: { operator: 'in', values: appraisalIds } },
+          this.appraisalCriterionModels?.filter((appc) =>
+            appraisalIds.includes(appc.appraisalid)
+          )
+        )
+      }),
+      map((appraisalsCriteria) => {
+        // Merge existing values with new values
+        const newAppraisalsCriteria = appraisalsCriteria.map(
+          (a) => new AppraisalCriterionModel(a)
+        )
+        this.appraisalCriterionModels = mergeWithExisting(
+          this.appraisalCriterionModels,
+          newAppraisalsCriteria,
+          ['id']
+        )
+        loadingEvent.next(newAppraisalsCriteria)
+        loadingEvent.complete()
+        this.emitAppraisalsLoaded()
+        return newAppraisalsCriteria
+      })
+    )
   }
 
   /**

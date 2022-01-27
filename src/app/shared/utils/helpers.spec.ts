@@ -238,13 +238,13 @@ describe('Helpers', () => {
   })
   it('I merge an existing behavioursubject array with a new value', () => {
     expect(
-      mergeWithExisting(SIMPLE_VALUES, NEXT_VALUES_ADD_NEW, ['id'])
+      mergeWithExisting(CURRENT_VALUES, NEXT_VALUES_ADD_NEW, ['id'])
     ).toContain(NEXT_VALUES_ADD_NEW[0])
   })
 
   it('I merge an existing behavioursubject array with a modified value', () => {
     expect(
-      mergeWithExisting(SIMPLE_VALUES, NEXT_VALUES_CHANGE, ['id'])
+      mergeWithExisting(CURRENT_VALUES, NEXT_VALUES_CHANGE, ['id'])
     ).toContain(NEXT_VALUES_CHANGE[0])
   })
 

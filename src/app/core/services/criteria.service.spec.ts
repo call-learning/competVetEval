@@ -53,6 +53,7 @@ describe('Criteria Service', () => {
   })
   afterEach(() => {
     worker.resetHandlers()
+    TestBed.resetTestingModule()
   })
   afterAll(() => {
     worker.stop()

@@ -90,6 +90,12 @@ export class BaseDataService {
     }
   }
 
+  public forceRefresh() {
+    this.resetService()
+    this.refresh('clsituation').pipe(first()).subscribe()
+    this.refresh('role').pipe(first()).subscribe()
+    this.refresh('group_assign').pipe(first()).subscribe()
+  }
   /**
    * Refresh data and return current information
    *
@@ -97,10 +103,13 @@ export class BaseDataService {
    */
   public refresh(entityType: string): Observable<BaseMoodleModel[]> {
     let loadingEvent = this.loadingEvents.get(entityType)
-    if (loadingEvent === undefined) {
-      loadingEvent = new EventEmitter<BaseMoodleModel[]>()
-      this.loadingEvents.set(entityType, loadingEvent)
-      this.refreshFromAPI(entityType).subscribe((model) => {
+    if (loadingEvent && !loadingEvent.isStopped) {
+      return loadingEvent.asObservable()
+    }
+    loadingEvent = new EventEmitter<BaseMoodleModel[]>()
+    this.loadingEvents.set(entityType, loadingEvent)
+    return this.refreshFromAPI(entityType).pipe(
+      map((model: BaseMoodleModel[]) => {
         this.entities[entityType] = model.map((model) => {
           switch (entityType) {
             case 'clsituation':
@@ -114,9 +123,9 @@ export class BaseDataService {
         loadingEvent.emit(this.entities[entityType])
         loadingEvent.complete()
         this.loadingEvents.delete(entityType)
+        return this.entities[entityType]
       })
-    }
-    return loadingEvent.asObservable()
+    )
   }
 
   /**

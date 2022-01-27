@@ -9,7 +9,7 @@ import {
   PopoverController,
 } from '@ionic/angular'
 
-import { filter, takeUntil, tap } from 'rxjs/operators'
+import { takeUntil, tap } from 'rxjs/operators'
 import { AuthService } from 'src/app/core/services/auth.service'
 import { BaseComponent } from 'src/app/shared/components/base/base.component'
 import { ScheduledSituationService } from '../../core/services/scheduled-situation.service'
@@ -17,7 +17,7 @@ import { ModalScanAppraisalComponent } from '../../shared/modals/modal-scan-appr
 import { ScheduledSituation } from '../../shared/models/ui/scheduled-situation.model'
 import { AppraisalUiService } from './../../core/services/appraisal-ui.service'
 import { SituationsFilters } from 'src/app/core/services/situations-filters.service'
-import { BehaviorSubject, combineLatest } from 'rxjs'
+import { BehaviorSubject, combineLatest, forkJoin } from 'rxjs'
 
 /**
  * SituationModel List page
@@ -81,43 +81,11 @@ export class SituationsListPage extends BaseComponent implements OnInit {
     this.initComponent()
     this.loadingController.create().then((loader) => {
       loader.present().then(() =>
-        combineLatest([
-          this.scheduledSituationsService.situations$,
-          this.scheduledSituationsService.situationStats$,
-          this.situationsFilters,
-        ])
-          .pipe(
-            filter(
-              ([situations, stats, filters]) =>
-                situations != null && stats != null && filters != null
-            ),
-            tap(([situations, stats, filters]) => {
-              this.situations = situations
-              situations.forEach((situation) => {
-                if (this.authService.isStudent) {
-                  this.scheduledSituationsService
-                    .getMyScheduledSituationStats(situation.evalPlan.id)
-                    .subscribe((stats) => {
-                      situation.stats = stats
-                    })
-                } else {
-                  this.scheduledSituationsService
-                    .getAppraiserScheduledSituationStats(
-                      situation.evalPlan.id,
-                      situation.studentId
-                    )
-                    .subscribe((stats) => {
-                      situation.stats = stats
-                    })
-                }
-              })
-              this.filterSituations()
-              if (loader.animated) {
-                loader.dismiss()
-              }
-            })
-          )
-          .subscribe()
+        this.getLoadDataObservable().subscribe(([situations]) => {
+          if (loader.animated) {
+            loader.dismiss()
+          }
+        })
       )
     })
   }
@@ -308,5 +276,21 @@ export class SituationsListPage extends BaseComponent implements OnInit {
       event.target.complete()
     })
     this.appraisalUIService.forceRefresh()
+    this.scheduledSituationsService.forceRefresh()
+    this.getLoadDataObservable().subscribe()
+  }
+
+  protected getLoadDataObservable() {
+    return combineLatest([
+      this.scheduledSituationsService.situations$,
+      this.situationsFilters,
+    ]).pipe(
+      tap(([situations]) => {
+        this.situations = situations
+        this.scheduledSituationsService.statsComputedEvent$.subscribe(() => {
+          this.filterSituations()
+        })
+      })
+    )
   }
 }

@@ -51,6 +51,7 @@ describe('User Data Service', () => {
   })
   afterEach(() => {
     worker.resetHandlers()
+    TestBed.resetTestingModule()
   })
 
   afterAll(() => {
