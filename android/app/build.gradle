@@ -10,8 +10,8 @@ android {
         applicationId "fr.calllearning.competveteval"
         minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 21
         targetSdkVersion project.hasProperty('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 29
-        versionCode 35
-        versionName '0.5.7'
+        versionCode 36
+        versionName '0.5.8'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -62,7 +62,7 @@
 
     <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
 
-    <button class="btn btn-full item-connect" (click)="login()">
+    <button class="btn btn-primary btn-full item-connect" (click)="login()">
       Se connecter
     </button>
 
@@ -75,7 +75,7 @@
   <ng-container *ngIf="idpList">
     <div *ngFor="let idp of idpList" class="nnki-mt">
       <button
-        class="btn btn-full nnki-mt item-connect-cas"
+        class="btn btn-primary btn-full nnki-mt item-connect-cas"
         (click)="launchIdp(idp.url)"
       >
         <ion-img
