@@ -76,14 +76,12 @@
             <div class="list-item-content">
               <div class="list-item-title">
                 <ion-item lines="none">
-                  <ion-avatar slot="start"
-                    ><img src="{{appraisal.appraiser?.userpictureurl}}"
-                  /></ion-avatar>
-                  <ion-label
-                    ><strong
-                      >{{ appraisal.appraiser?.fullname }}</strong
-                    ></ion-label
-                  >
+                  <ion-avatar slot="start">
+                    <img src="{{appraisal.appraiser?.userpictureurl}}" />
+                  </ion-avatar>
+                  <ion-label>
+                    <strong>{{ appraisal.appraiser?.fullname }}</strong>
+                  </ion-label>
                 </ion-item>
               </div>
               <div class="list-item-subtitle">
@@ -134,7 +132,7 @@
     </div>
     <div class="situation-detail__ask-appraisal" *ngIf="authService.isStudent">
       <ion-button
-        class="btn btn-full nnki-mb4 item-ask-observation"
+        class="btn-full nnki-mb4 item-ask-observation"
         (click)="openModalAskAppraisal()"
         [disabled]="!appraisals"
       >
